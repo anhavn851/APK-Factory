@@ -1,5 +1,7 @@
 {
   "appName": "UltraAC IR Remote — Điều Khiển Điều Hòa Vạn Năng Siêu Tốc",
   "packageId": "com.apkfactory.ultraacirremotedieukhiendieuhoavannangsieutoc",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "hasCustomMainActivity": false,
+  "hasCustomManifest": false
 }
