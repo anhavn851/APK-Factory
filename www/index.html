@@ -1,2386 +1,2548 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#12100e" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Vòng Quay" />
+  <meta name="theme-color" content="#070a10" />
+  <title>UltraAC IR Remote — Điều Khiển Điều Hòa Vạn Năng Siêu Tốc</title>
+  <style>
+    /* ==========================================================================
+       ULTRA-AC IR REMOTE — 100% OFFLINE ZERO-LATENCY CSS ENGINE
+       Modern Dark Mode + Glassmorphism Liquid Crystal Display (LCD)
+       ========================================================================== */
+    :root {
+      --bg-deep: #070a10;
+      --bg-shell: #0c111d;
+      --bg-card: rgba(22, 31, 48, 0.72);
+      --bg-card-active: rgba(30, 43, 66, 0.92);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(56, 189, 248, 0.35);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-cool: #38bdf8;
+      --accent-heat: #fb923c;
+      --accent-dry: #a78bfa;
+      --accent-fan: #34d399;
+      --accent-auto: #2dd4bf;
+      --lcd-glow: rgba(56, 189, 248, 0.16);
+      --lcd-border: rgba(56, 189, 248, 0.32);
+      --lcd-accent: #38bdf8;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
 
-  <title>Lucky Wheel Studio</title>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-  <!-- Google Fonts: Be Vietnam Pro & Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Be Vietnam Pro"', '"Plus Jakarta Sans"', 'sans-serif'],
-          }
-        }
+    input, textarea, select {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+    }
+
+    /* App Container: Fullscreen on Mobile, Centered Remote Shell on Desktop */
+    .remote-app-shell {
+      width: 100%;
+      max-width: 430px;
+      height: 100dvh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 18%, rgba(30, 41, 59, 0.55) 0%, var(--bg-shell) 72%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 500px) {
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at 50% 10%, #111827 0%, #05070b 100%);
+      }
+      .remote-app-shell {
+        height: min(96dvh, 900px);
+        border-radius: 38px;
+        border: 5px solid #1e293b;
+        box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08);
       }
     }
-  </script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    /* Top IR Blaster Emitter Bar & Room Tabs */
+    .top-bar {
+      padding: max(8px, env(safe-area-inset-top)) 12px 6px;
+      background: rgba(12, 17, 29, 0.9);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      z-index: 20;
+    }
 
-  <!-- Custom CSS -->
-  <style>
-/* ==========================================================================
-   Lucky Wheel Studio - Warm Modern Mobile UI (Hiện đại, Trầm ấm, Tinh tế)
-   ========================================================================== */
+    .header-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
 
-:root {
-  --font-main: 'Be Vietnam Pro', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
+    .brand-selector-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
+    .brand-selector-pill select {
+      background: transparent;
+      border: none;
+      color: var(--lcd-accent);
+      font-weight: 800;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
 
-html, body {
-  font-family: var(--font-main);
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overscroll-behavior-y: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
+    .brand-selector-pill select option {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
 
-input, textarea, select {
-  user-select: text;
-  -webkit-user-select: text;
-}
+    /* Virtual IR LED Indicator */
+    .ir-emitter-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+    }
 
-/* ==========================================================================
-   1. TÔNG MÀU TRẦM ẤM - HIỆN ĐẠI (WARM ESPRESSO DARK & OAT CREAM LIGHT)
-   ========================================================================== */
-body.dark-theme {
-  background-color: #12100e;
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.09) 0%, transparent 55%),
-    radial-gradient(circle at 85% 90%, rgba(194, 94, 74, 0.07) 0%, transparent 50%),
-    linear-gradient(180deg, #161311 0%, #12100e 100%);
-  color: #f5f2eb;
-}
+    .ir-led-bulb {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #334155;
+      transition: all 0.06s ease;
+    }
 
-body.light-theme {
-  background-color: #f4EFE6;
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.08) 0%, transparent 55%),
-    linear-gradient(180deg, #f9f6f0 0%, #efe9de 100%);
-  color: #292524;
-}
+    .ir-led-bulb.transmitting {
+      background: #ef4444;
+      box-shadow: 0 0 12px #ef4444, 0 0 22px #f87171;
+      transform: scale(1.25);
+    }
 
-/* Khung Điện Thoại (Mobile App Shell) */
-.mobile-app-shell {
-  width: 100%;
-  max-width: 440px;
-  height: 100dvh;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  background: rgba(24, 21, 19, 0.92);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-}
+    /* Room Tabs Bar (Zero-Click Fast Room Switcher) */
+    .room-tabs-scroll {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .room-tabs-scroll::-webkit-scrollbar {
+      display: none;
+    }
 
-body.light-theme .mobile-app-shell {
-  background: rgba(251, 248, 243, 0.94);
-}
+    .room-tab {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(22, 31, 48, 0.55);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.14s ease;
+    }
 
-/* Hiển thị khung điện thoại sang trọng khi mở trên màn hình lớn */
-@media (min-width: 500px) {
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
+    .room-tab.active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--lcd-border);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(56, 189, 248, 0.12);
+    }
 
-  .mobile-app-shell {
-    height: min(93dvh, 860px);
-    border-radius: 40px;
-    border: 6px solid #292524;
-    box-shadow: 
-      0 30px 70px -15px rgba(0, 0, 0, 0.75),
-      0 0 0 1px rgba(245, 242, 235, 0.07);
-  }
+    .room-tab .room-power-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #475569;
+    }
 
-  body.light-theme .mobile-app-shell {
-    border-color: #d6cfc2;
-    box-shadow: 
-      0 25px 60px -15px rgba(68, 64, 60, 0.16),
-      0 0 0 1px rgba(41, 37, 36, 0.05);
-  }
-}
+    .room-tab .room-power-dot.on {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
 
-/* Thẻ bề mặt trầm ấm (Warm Glass & Matte Surfaces) */
-.glass-card {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(33, 29, 26, 0.82);
-  border: 1px solid rgba(245, 242, 235, 0.07);
-}
+    /* Main Scrollable Control Area */
+    .remote-main-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scrollbar-width: none;
+    }
+    .remote-main-body::-webkit-scrollbar {
+      display: none;
+    }
 
-body.light-theme .glass-card {
-  background: rgba(255, 253, 249, 0.92);
-  border: 1px solid rgba(214, 207, 194, 0.75);
-}
+    /* ==========================================================================
+       MODERN GLASSMORPHISM LCD DISPLAY
+       ========================================================================== */
+    .lcd-screen {
+      position: relative;
+      border-radius: 24px;
+      padding: 14px 16px;
+      background:
+        radial-gradient(circle at 80% 15%, var(--lcd-glow) 0%, transparent 65%),
+        linear-gradient(165deg, rgba(19, 29, 46, 0.92) 0%, rgba(10, 16, 28, 0.96) 100%);
+      border: 1.5px solid var(--lcd-border);
+      box-shadow:
+        0 14px 32px -8px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: border-color 0.25s ease, opacity 0.2s ease;
+    }
 
-.glass-subcard {
-  background: rgba(41, 36, 33, 0.65);
-  border: 1px solid rgba(245, 242, 235, 0.065);
-  transition: all 0.2s ease;
-}
+    .lcd-screen.power-off {
+      border-color: rgba(148, 163, 184, 0.15);
+      background: linear-gradient(165deg, rgba(13, 18, 28, 0.88) 0%, rgba(8, 11, 18, 0.94) 100%);
+    }
 
-body.light-theme .glass-subcard {
-  background: #f3ede2;
-  border: 1px solid #e2d9c8;
-}
+    .lcd-screen.power-off .lcd-active-content {
+      opacity: 0.28;
+      filter: grayscale(85%);
+    }
 
-.glass-input {
-  background: rgba(20, 18, 16, 0.65);
-  border: 1px solid rgba(245, 242, 235, 0.1);
-  color: #f5f2eb;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
+    .lcd-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding-bottom: 8px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
 
-.glass-input:focus {
-  outline: none;
-  border-color: #d97706;
-  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
-}
+    .lcd-mode-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-body.light-theme .glass-input {
-  background: #ffffff;
-  border: 1px solid #d6cfc2;
-  color: #292524;
-}
+    .lcd-mode-pill {
+      padding: 3px 8px;
+      border-radius: 7px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      transition: all 0.15s ease;
+    }
 
-body.light-theme .glass-input:focus {
-  border-color: #b45309;
-  box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.12);
-}
+    .lcd-mode-pill.active {
+      background: var(--lcd-accent);
+      color: #060911;
+      box-shadow: 0 0 10px var(--lcd-glow);
+    }
 
-/* Nút màu nhấn trầm ấm (Warm Amber / Terracotta Accent) */
-.btn-warm-primary {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-  color: #fffbeb;
-  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.28);
-  transition: all 0.18s ease;
-}
+    .lcd-center-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
 
-.btn-warm-primary:hover {
-  filter: brightness(1.06);
-}
+    .lcd-temp-wrap {
+      display: flex;
+      align-items: flex-start;
+      line-height: 1;
+    }
 
-.btn-warm-primary:active {
-  transform: scale(0.96);
-}
+    .lcd-temp-number {
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 24px var(--lcd-glow);
+    }
 
-/* ==========================================================================
-   2. NÚT 'QUAY' & KIM CHỈ HIỆN ĐẠI, SANG TRỌNG (KHÔNG CỔ ĐIỂN)
-   ========================================================================== */
-.spin-btn-modern {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 68px;
-  height: 68px;
-  border-radius: 9999px;
-  background: #1c1917;
-  border: 3px solid #e09f5a;
-  box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.5),
-    0 0 0 4px rgba(28, 25, 23, 0.85),
-    inset 0 1px 2px rgba(255, 247, 237, 0.15);
-  color: #f5f2eb;
-  font-weight: 800;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 25;
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease;
-}
+    .lcd-temp-decimal {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--lcd-accent);
+      margin-top: 6px;
+      margin-left: 2px;
+    }
 
-body.light-theme .spin-btn-modern {
-  background: #292524;
-  border-color: #d97706;
-  box-shadow:
-    0 8px 20px rgba(41, 37, 36, 0.28),
-    0 0 0 4px rgba(251, 248, 243, 0.92);
-}
+    .lcd-temp-unit {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-top: 7px;
+      margin-left: 2px;
+    }
 
-.spin-btn-modern:hover:not(:disabled) {
-  transform: translate(-50%, -50%) scale(1.05);
-  border-color: #f59e0b;
-}
+    .lcd-telemetry-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+    }
 
-.spin-btn-modern:active:not(:disabled) {
-  transform: translate(-50%, -50%) scale(0.94);
-}
+    .lcd-stat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3.5px 8px;
+      border-radius: 8px;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
 
-.spin-btn-modern:disabled {
-  opacity: 0.8;
-  cursor: not-allowed;
-}
+    .lcd-bottom-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      font-size: 10.5px;
+    }
 
-/* Kim chỉ hiện đại (Sleek Watch-Hand Pointer) ở vị trí 12 giờ */
-.wheel-pointer-wrapper {
-  position: absolute;
-  top: -13px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 30;
-  pointer-events: none;
-  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.45));
-}
+    .lcd-active-flags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
 
-.wheel-pointer {
-  transform-origin: 50% 11px;
-  transition: transform 0.055s cubic-bezier(0.22, 1, 0.36, 1);
-}
+    .lcd-flag-tag {
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 9.5px;
+      font-weight: 800;
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--lcd-accent);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
 
-/* Thanh trượt thời gian quay (Warm Range Slider) */
-input[type="range"].warm-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 5px;
-  border-radius: 9999px;
-  background: rgba(245, 242, 235, 0.14);
-  outline: none;
-}
+    /* ==========================================================================
+       THUMB-FRIENDLY PRIMARY CONTROLS & 1-TAP MACROS
+       ========================================================================== */
+    .macro-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
 
-body.light-theme input[type="range"].warm-slider {
-  background: rgba(41, 37, 36, 0.15);
-}
+    .macro-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 8px 6px;
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
+    }
 
-input[type="range"].warm-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 9999px;
-  background: #d97706;
-  border: 2px solid #f5f2eb;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-}
+    .macro-btn:active {
+      transform: scale(0.95);
+    }
 
-/* Color Picker Input */
-input[type="color"].color-swatch-input {
-  -webkit-appearance: none;
-  appearance: none;
-  border: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  padding: 0;
-  cursor: pointer;
-  background: transparent;
-  overflow: hidden;
-  flex-shrink: 0;
-}
+    .macro-btn.active-macro {
+      border-color: var(--lcd-accent);
+      background: rgba(56, 189, 248, 0.15);
+    }
 
-input[type="color"].color-swatch-input::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
+    /* Core D-Pad & Power / Temp / Mode / Fan Grid */
+    .primary-control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 8px;
+      align-items: stretch;
+    }
 
-input[type="color"].color-swatch-input::-webkit-color-swatch {
-  border: 1.5px solid rgba(245, 242, 235, 0.45);
-  border-radius: 8px;
-}
+    .ctrl-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-body.light-theme input[type="color"].color-swatch-input::-webkit-color-swatch {
-  border: 1.5px solid rgba(41, 37, 36, 0.2);
-}
+    .r-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 11px 8px;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
 
-/* Hide Number Input Spinners */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type="number"] {
-  -moz-appearance: textfield;
-}
+    .r-btn:active {
+      transform: scale(0.94);
+      background: var(--bg-card-active);
+      border-color: var(--lcd-accent);
+    }
 
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
+    .r-btn-power {
+      background: linear-gradient(145deg, rgba(239, 68, 68, 0.22), rgba(153, 27, 27, 0.28));
+      border-color: rgba(248, 113, 113, 0.38);
+      color: #fecaca;
+    }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
+    .r-btn-power.power-on {
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.24), rgba(5, 150, 105, 0.32));
+      border-color: rgba(52, 211, 153, 0.48);
+      color: #a7f3d0;
+    }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(168, 162, 158, 0.22);
-  border-radius: 9999px;
-}
+    /* Center Temperature Rocker */
+    .temp-rocker {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.92) 100%);
+      border: 1.5px solid var(--lcd-border);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
 
-/* Modal Pop Animation */
-@keyframes modalPopIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.92) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
+    .temp-step-btn {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 18px;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s ease, transform 0.08s ease;
+    }
 
-.animate-modal-pop {
-  animation: modalPopIn 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
+    .temp-step-btn:active {
+      background: rgba(56, 189, 248, 0.22);
+      transform: scale(0.95);
+    }
 
-/* Light Mode Typography Overrides */
-body.light-theme .text-amber-300,
-body.light-theme .text-amber-400 {
-  color: #b45309 !important;
-}
-body.light-theme .text-stone-300 {
-  color: #57534e !important;
-}
-body.light-theme .text-emerald-400 {
-  color: #047857 !important;
-}
-body.light-theme .text-rose-400 {
-  color: #be123c !important;
-}
-body.light-theme .bg-stone-950\/50 {
-  background-color: #e7e0d3 !important;
-  border-color: #d6cfc2 !important;
-}
+    .temp-rocker-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
 
-</style>
+    /* Dynamic Brand Feature Drawer */
+    .brand-drawer-card {
+      background: rgba(15, 23, 42, 0.68);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 10px;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .brand-features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .feature-chip-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 6px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .feature-chip-btn.active {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--lcd-accent);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.14);
+    }
+
+    /* Tool Action Row (Dual Timer, Blind Mode, Auto-Scanner) */
+    .advanced-tools-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .tool-pill-btn {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 9px 6px;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .tool-pill-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* ==========================================================================
+       BOTTOM IR OSCILLOSCOPE & PACKET DEBUG BAR
+       ========================================================================== */
+    .ir-debug-footer {
+      background: #05080f;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      padding: 7px 12px max(8px, env(safe-area-inset-bottom));
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .debug-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .debug-hex-string {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #34d399;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    #irWaveformCanvas {
+      width: 100%;
+      height: 28px;
+      background: rgba(15, 23, 42, 0.75);
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      display: block;
+    }
+
+    /* ==========================================================================
+       MODALS (DUAL-MODE TIMER, AUTO-SCANNER, RAW IR)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 6, 12, 0.84);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 60;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 430px;
+      max-height: 88dvh;
+      background: #0f1626;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.75);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .seg-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: #080c15;
+      padding: 4px;
+      border-radius: 14px;
+    }
+
+    .seg-tab-btn {
+      padding: 8px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .seg-tab-btn.active {
+      background: #1e293b;
+      color: var(--lcd-accent);
+    }
+
+    .form-card {
+      background: rgba(22, 31, 48, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .primary-action-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .danger-action-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       BLIND GESTURE MODE (OLED PURE BLACK OVERLAY)
+       ========================================================================== */
+    #blindGestureOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 36px 24px;
+      color: rgba(255, 255, 255, 0.22);
+      touch-action: none;
+    }
+
+    #blindGestureOverlay.open {
+      display: flex;
+    }
+
+    .blind-center-readout {
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .blind-big-temp {
+      font-size: 84px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.26);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .blind-feedback-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(56, 189, 248, 0.45);
+      margin-top: 10px;
+      min-height: 22px;
+    }
+  </style>
 </head>
-<body class="dark-theme">
+<body>
 
-  <!-- KHUNG ỨNG DỤNG ĐIỆN THOẠI (WARM MODERN MOBILE SHELL) -->
-  <div class="mobile-app-shell">
+  <!-- ================= MAIN REMOTE SHELL ================= -->
+  <div class="remote-app-shell">
 
-    <!-- 1. TOP APP BAR -->
-    <header class="glass-card border-t-0 border-x-0 px-4 py-2.5 flex items-center justify-between gap-2 z-30 flex-shrink-0" style="padding-top: max(10px, env(safe-area-inset-top));">
-      <!-- App Title & Current Preset Quick Select -->
-      <div class="flex items-center gap-2.5 min-w-0 flex-1">
-        <div class="w-8 h-8 rounded-xl btn-warm-primary flex items-center justify-center flex-shrink-0">
-          <i data-lucide="compass" class="w-4 h-4"></i>
+    <!-- 1. TOP BAR: BRAND SELECTOR, VIRTUAL IR LED & ROOM TABS -->
+    <header class="top-bar">
+      <div class="header-status-row">
+        <!-- Brand Selector -->
+        <div class="brand-selector-pill">
+          <span>Hãng:</span>
+          <select id="brandSelect" aria-label="Chọn hãng điều hòa">
+            <option value="Daikin">Daikin</option>
+            <option value="Panasonic">Panasonic</option>
+            <option value="Mitsubishi">Mitsubishi</option>
+            <option value="Casper">Casper</option>
+            <option value="Gree">Gree</option>
+            <option value="Midea">Midea</option>
+            <option value="Funiki">Funiki</option>
+            <option value="LG">LG</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Toshiba">Toshiba</option>
+            <option value="Sharp">Sharp</option>
+            <option value="Nagakawa">Nagakawa</option>
+          </select>
         </div>
-        <div class="min-w-0 flex-1">
-          <div class="relative flex items-center">
-            <select id="quickPresetSelect" aria-label="Chọn bộ vòng quay" class="bg-transparent font-bold text-xs sm:text-sm pr-5 py-0.5 appearance-none cursor-pointer truncate w-full focus:outline-none">
-            </select>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-0.5 pointer-events-none opacity-55"></i>
+
+        <!-- IR Blaster Emitter LED & Beep Toggle -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button id="beepToggleBtn" type="button" title="Bật/Tắt tiếng Bíp điều hòa" class="ir-emitter-indicator" style="cursor: pointer;">
+            <span id="beepIconText">🔊 Bíp</span>
+          </button>
+          <div class="ir-emitter-indicator" title="Trạng thái mắt phát hồng ngoại IR 38kHz">
+            <span id="irBlasterLed" class="ir-led-bulb"></span>
+            <span id="irStatusBadgeText">IR 38kHz</span>
           </div>
-          <p class="text-[10px] opacity-55 truncate -mt-0.5">
-            <span id="activeItemsCountBadge">0 mục</span> • <span id="totalSlicesCountBadge">0 ô quay</span>
-          </p>
         </div>
       </div>
 
-      <!-- Top Right Controls: Font Size, Sound, Theme -->
-      <div class="flex items-center gap-1.5 flex-shrink-0">
-        <!-- Font Size Cycle Button -->
-        <button id="fontSizeCycleBtn" type="button" title="Chỉnh cỡ chữ trên vòng quay" class="glass-subcard px-2.5 py-1.5 rounded-xl flex items-center gap-1 text-[11px] font-bold active:scale-95 transition">
-          <i data-lucide="type" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span id="fontSizeBadgeText">Chữ: Lớn</span>
-        </button>
-
-        <!-- Sound Toggle -->
-        <button id="soundToggleBtn" type="button" title="Bật/Tắt Âm Thanh" class="glass-subcard p-2 rounded-xl flex items-center justify-center active:scale-95 transition">
-          <i id="soundIcon" data-lucide="volume-2" class="w-4 h-4 text-amber-400"></i>
-        </button>
-
-        <!-- Theme Toggle -->
-        <button id="themeToggleBtn" type="button" title="Đổi Giao diện Trầm Tối / Kem Ấm" class="glass-subcard p-2 rounded-xl flex items-center justify-center active:scale-95 transition">
-          <i id="themeIcon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
-        </button>
+      <!-- Room Tabs (1-Tap or Swipe on LCD) -->
+      <div id="roomTabsContainer" class="room-tabs-scroll">
+        <!-- Dynamically populated Room Tabs -->
       </div>
     </header>
 
-    <!-- 2. MAIN APP CONTENT (4 MÀN HÌNH TAB) -->
-    <main class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative">
+    <!-- 2. MAIN REMOTE BODY -->
+    <main class="remote-main-body">
 
-      <!-- ================= MÀN HÌNH 1: VÒNG QUAY (WHEEL SCREEN) ================= -->
-      <section id="tabPanel-wheel" class="studio-tab-panel flex flex-col items-center justify-between min-h-full px-3.5 py-2.5">
-        
-        <!-- Live Pointer Indicator Pill -->
-        <div class="w-full flex items-center justify-center">
-          <div class="flex items-center gap-2 px-3.5 py-1 rounded-full glass-subcard">
-            <span id="livePointerColorDot" class="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0"></span>
-            <span class="text-[11px] opacity-60">Đang trỏ:</span>
-            <span id="livePointerLabel" class="text-xs font-bold truncate max-w-[220px]">
-              Sẵn sàng quay
-            </span>
+      <!-- MODERN GLASSMORPHISM LCD DISPLAY -->
+      <section id="lcdScreen" class="lcd-screen" title="Vuốt ngang trên màn hình LCD để chuyển phòng nhanh">
+        <div class="lcd-top-row">
+          <span id="lcdRoomAndBrandText">PHÒNG NGỦ • DAIKIN (REV-A)</span>
+          <div class="lcd-mode-badges">
+            <span data-mode-pill="auto" class="lcd-mode-pill">AUTO</span>
+            <span data-mode-pill="cool" class="lcd-mode-pill active">COOL</span>
+            <span data-mode-pill="dry" class="lcd-mode-pill">DRY</span>
+            <span data-mode-pill="fan" class="lcd-mode-pill">FAN</span>
+            <span data-mode-pill="heat" class="lcd-mode-pill">HEAT</span>
           </div>
         </div>
 
-        <!-- WHEEL STAGE (Hiện đại, Trầm ấm, Tinh tế) -->
-        <div class="relative my-auto py-2 flex items-center justify-center select-none">
-          <!-- Sleek Watch-Style Pointer at 12 o'clock -->
-          <div class="wheel-pointer-wrapper">
-            <div id="wheelPointer" class="wheel-pointer">
-              <svg width="36" height="44" viewBox="0 0 36 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 41L6.5 14.5C4.5 9.8 7.9 4 13.1 4H22.9C28.1 4 31.5 9.8 29.5 14.5L18 41Z" fill="#292524" stroke="#e09f5a" stroke-width="2.5" stroke-linejoin="round"/>
-                <circle cx="18" cy="13" r="4" fill="#e09f5a"/>
-              </svg>
+        <div class="lcd-active-content">
+          <div class="lcd-center-grid">
+            <!-- Large Temperature Display -->
+            <div class="lcd-temp-wrap">
+              <span id="lcdTempInt" class="lcd-temp-number">25</span>
+              <span id="lcdTempDec" class="lcd-temp-decimal">.0</span>
+              <span class="lcd-temp-unit">°C</span>
+            </div>
+
+            <!-- Right Telemetry Chips (Fan, Swing V/H, Step) -->
+            <div class="lcd-telemetry-col">
+              <div class="lcd-stat-chip">
+                <span>🌀 Quạt:</span>
+                <strong id="lcdFanText" style="color: var(--lcd-accent);">AUTO</strong>
+              </div>
+              <div class="lcd-stat-chip">
+                <span>↕️ Gió dọc:</span>
+                <strong id="lcdSwingVText">AUTO</strong>
+              </div>
+              <div class="lcd-stat-chip">
+                <span>↔️ Gió ngang:</span>
+                <strong id="lcdSwingHText">AUTO</strong>
+              </div>
             </div>
           </div>
 
-          <!-- High-DPI HTML5 Canvas -->
-          <div id="canvasContainer" class="relative z-10 flex items-center justify-center">
-            <canvas id="wheelCanvas" class="rounded-full"></canvas>
-
-            <!-- Modern Matte Center 'QUAY' Button -->
-            <button id="spinBtn" type="button" aria-label="Bắt đầu quay" class="spin-btn-modern">
-              <span class="text-[11px] font-extrabold tracking-widest text-amber-400">QUAY</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Bottom Controls on Wheel Screen -->
-        <div class="w-full space-y-2 mt-1">
-          
-          <!-- Thanh tùy chỉnh Thời gian quay (Spin Duration Control) -->
-          <div class="glass-subcard px-3 py-2 rounded-2xl flex items-center justify-between gap-2.5">
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <i data-lucide="timer" class="w-3.5 h-3.5 text-amber-400"></i>
-              <span class="text-[11px] font-semibold opacity-80">Thời gian:</span>
-              <span id="spinDurationValueText" class="text-xs font-extrabold text-amber-400 min-w-[28px]">5s</span>
+          <div class="lcd-bottom-row">
+            <div id="lcdActiveFlagsContainer" class="lcd-active-flags">
+              <!-- Active brand features & timer badges -->
             </div>
-
-            <input
-              id="spinDurationSlider"
-              type="range"
-              min="1"
-              max="20"
-              step="1"
-              value="5"
-              aria-label="Thời gian quay (giây)"
-              class="warm-slider flex-1 cursor-pointer"
-            />
-
-            <!-- Quick Duration Chips -->
-            <div class="flex items-center gap-1 flex-shrink-0">
-              <button type="button" data-dur="3" class="dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold glass-subcard hover:border-amber-500/40">3s</button>
-              <button type="button" data-dur="5" class="dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold glass-subcard hover:border-amber-500/40">5s</button>
-              <button type="button" data-dur="10" class="dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold glass-subcard hover:border-amber-500/40">10s</button>
-            </div>
+            <span id="lcdTimerCountdownText" style="font-family: var(--font-mono); font-weight: 800; color: #fbbf24;"></span>
           </div>
-
-          <!-- 2 Chế độ hiển thị khi nhân số lượng -->
-          <div class="grid grid-cols-2 gap-1.5 glass-subcard p-1 rounded-2xl">
-            <button id="modeDuplicateBtn" type="button" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all">
-              <i data-lucide="grid" class="w-3.5 h-3.5"></i>
-              <span>Tách ô (xN)</span>
-            </button>
-            <button id="modeWeightedBtn" type="button" class="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all">
-              <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
-              <span>Mở rộng diện tích</span>
-            </button>
-          </div>
-
-          <!-- Hàng nút: Trộn xen kẽ + Ngẫu nhiên + Mở nhanh Biến số -->
-          <div class="flex items-center gap-1.5">
-            <button id="interleaveBtn" type="button" class="flex-1 glass-subcard py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-amber-300 active:scale-95 transition">
-              <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
-              <span>Trộn xen kẽ</span>
-            </button>
-            <button id="randomShuffleBtn" type="button" class="glass-subcard py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition">
-              <i data-lucide="dices" class="w-3.5 h-3.5"></i>
-              <span>Ngẫu nhiên</span>
-            </button>
-            <button id="goToItemsQuickBtn" type="button" class="btn-warm-primary py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1">
-              <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-              <span>Sửa mục</span>
-            </button>
-          </div>
-          <p id="modeDescriptionText" class="hidden"></p>
-        </div>
-
-      </section>
-
-      <!-- ================= MÀN HÌNH 2: BIẾN SỐ & NHÂN HỆ SỐ ================= -->
-      <section id="tabPanel-items" class="studio-tab-panel hidden flex-col px-3.5 py-3">
-        <!-- Quick Add Form with Syntax Support (Tên mục * N or Tên mục xN) -->
-        <form id="quickAddItemForm" class="mb-3">
-          <div class="flex items-center justify-between text-[11px] font-semibold opacity-75 mb-1.5">
-            <span>Cú pháp nhanh: <code class="text-amber-400 font-bold">Tên * N</code> hoặc <code class="text-amber-400 font-bold">Tên xN</code></span>
-            <button id="toggleBulkEditBtn" type="button" class="text-amber-400 underline flex items-center gap-1 font-bold">
-              <i data-lucide="file-text" class="w-3 h-3"></i>
-              <span>Nhập hàng loạt</span>
-            </button>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <div class="relative flex-1">
-              <input
-                id="quickAddInput"
-                type="text"
-                placeholder="VD: Giải thưởng A * 5 hoặc Voucher x3"
-                class="glass-input w-full rounded-xl pl-3 pr-12 py-2.5 text-xs font-medium"
-              />
-              <span id="syntaxPreviewBadge" class="hidden absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-extrabold rounded bg-amber-500/20 text-amber-300">
-                x1
-              </span>
-            </div>
-            <button type="submit" class="btn-warm-primary font-bold text-xs px-3.5 py-2.5 rounded-xl flex items-center gap-1 flex-shrink-0">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Thêm</span>
-            </button>
-          </div>
-        </form>
-
-        <!-- Collapsible Bulk Text Area Mode -->
-        <div id="bulkEditContainer" class="hidden mb-3 glass-subcard p-3 rounded-2xl border border-amber-500/30">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold text-amber-300">Nhập nhanh nhiều dòng (Mỗi dòng 1 mục)</span>
-            <span class="text-[10px] opacity-65"><code>Tên * N</code> / <code>Tên xN</code></span>
-          </div>
-          <textarea
-            id="bulkTextarea"
-            rows="5"
-            placeholder="Giải Đặc Biệt * 1&#10;Giải Nhất x2&#10;Voucher 500K * 4"
-            class="glass-input w-full rounded-xl p-2.5 text-xs font-mono leading-relaxed custom-scrollbar"
-          ></textarea>
-          <div class="flex items-center justify-end gap-2 mt-2">
-            <button id="cancelBulkBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold opacity-75">
-              Đóng
-            </button>
-            <button id="applyBulkBtn" type="button" class="btn-warm-primary px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
-              <i data-lucide="check" class="w-3.5 h-3.5"></i>
-              <span>Lưu danh sách</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Toolbar -->
-        <div class="flex items-center justify-between gap-2 mb-2 text-[11px]">
-          <span class="opacity-70 font-medium">Danh sách (<span id="visibleRatioText">0/0 hiển thị</span>)</span>
-          <div class="flex items-center gap-1.5">
-            <button id="showAllItemsBtn" type="button" class="glass-subcard px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1">
-              <i data-lucide="eye" class="w-3 h-3"></i>
-              <span>Hiện tất cả</span>
-            </button>
-            <button id="resetMultipliersBtn" type="button" class="glass-subcard px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1">
-              <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
-              <span>Về x1</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Item Cards List -->
-        <div id="itemsListContainer" class="space-y-2 pb-4">
         </div>
       </section>
 
-      <!-- ================= MÀN HÌNH 3: BỘ LƯU (PRESETS) ================= -->
-      <section id="tabPanel-presets" class="studio-tab-panel hidden flex-col px-3.5 py-3">
-        <div class="glass-subcard p-3 rounded-2xl mb-3">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-              <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
-              <span>Quản lý Bộ Vòng Quay</span>
-            </h3>
-            <span id="currentPresetBadge" class="text-[10px] font-semibold opacity-70 truncate max-w-[150px]"></span>
-          </div>
-          <form id="createPresetForm" class="flex items-center gap-1.5">
-            <input
-              id="newPresetNameInput"
-              type="text"
-              placeholder="Tên bộ vòng quay mới..."
-              class="glass-input flex-1 rounded-xl px-3 py-2 text-xs"
-            />
-            <button type="submit" class="btn-warm-primary text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1 flex-shrink-0">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-              <span>Tạo</span>
-            </button>
-          </form>
-          <div class="flex items-center justify-between mt-2.5 pt-2 border-t border-white/10 text-[11px]">
-            <button id="duplicateCurrentPresetBtn" type="button" class="text-stone-300 font-semibold flex items-center gap-1 hover:text-amber-400">
-              <i data-lucide="copy" class="w-3 h-3"></i>
-              <span>Nhân bản bộ này</span>
-            </button>
-            <button id="restoreDefaultPresetsBtn" type="button" class="text-amber-400 font-semibold flex items-center gap-1">
-              <i data-lucide="sparkles" class="w-3 h-3"></i>
-              <span>Khôi phục 2 bộ mẫu</span>
-            </button>
-          </div>
-        </div>
+      <!-- 1-TAP MACROS (3 KỊCH BẢN 1-CHẠM) -->
+      <section class="macro-row">
+        <button type="button" id="macroTurboCoolBtn" class="macro-btn">
+          <span style="font-size: 15px;">❄️</span>
+          <span>Làm lạnh cấp tốc</span>
+          <span style="font-size: 9.5px; color: var(--text-muted);">18°C • Max • Swing</span>
+        </button>
 
-        <div id="presetsListContainer" class="space-y-2 pb-4">
-        </div>
+        <button type="button" id="macroFocusStudyBtn" class="macro-btn">
+          <span style="font-size: 15px;">📚</span>
+          <span>Học tập / Tập trung</span>
+          <span style="font-size: 9.5px; color: var(--text-muted);">26°C • Êm • Tắt LED</span>
+        </button>
+
+        <button type="button" id="macroAntiMoldBtn" class="macro-btn">
+          <span style="font-size: 15px;">🛡️</span>
+          <span>Sấy khô chống mốc</span>
+          <span style="font-size: 9.5px; color: var(--text-muted);">Fan • Tắt sau 15p</span>
+        </button>
       </section>
 
-      <!-- ================= MÀN HÌNH 4: LỊCH SỬ & THỐNG KÊ ================= -->
-      <section id="tabPanel-history" class="studio-tab-panel hidden flex-col px-3.5 py-3">
-        <div class="flex items-center justify-between mb-2.5">
-          <div class="text-xs font-bold flex items-center gap-1.5">
-            <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-400"></i>
-            <span>Thống kê tần suất (<span id="totalSpinsStat">0</span> lượt)</span>
-          </div>
-          <button id="clearHistoryBtn" type="button" class="glass-subcard px-2.5 py-1 rounded-lg text-[11px] font-semibold text-rose-400 flex items-center gap-1">
-            <i data-lucide="trash-2" class="w-3 h-3"></i>
-            <span>Xóa lịch sử</span>
+      <!-- PRIMARY THUMB-FRIENDLY CONTROLS -->
+      <section class="primary-control-grid">
+        <!-- Left Column: Power, Mode, Swing V -->
+        <div class="ctrl-col">
+          <button type="button" id="powerBtn" class="r-btn r-btn-power power-on">
+            <span style="font-size: 16px;">⏻</span>
+            <span id="powerBtnLabel">NGUỒN: BẬT</span>
+          </button>
+
+          <button type="button" id="modeCycleBtn" class="r-btn">
+            <span style="font-size: 15px;">🎛️</span>
+            <span>CHẾ ĐỘ (MODE)</span>
+          </button>
+
+          <button type="button" id="swingVCycleBtn" class="r-btn">
+            <span style="font-size: 15px;">↕️</span>
+            <span>ĐẢO GIÓ DỌC</span>
           </button>
         </div>
 
-        <div id="statsLeaderboardContainer" class="glass-subcard p-3 rounded-2xl mb-3.5 space-y-2 max-h-[190px] overflow-y-auto custom-scrollbar">
+        <!-- Center Column: Ergonomic Temperature Rocker (+ / -) -->
+        <div class="temp-rocker">
+          <button type="button" id="tempUpBtn" class="temp-step-btn" aria-label="Tăng nhiệt độ">
+            ＋
+          </button>
+          <div id="tempStepModeToggle" class="temp-rocker-label" title="Bấm để đổi bước nhảy 0.5°C hoặc 1.0°C">
+            <span>NHIỆT ĐỘ</span>
+            <span id="tempStepBadge" style="color: var(--lcd-accent);">(±0.5°C)</span>
+          </div>
+          <button type="button" id="tempDownBtn" class="temp-step-btn" aria-label="Giảm nhiệt độ">
+            －
+          </button>
         </div>
 
-        <div class="text-xs font-bold mb-2 flex items-center gap-1.5">
-          <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
-          <span>Nhật ký kết quả chi tiết</span>
+        <!-- Right Column: Fan Speed, Swing H, Quiet/Turbo Quick -->
+        <div class="ctrl-col">
+          <button type="button" id="fanCycleBtn" class="r-btn">
+            <span style="font-size: 15px;">🌀</span>
+            <span>TỐC ĐỘ QUẠT</span>
+          </button>
+
+          <button type="button" id="swingHCycleBtn" class="r-btn">
+            <span style="font-size: 15px;">↔️</span>
+            <span>ĐẢO GIÓ NGANG</span>
+          </button>
+
+          <button type="button" id="openTimerModalBtn" class="r-btn" style="border-color: rgba(251, 191, 36, 0.35);">
+            <span style="font-size: 15px;">⏱️</span>
+            <span style="color: #fde68a;">HẸN GIỜ KÉP</span>
+          </button>
         </div>
-        <div id="historyTimelineContainer" class="space-y-2 pb-4">
+      </section>
+
+      <!-- DYNAMIC BRAND FEATURE DRAWER (BIẾN ĐỔI THEO HÃNG) -->
+      <section class="brand-drawer-card">
+        <div class="drawer-header">
+          <span id="brandDrawerTitle">TÍNH NĂNG CHUYÊN BIỆT: DAIKIN</span>
+          <span id="protocolVariantBadge" style="color: var(--lcd-accent); font-family: var(--font-mono);">PROTO: REV-A</span>
         </div>
+        <div id="brandFeaturesGrid" class="brand-features-grid">
+          <!-- Dynamically populated based on selected brand group -->
+        </div>
+      </section>
+
+      <!-- KILLER FEATURES BAR: BLIND MODE & AUTO-SCANNER / RAW IR -->
+      <section class="advanced-tools-row">
+        <button type="button" id="openBlindModeBtn" class="tool-pill-btn">
+          <span>🌑</span>
+          <span>Điều khiển mù</span>
+        </button>
+
+        <button type="button" id="openScannerModalBtn" class="tool-pill-btn">
+          <span>📡</span>
+          <span>Dò mã tự động</span>
+        </button>
+
+        <button type="button" id="openRawIrModalBtn" class="tool-pill-btn">
+          <span>⚡</span>
+          <span>Nạp Raw / Hex</span>
+        </button>
       </section>
 
     </main>
 
-    <!-- 3. BOTTOM NAVIGATION BAR -->
-    <nav class="glass-card border-b-0 border-x-0 px-2.5 pt-1.5 pb-2 grid grid-cols-4 gap-1.5 z-30 flex-shrink-0" style="padding-bottom: max(8px, env(safe-area-inset-bottom));">
-      <button type="button" data-tab="wheel" class="studio-tab-btn flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-bold transition-all btn-warm-primary">
-        <i data-lucide="compass" class="w-4 h-4 mb-0.5"></i>
-        <span>Vòng quay</span>
-      </button>
+    <!-- 3. BOTTOM IR OSCILLOSCOPE & PACKET HEX DEBUGGER -->
+    <footer class="ir-debug-footer">
+      <div class="debug-meta-row">
+        <span id="debugBridgeModeText">Bridge: Web Simulator (Oscilloscope)</span>
+        <span id="debugPulseStatsText">38.0 kHz • 0 pulses • 0.0 ms</span>
+      </div>
+      <div id="debugHexPacketText" class="debug-hex-string">
+        HEX: [Sẵn sàng phát gói tin trạng thái IR]
+      </div>
+      <canvas id="irWaveformCanvas" width="380" height="28"></canvas>
+    </footer>
 
-      <button type="button" data-tab="items" class="studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-semibold transition-all opacity-65 hover:opacity-100">
-        <i data-lucide="sliders-horizontal" class="w-4 h-4 mb-0.5"></i>
-        <span>Biến số</span>
-        <span id="tabItemsCount" class="absolute top-1 right-3 px-1.5 text-[9px] font-extrabold rounded-full bg-amber-500/20 text-amber-300">0</span>
-      </button>
+  </div>
 
-      <button type="button" data-tab="presets" class="studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-semibold transition-all opacity-65 hover:opacity-100">
-        <i data-lucide="folder-heart" class="w-4 h-4 mb-0.5"></i>
-        <span>Bộ lưu</span>
-        <span id="tabPresetsCount" class="absolute top-1 right-3 px-1.5 text-[9px] font-extrabold rounded-full bg-amber-500/20 text-amber-300">2</span>
-      </button>
+  <!-- ================= MODAL 1: HẸN GIỜ KÉP (DUAL-MODE SMART TIMER) ================= -->
+  <div id="timerModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #fde68a;">
+          ⏱️ Hệ Thống Hẹn Giờ Kép (Dual-Mode Timer)
+        </h3>
+        <button type="button" id="closeTimerModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
+      </div>
 
-      <button type="button" data-tab="history" class="studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-semibold transition-all opacity-65 hover:opacity-100">
-        <i data-lucide="history" class="w-4 h-4 mb-0.5"></i>
-        <span>Lịch sử</span>
-        <span id="tabHistoryCount" class="absolute top-1 right-3 px-1.5 text-[9px] font-extrabold rounded-full bg-amber-500/20 text-amber-300">0</span>
-      </button>
-    </nav>
+      <!-- 2 Mode Selector -->
+      <div class="seg-tabs">
+        <button type="button" id="tabBtnHwTimer" class="seg-tab-btn active">
+          1. Hẹn giờ Bo mạch (IR Packet)
+        </button>
+        <button type="button" id="tabBtnSleepCurve" class="seg-tab-btn">
+          2. Đường cong Giấc ngủ
+        </button>
+      </div>
 
-    <!-- ================= WINNER RESULT MODAL ================= -->
-    <div id="winnerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-      <div class="glass-card animate-modal-pop w-full max-w-[360px] rounded-3xl p-5 text-center relative overflow-hidden border border-white/10 shadow-2xl">
-        <div id="winnerModalGlow" class="w-32 h-32 rounded-full blur-3xl absolute -top-14 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none bg-amber-500"></div>
+      <!-- Panel 1: Hardware IR Packet Timer -->
+      <div id="panelHwTimer" style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="form-card">
+          <p style="margin: 0 0 8px; font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
+            Đóng gói trực tiếp bit <code>timer_on</code> / <code>timer_off</code> kèm số phút vào gói tin IR và bắn lên bo mạch điều hòa (điều hòa tự đếm ngược độc lập).
+          </p>
 
-        <div class="mx-auto w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-2.5 relative z-10">
-          <i data-lucide="award" class="w-6 h-6 text-amber-400"></i>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #34d399;">
+                Hẹn Bật (Timer ON)
+              </label>
+              <select id="hwTimerOnSelect" style="width: 100%; padding: 8px; border-radius: 10px; background: #090d16; color: white; border: 1px solid var(--border-subtle); font-weight: 700;">
+                <!-- Populated 0.0h to 24.0h step 0.5h -->
+              </select>
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #fb923c;">
+                Hẹn Tắt (Timer OFF)
+              </label>
+              <select id="hwTimerOffSelect" style="width: 100%; padding: 8px; border-radius: 10px; background: #090d16; color: white; border: 1px solid var(--border-subtle); font-weight: 700;">
+                <!-- Populated 0.0h to 24.0h step 0.5h -->
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button type="button" id="activateHwTimerBtn" class="primary-action-btn">
+              Kích hoạt & Bắn Gói Tin Hẹn Giờ
+            </button>
+            <button type="button" id="cancelHwTimerBtn" class="danger-action-btn" style="width: auto; white-space: nowrap; padding: 0 14px;">
+              Hủy Hẹn Giờ
+            </button>
+          </div>
         </div>
+      </div>
 
-        <p class="text-[11px] font-bold uppercase tracking-wider opacity-65 mb-1 relative z-10">
-          Kết quả vòng quay
+      <!-- Panel 2: Smart Sleep Curve / Scheduled Macro -->
+      <div id="panelSleepCurve" style="display: none; flex-direction: column; gap: 10px;">
+        <div class="form-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 800; color: var(--lcd-accent);">Chuỗi Kịch Bản Giấc Ngủ Đêm</span>
+            <label style="display: flex; align-items: center; gap: 5px; font-size: 11px; cursor: pointer;">
+              <input type="checkbox" id="sleepWakeLockToggle" checked />
+              <span>Giữ thức (WakeLock)</span>
+            </label>
+          </div>
+
+          <div id="sleepCurveStepsList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;">
+            <!-- Editable Sleep Curve Checkpoints -->
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button type="button" id="toggleSleepCurveActiveBtn" class="primary-action-btn">
+              Bật Đường Cong Giấc Ngủ
+            </button>
+            <button type="button" id="demoSleepCurveNowBtn" class="tool-pill-btn" style="justify-content: center;">
+              ▶️ Chạy thử (2s/mốc)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: TRÌNH DÒ MÃ TỰ ĐỘNG (AUTO-SCANNER) ================= -->
+  <div id="scannerModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--lcd-accent);">
+          📡 Trình Dò Mã Hồng Ngoại Tự Động (Auto-Scanner)
+        </h3>
+        <button type="button" id="closeScannerModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+
+      <div class="form-card" style="text-align: center;">
+        <p style="margin: 0 0 10px; font-size: 12px; color: var(--text-muted);">
+          Hướng mắt hồng ngoại về phía điều hòa. Cứ mỗi <b>1.5 giây</b> ứng dụng sẽ tự động phát một biến thể giao thức (<code id="scannerCurrentBrandText">Daikin</code>).
         </p>
 
-        <!-- Winner Name Banner -->
-        <div id="winnerPrizeCard" class="my-3.5 p-3.5 rounded-2xl glass-subcard border relative z-10">
-          <div class="flex items-center justify-center gap-1.5 mb-1">
-            <span id="winnerColorDot" class="w-3 h-3 rounded-full"></span>
-            <span id="winnerMultiplierBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">
-              Hệ số: x1
-            </span>
-            <span id="winnerProbabilityBadge" class="text-[11px] font-semibold opacity-70">
-              (0%)
-            </span>
+        <div style="padding: 14px; border-radius: 16px; background: #070a10; border: 1px solid var(--lcd-border); margin-bottom: 12px;">
+          <div style="font-size: 11px; color: var(--text-muted);">Đang thử nghiệm biến thể:</div>
+          <div id="scannerVariantDisplay" style="font-size: 20px; font-weight: 900; color: var(--lcd-accent); margin: 4px 0;">
+            Model Protocol REV-A (Standard)
           </div>
-          <h2 id="winnerNameText" class="text-lg font-extrabold tracking-tight break-words mt-1">
-            Giải Thưởng
-          </h2>
+          <div id="scannerProgressText" style="font-family: var(--font-mono); font-size: 11px; color: #34d399;">
+            Biến thể 1 / 5 • Chu kỳ 1.5s
+          </div>
         </div>
 
-        <!-- 3 Action Buttons -->
-        <div class="space-y-2 mt-4 relative z-10">
-          <button id="modalKeepBtn" type="button" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs btn-warm-primary flex items-center justify-center gap-1.5">
-            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-            <span>Quay tiếp (Giữ nguyên)</span>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" id="startStopAutoScanBtn" class="primary-action-btn">
+            ▶️ Bắt đầu Tự động Dò (1.5s / mã)
           </button>
-
-          <button id="modalDecreaseOneBtn" type="button" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs glass-subcard text-amber-300 flex items-center justify-center gap-1.5 active:scale-95 transition">
-            <i data-lucide="minus-circle" class="w-3.5 h-3.5"></i>
-            <span id="modalDecreaseBtnText">Giảm 1 lượt của mục này</span>
-          </button>
-
-          <button id="modalRemoveCompletelyBtn" type="button" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs glass-subcard text-rose-400 flex items-center justify-center gap-1.5 active:scale-95 transition">
-            <i data-lucide="eye-off" class="w-3.5 h-3.5"></i>
-            <span>Loại bỏ hoàn toàn mục này</span>
+          <button type="button" id="lockScannedProtocolBtn" class="primary-action-btn" style="background: linear-gradient(135deg, #059669, #10b981);">
+            ✅ Đã nghe tiếng Bíp — Khóa mã này!
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Toast Notification -->
-    <div id="toastContainer" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-1.5 pointer-events-none w-[90%] max-w-[360px]"></div>
-
   </div>
 
-  <!-- Application Script -->
+  <!-- ================= MODAL 3: NẠP MÃ RAW IR / PRONTO HEX ================= -->
+  <div id="rawIrModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #34d399;">
+          ⚡ Nạp Mã Raw Micro-giây / Pronto Hex (Nội địa Nhật)
+        </h3>
+        <button type="button" id="closeRawIrModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+
+      <div class="form-card">
+        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+          Dán chuỗi xung micro-giây (VD: <code>3450, 1720, 430, 1290...</code>) hoặc mã <b>Pronto Hex</b> (<code>0000 006D ...</code>):
+        </label>
+        <textarea
+          id="rawIrInputTextarea"
+          rows="5"
+          style="width: 100%; border-radius: 12px; background: #070a10; color: #34d399; border: 1px solid var(--border-subtle); padding: 10px; font-family: var(--font-mono); font-size: 11px;"
+          placeholder="3450, 1720, 430, 430, 430, 1290, 430, 430..."
+        ></textarea>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button type="button" id="fireCustomRawIrBtn" class="primary-action-btn">
+            🔥 Phát Tia Raw IR Ngay
+          </button>
+          <button type="button" id="fillSampleProntoBtn" class="tool-pill-btn" style="width: auto; padding: 0 12px; white-space: nowrap;">
+            Mẫu Pronto Hex
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BLIND GESTURE MODE OVERLAY (OLED PURE BLACK) ================= -->
+  <div id="blindGestureOverlay">
+    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700;">🌑 CHẾ ĐỘ ĐIỀU KHIỂN MÙ BAN ĐÊM (OLED BLACK)</span>
+      <button type="button" id="exitBlindModeBtn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.55); padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; cursor: pointer;">
+        Thoát
+      </button>
+    </div>
+
+    <div class="blind-center-readout">
+      <div id="blindModeRoomText" style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">PHÒNG NGỦ • COOL</div>
+      <div id="blindModeBigTemp" class="blind-big-temp">25.0°C</div>
+      <div id="blindModeFeedback" class="blind-feedback-text">Sẵn sàng nhận cử chỉ</div>
+    </div>
+
+    <div style="text-align: center; font-size: 11.5px; line-height: 1.7; pointer-events: none;">
+      <div>⬆️ <b>Vuốt Lên / Xuống</b>: Tăng / Giảm 1°C (Rung 1 nhịp ngắn)</div>
+      <div>👆👆 <b>Chạm Đúp (Double Tap)</b>: Bật / Tắt Nguồn (Rung 2 nhịp dài)</div>
+      <div>👇 <b>Chạm Giữ (Long Press)</b>: Chế độ Ngủ 27°C + Quiet + Tắt LED</div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT ENGINE ================= -->
   <script>
-/**
- * ============================================================================
- * LUCKY WHEEL STUDIO - WARM MODERN MOBILE EDITION
- * Phong cách Hiện đại, Trầm ấm | Tùy chỉnh thời gian quay | Chữ to sắc nét
- * ============================================================================
- */
+    (function () {
+      'use strict';
 
-(function () {
-  'use strict';
+      const STORAGE_KEY = 'ultra_ac_ir_state_v1';
+      const CARRIER_FREQ_HZ = 38000;
 
-  const STORAGE_KEY = 'lucky_wheel_studio_warm_v3';
-  const POINTER_RAD = -Math.PI / 2; // Kim chỉ ở góc 12 giờ
-
-  // Bảng màu Hiện đại - Trầm ấm - Có gu (Warm Modern Designer Palette)
-  const WARM_MODERN_PALETTE = [
-    '#c25e4a', // Terracotta (Đỏ đất ấm)
-    '#d48c46', // Warm Ochre (Vàng hổ phách trầm)
-    '#4a7c6f', // Deep Sage (Xanh rêu trầm)
-    '#3d5a6c', // Slate Teal (Xanh khói trầm)
-    '#8c5868', // Dusty Plum (Tím mận trầm)
-    '#6b705c', // Olive Stone (Xanh ô-liu trầm)
-    '#b56551', // Cinnamon Rust (Nâu quế ấm)
-    '#5c6478'  // Warm Dusk (Xám lam chiều tà)
-  ];
-
-  // ==========================================================================
-  // 1. KHỞI TẠO 2 BỘ MẪU (SAMPLE PRESETS) TÔNG MÀU TRẦM ẤM HIỆN ĐẠI
-  // ==========================================================================
-  function createDefaultPresets() {
-    return [
-      {
-        id: 'preset_event_lucky_draw',
-        name: '🎁 Bốc Thăm Sự Kiện',
-        updatedAt: Date.now(),
-        items: [
-          { id: 'item_1', name: 'iPhone 16 Pro', color: '#c25e4a', quantity: 1, visible: true },
-          { id: 'item_2', name: 'AirPods Pro 2', color: '#d48c46', quantity: 2, visible: true },
-          { id: 'item_3', name: 'Loa Marshall', color: '#4a7c6f', quantity: 2, visible: true },
-          { id: 'item_4', name: 'Voucher 500K', color: '#3d5a6c', quantity: 3, visible: true },
-          { id: 'item_5', name: 'Áo Thun', color: '#8c5868', quantity: 4, visible: true },
-          { id: 'item_6', name: 'May Mắn Lần Sau', color: '#6b705c', quantity: 3, visible: true }
-        ]
-      },
-      {
-        id: 'preset_food_milktea',
-        name: '🧋 Hôm Nay Ăn Gì?',
-        updatedAt: Date.now() - 3600000,
-        items: [
-          { id: 'food_1', name: 'Lẩu Thái', color: '#c25e4a', quantity: 2, visible: true },
-          { id: 'food_2', name: 'Thịt Nướng BBQ', color: '#d48c46', quantity: 2, visible: true },
-          { id: 'food_3', name: 'Cơm Tấm', color: '#4a7c6f', quantity: 4, visible: true },
-          { id: 'food_4', name: 'Bún Đậu', color: '#3d5a6c', quantity: 3, visible: true },
-          { id: 'food_5', name: 'Trà Sữa', color: '#8c5868', quantity: 4, visible: true },
-          { id: 'food_6', name: 'Pizza Hải Sản', color: '#b56551', quantity: 2, visible: true }
-        ]
-      }
-    ];
-  }
-
-  // ==========================================================================
-  // 2. QUẢN LÝ TRẠNG THÁI (STATE) & LOCALSTORAGE
-  // ==========================================================================
-  let appState = {
-    theme: 'dark', // 'dark' (Trầm tối Espresso) | 'light' (Kem ấm Oat Cream)
-    soundEnabled: true,
-    spinDurationSec: 5, // Thời gian quay tùy chỉnh (mặc định 5 giây)
-    fontScaleMode: 'large', // 'normal' | 'large' | 'xlarge'
-    displayMode: 'duplicate', // 'duplicate' (Nhân bản tách ô) | 'weighted' (Mở rộng diện tích)
-    currentPresetId: 'preset_event_lucky_draw',
-    presets: createDefaultPresets(),
-    history: [],
-    interleaveSeed: 0,
-    customSliceOrder: null
-  };
-
-  let wheelSlices = [];
-  let wheelRotation = 0;
-  let isSpinning = false;
-  let lastSliceIndexUnderPointer = -1;
-  let pointerBounceTimeout = null;
-  let currentWinnerSlice = null;
-
-  function loadStateFromStorage() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object') {
-        appState.theme = parsed.theme === 'light' ? 'light' : 'dark';
-        appState.soundEnabled = parsed.soundEnabled !== false;
-        if (typeof parsed.spinDurationSec === 'number' && parsed.spinDurationSec >= 1 && parsed.spinDurationSec <= 30) {
-          appState.spinDurationSec = parsed.spinDurationSec;
+      // ========================================================================
+      // 1. CẤU HÌNH ĐẶC TẢ 12 HÃNG ĐIỀU HÒA & KHAY TÍNH NĂNG ĐỘNG
+      // ========================================================================
+      const BRAND_PROFILES = {
+        Daikin: {
+          group: 'group_jp_premium',
+          halfDegree: true,
+          headerMark: 3450, headerSpace: 1720,
+          bitMark: 430, zeroSpace: 430, oneSpace: 1290,
+          vendorCode: [0x11, 0xDA],
+          features: [
+            { key: 'powerful', label: 'Powerful', sub: 'Cực mạnh', bit: 0 },
+            { key: 'econo', label: 'Econo', sub: 'Tiết kiệm', bit: 1 },
+            { key: 'quiet', label: 'Quiet', sub: 'Siêu tĩnh', bit: 2 },
+            { key: 'sensor', label: 'Sensor', sub: 'Mắt thần', bit: 3 },
+            { key: 'moldProof', label: 'Nanoe-G / Mold', sub: 'Lọc khí & Mốc', bit: 4 },
+            { key: 'led', label: 'Đèn dàn lạnh', sub: 'Bật/Tắt LED', bit: 5 }
+          ]
+        },
+        Panasonic: {
+          group: 'group_jp_premium',
+          halfDegree: true,
+          headerMark: 3500, headerSpace: 1750,
+          bitMark: 435, zeroSpace: 435, oneSpace: 1300,
+          vendorCode: [0x02, 0x20],
+          features: [
+            { key: 'powerful', label: 'Powerful', sub: 'Làm lạnh nhanh', bit: 0 },
+            { key: 'econo', label: 'Econavi', sub: 'Tiết kiệm điện', bit: 1 },
+            { key: 'quiet', label: 'Quiet', sub: 'Siêu êm', bit: 2 },
+            { key: 'sensor', label: 'Sensor', sub: 'Mắt thần', bit: 3 },
+            { key: 'moldProof', label: 'Nanoe-G', sub: 'Khử khuẩn', bit: 4 },
+            { key: 'led', label: 'Đèn dàn lạnh', sub: 'Bật/Tắt LED', bit: 5 }
+          ]
+        },
+        Mitsubishi: {
+          group: 'group_jp_premium',
+          halfDegree: true,
+          headerMark: 3400, headerSpace: 1700,
+          bitMark: 420, zeroSpace: 420, oneSpace: 1260,
+          vendorCode: [0x23, 0xCB],
+          features: [
+            { key: 'powerful', label: 'Powerful', sub: 'Công suất cao', bit: 0 },
+            { key: 'econo', label: 'Econo Cool', sub: 'Tiết kiệm', bit: 1 },
+            { key: 'quiet', label: 'Quiet', sub: 'Êm dịu', bit: 2 },
+            { key: 'sensor', label: '3D i-See', sub: 'Mắt thần 3D', bit: 3 },
+            { key: 'moldProof', label: 'Mold Proof', sub: 'Chống nấm mốc', bit: 4 },
+            { key: 'led', label: 'Đèn dàn lạnh', sub: 'Bật/Tắt LED', bit: 5 }
+          ]
+        },
+        Casper: {
+          group: 'group_smart_value',
+          halfDegree: true,
+          headerMark: 9000, headerSpace: 4500,
+          bitMark: 620, zeroSpace: 540, oneSpace: 1640,
+          vendorCode: [0xCA, 0x50],
+          features: [
+            { key: 'turbo', label: 'Turbo', sub: 'Làm lạnh 30s', bit: 0 },
+            { key: 'ifeel', label: 'iFeel', sub: 'Cảm biến nhiệt', bit: 1 },
+            { key: 'xfan', label: 'iClean / X-Fan', sub: 'Tự làm sạch', bit: 2 },
+            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
+            { key: 'eco', label: 'Eco', sub: 'Tiết kiệm', bit: 5 }
+          ]
+        },
+        Gree: {
+          group: 'group_smart_value',
+          halfDegree: false,
+          headerMark: 9000, headerSpace: 4500,
+          bitMark: 620, zeroSpace: 540, oneSpace: 1640,
+          vendorCode: [0x47, 0x52],
+          features: [
+            { key: 'turbo', label: 'Turbo', sub: 'Tăng tốc', bit: 0 },
+            { key: 'ifeel', label: 'iFeel', sub: 'Theo Remote', bit: 1 },
+            { key: 'xfan', label: 'X-Fan', sub: 'Sấy dàn lạnh', bit: 2 },
+            { key: 'led', label: 'LED Display', sub: 'Đèn màn hình', bit: 3 },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ ngon', bit: 4 },
+            { key: 'eco', label: 'Cold Plasma', sub: 'Lọc khí', bit: 5 }
+          ]
+        },
+        Midea: {
+          group: 'group_smart_value',
+          halfDegree: false,
+          headerMark: 4400, headerSpace: 4400,
+          bitMark: 540, zeroSpace: 540, oneSpace: 1620,
+          vendorCode: [0xB2, 0x4D],
+          features: [
+            { key: 'turbo', label: 'Turbo', sub: 'Cực nhanh', bit: 0 },
+            { key: 'ifeel', label: 'Follow Me', sub: 'iFeel Sensor', bit: 1 },
+            { key: 'xfan', label: 'Self-Clean', sub: 'Tự làm sạch', bit: 2 },
+            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
+            { key: 'eco', label: 'Gear Eco', sub: 'Tiết kiệm', bit: 5 }
+          ]
+        },
+        Funiki: {
+          group: 'group_smart_value',
+          halfDegree: false,
+          headerMark: 9000, headerSpace: 4500,
+          bitMark: 600, zeroSpace: 550, oneSpace: 1650,
+          vendorCode: [0xF0, 0x4E],
+          features: [
+            { key: 'turbo', label: 'Turbo', sub: 'Làm lạnh nhanh', bit: 0 },
+            { key: 'ifeel', label: 'iFeel', sub: 'Cảm biến nhiệt', bit: 1 },
+            { key: 'xfan', label: 'Self-Clean', sub: 'Sấy dàn lạnh', bit: 2 },
+            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
+            { key: 'eco', label: 'Nano Silver', sub: 'Kháng khuẩn', bit: 5 }
+          ]
+        },
+        Nagakawa: {
+          group: 'group_smart_value',
+          halfDegree: false,
+          headerMark: 9000, headerSpace: 4500,
+          bitMark: 600, zeroSpace: 550, oneSpace: 1650,
+          vendorCode: [0x9A, 0x6A],
+          features: [
+            { key: 'turbo', label: 'Turbo', sub: 'Siêu tốc', bit: 0 },
+            { key: 'ifeel', label: 'iFeel', sub: 'Theo Remote', bit: 1 },
+            { key: 'xfan', label: 'Auto Clean', sub: 'Tự làm sạch', bit: 2 },
+            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
+            { key: 'eco', label: 'Eco', sub: 'Tiết kiệm', bit: 5 }
+          ]
+        },
+        LG: {
+          group: 'group_kr_tech',
+          halfDegree: false,
+          headerMark: 8400, headerSpace: 4200,
+          bitMark: 520, zeroSpace: 520, oneSpace: 1580,
+          vendorCode: [0x88, 0x00],
+          features: [
+            { key: 'jetCool', label: 'Jet Cool', sub: 'Lạnh tức thì', bit: 0 },
+            { key: 'energySaving', label: 'Energy Ctrl', sub: '40% / 60% / 80%', bit: 1, multiLevel: true },
+            { key: 'comfortAir', label: 'Comfort Air', sub: 'Gió dễ chịu', bit: 2 },
+            { key: 'ionizer', label: 'Plasmaster', sub: 'Ion lọc khí', bit: 3 },
+            { key: 'quiet', label: 'Silent', sub: 'Giảm ồn', bit: 4 },
+            { key: 'led', label: 'Light Off', sub: 'Đèn dàn lạnh', bit: 5 }
+          ]
+        },
+        Samsung: {
+          group: 'group_kr_tech',
+          halfDegree: false,
+          headerMark: 3000, headerSpace: 9000,
+          bitMark: 500, zeroSpace: 500, oneSpace: 1500,
+          vendorCode: [0xB2, 0xF9],
+          features: [
+            { key: 'jetCool', label: 'Fast Cool', sub: 'Làm lạnh nhanh', bit: 0 },
+            { key: 'energySaving', label: 'Energy Saving', sub: '40% / 60% / 80%', bit: 1, multiLevel: true },
+            { key: 'comfortAir', label: 'WindFree', sub: 'Gió buốt 0%', bit: 2 },
+            { key: 'ionizer', label: 'Ionizer', sub: 'Lọc bụi mịn', bit: 3 },
+            { key: 'quiet', label: 'Quiet', sub: 'Siêu êm', bit: 4 },
+            { key: 'led', label: 'Beep / Light', sub: 'Đèn màn hình', bit: 5 }
+          ]
+        },
+        Toshiba: {
+          group: 'group_kr_tech',
+          halfDegree: true,
+          headerMark: 4400, headerSpace: 4300,
+          bitMark: 540, zeroSpace: 540, oneSpace: 1620,
+          vendorCode: [0xF2, 0x0D],
+          features: [
+            { key: 'jetCool', label: 'Hi-Power', sub: 'Công suất lớn', bit: 0 },
+            { key: 'energySaving', label: 'Power Sel', sub: '50% / 75% / 100%', bit: 1, multiLevel: true },
+            { key: 'comfortAir', label: 'Comfort Air', sub: 'Luồng gió êm', bit: 2 },
+            { key: 'ionizer', label: 'Pure Ion', sub: 'Lọc khí Plasma', bit: 3 },
+            { key: 'quiet', label: 'Quiet', sub: 'Tĩnh lặng', bit: 4 },
+            { key: 'led', label: 'LED', sub: 'Đèn dàn lạnh', bit: 5 }
+          ]
+        },
+        Sharp: {
+          group: 'group_kr_tech',
+          halfDegree: true,
+          headerMark: 3800, headerSpace: 1900,
+          bitMark: 460, zeroSpace: 460, oneSpace: 1380,
+          vendorCode: [0xAA, 0x5A],
+          features: [
+            { key: 'jetCool', label: 'Super Jet', sub: 'Giảm 5°C/5p', bit: 0 },
+            { key: 'energySaving', label: 'J-Tech Eco', sub: '40% / 60% / 80%', bit: 1, multiLevel: true },
+            { key: 'comfortAir', label: 'Coanda Air', sub: 'Gió trần nhà', bit: 2 },
+            { key: 'ionizer', label: 'Plasmacluster', sub: 'Diệt khuẩn Ion', bit: 3 },
+            { key: 'quiet', label: 'Baby Sleep', sub: 'Êm dịu', bit: 4 },
+            { key: 'led', label: 'LED', sub: 'Đèn dàn lạnh', bit: 5 }
+          ]
         }
-        if (['normal', 'large', 'xlarge'].includes(parsed.fontScaleMode)) {
-          appState.fontScaleMode = parsed.fontScaleMode;
-        }
-        appState.displayMode = parsed.displayMode === 'weighted' ? 'weighted' : 'duplicate';
-        if (Array.isArray(parsed.presets) && parsed.presets.length > 0) {
-          appState.presets = parsed.presets;
-        }
-        if (parsed.currentPresetId && appState.presets.some(p => p.id === parsed.currentPresetId)) {
-          appState.currentPresetId = parsed.currentPresetId;
-        } else {
-          appState.currentPresetId = appState.presets[0].id;
-        }
-        if (Array.isArray(parsed.history)) {
-          appState.history = parsed.history;
-        }
-      }
-    } catch (err) {
-      console.warn('Không thể đọc LocalStorage:', err);
-    }
-  }
+      };
 
-  function saveStateToStorage() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        theme: appState.theme,
-        soundEnabled: appState.soundEnabled,
-        spinDurationSec: appState.spinDurationSec,
-        fontScaleMode: appState.fontScaleMode,
-        displayMode: appState.displayMode,
-        currentPresetId: appState.currentPresetId,
-        presets: appState.presets,
-        history: appState.history
-      }));
-    } catch (err) {
-      console.warn('Không thể lưu LocalStorage:', err);
-    }
-  }
+      const PROTOCOL_VARIANTS = [
+        { id: 'REV-A', name: 'Model Protocol REV-A (Standard Inverter)', timingMult: 1.00, xorSeed: 0x00 },
+        { id: 'REV-B', name: 'Model Protocol REV-B (Smart Series V2)', timingMult: 1.04, xorSeed: 0x55 },
+        { id: 'REV-C', name: 'Model Protocol REV-C (Multi-Split Commercial)', timingMult: 0.96, xorSeed: 0xAA },
+        { id: 'REV-D', name: 'Model Protocol REV-D (Domestic Japan 100V)', timingMult: 1.08, xorSeed: 0x3C },
+        { id: 'REV-E', name: 'Model Protocol REV-E (Extended 21-Byte State)', timingMult: 0.94, xorSeed: 0xF0 }
+      ];
 
-  function getCurrentPreset() {
-    let preset = appState.presets.find(p => p.id === appState.currentPresetId);
-    if (!preset) {
-      preset = appState.presets[0];
-      appState.currentPresetId = preset.id;
-    }
-    return preset;
-  }
+      const MODES = ['auto', 'cool', 'dry', 'fan', 'heat'];
+      const FAN_SPEEDS = ['AUTO', 'QUIET', 'BẬC 1', 'BẬC 2', 'BẬC 3', 'BẬC 4', 'TURBO'];
+      const SWING_V_MODES = ['AUTO', 'CAO', 'GIỮA', 'THẤP', 'CỐ ĐỊNH'];
+      const SWING_H_MODES = ['AUTO', 'TRÁI', 'GIỮA', 'PHẢI', 'GÓC RỘNG'];
 
-  // ==========================================================================
-  // 3. WEB AUDIO API (ÂM THANH TRẦM ẤM, TỰ NHIÊN)
-  // ==========================================================================
-  let audioCtx = null;
+      // ========================================================================
+      // 2. MODULE ĐỘC LẬP: IR PROTOCOL ENGINE (STATEFUL PACKET GENERATOR)
+      // ========================================================================
+      const IRProtocolEngine = {
+        /**
+         * Tính toán động gói tin trạng thái (Stateful Packet) gồm mảng Byte + Checksum
+         * và mã hóa sang mảng độ rộng xung micro-giây [mark1, space1, mark2, space2...]
+         */
+        encodeStateToPulses(roomState) {
+          const brandName = roomState.brand || 'Daikin';
+          const profile = BRAND_PROFILES[brandName] || BRAND_PROFILES.Daikin;
+          const variantObj = PROTOCOL_VARIANTS.find(v => v.id === roomState.protocolVariant) || PROTOCOL_VARIANTS[0];
 
-  function getAudioContext() {
-    if (!audioCtx) {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) {
-        audioCtx = new AudioContextClass();
-      }
-    }
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    return audioCtx;
-  }
+          const modeIdx = Math.max(0, MODES.indexOf(roomState.mode));
+          const fanIdx = Math.max(0, FAN_SPEEDS.indexOf(roomState.fan));
+          const swingVIdx = Math.max(0, SWING_V_MODES.indexOf(roomState.swingV));
+          const swingHIdx = Math.max(0, SWING_H_MODES.indexOf(roomState.swingH));
 
-  function playTickSound(speedRatio = 0.5) {
-    if (!appState.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
+          const clampedTemp = Math.min(30, Math.max(16, Number(roomState.temp) || 25));
+          const tempInt = Math.floor(clampedTemp) - 16; // 0..14
+          const hasHalfDeg = (clampedTemp % 1 !== 0) ? 1 : 0;
 
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+          // Byte 2: Power (bit 7) | Mode (bits 4..6) | SwingV (bits 0..3)
+          const byte2 = ((roomState.power ? 1 : 0) << 7) | ((modeIdx & 0x07) << 4) | (swingVIdx & 0x0F);
 
-    // Tiếng gảy gỗ trầm ấm (Warm Wooden Click)
-    osc.type = 'triangle';
-    const startFreq = 380 + Math.min(1, Math.max(0, speedRatio)) * 180;
-    osc.frequency.setValueAtTime(startFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(95, now + 0.024);
+          // Byte 3: Half-degree (bit 7) | EnergySaving Level (bits 5..6) | Temp (bits 0..4)
+          const energyLevel = Number(roomState.energySavingLevel) || 0; // 0: Off, 1: 40%, 2: 60%, 3: 80%
+          const byte3 = (hasHalfDeg << 7) | ((energyLevel & 0x03) << 5) | (tempInt & 0x1F);
 
-    const volume = 0.18 + Math.min(1, Math.max(0, speedRatio)) * 0.1;
-    gain.gain.setValueAtTime(volume, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.026);
+          // Byte 4: Fan (bits 4..7) | SwingH (bits 0..3)
+          const byte4 = ((fanIdx & 0x0F) << 4) | (swingHIdx & 0x0F);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+          // Byte 5 & 6: Hardware Timer ON & Timer OFF (số bước 10 phút + cờ kích hoạt ở bit 7)
+          const timerOnSteps = roomState.timerOnMinutes > 0
+            ? Math.min(127, Math.round(roomState.timerOnMinutes / 10))
+            : 0;
+          const timerOffSteps = roomState.timerOffMinutes > 0
+            ? Math.min(127, Math.round(roomState.timerOffMinutes / 10))
+            : 0;
+          const byte5 = timerOnSteps > 0 ? (0x80 | timerOnSteps) : 0x00;
+          const byte6 = timerOffSteps > 0 ? (0x80 | timerOffSteps) : 0x00;
 
-    osc.start(now);
-    osc.stop(now + 0.028);
-  }
+          // Byte 7: Brand-Specific Feature Flags
+          let extFlags = 0;
+          const flags = roomState.features || {};
+          profile.features.forEach(feat => {
+            if (flags[feat.key]) {
+              extFlags |= (1 << feat.bit);
+            }
+          });
 
-  function playVictoryFanfare() {
-    if (!appState.soundEnabled) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
+          // Đóng gói mảng Byte
+          const bytes = [
+            profile.vendorCode[0],
+            profile.vendorCode[1] ^ variantObj.xorSeed,
+            byte2,
+            byte3,
+            byte4,
+            byte5,
+            byte6,
+            extFlags
+          ];
 
-    const now = ctx.currentTime;
-    const notes = [
-      { freq: 440.00, time: 0.00, dur: 0.12, vol: 0.18 }, // A4
-      { freq: 554.37, time: 0.11, dur: 0.12, vol: 0.20 }, // C#5
-      { freq: 659.25, time: 0.22, dur: 0.14, vol: 0.22 }, // E5
-      { freq: 880.00, time: 0.35, dur: 0.48, vol: 0.25 }  // A5
-    ];
-
-    notes.forEach(note => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(note.freq, now + note.time);
-
-      gain.gain.setValueAtTime(0.001, now + note.time);
-      gain.gain.linearRampToValueAtTime(note.vol, now + note.time + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0008, now + note.time + note.dur);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(now + note.time);
-      osc.stop(now + note.time + note.dur + 0.02);
-    });
-  }
-
-  // ==========================================================================
-  // 4. PARSER CÚ PHÁP NHẬP NHANH: "Tên mục * N" HOẶC "Tên mục xN"
-  // ==========================================================================
-  function parseItemInputSyntax(rawString) {
-    const trimmed = (rawString || '').trim();
-    if (!trimmed) return null;
-
-    const regex = /^(.+?)(?:\s*\*\s*(\d+)|\s+[xX]\s*(\d+))$/;
-    const match = trimmed.match(regex);
-
-    if (match) {
-      const cleanName = match[1].trim();
-      const qtyStr = match[2] || match[3];
-      const qty = Math.min(500, Math.max(1, parseInt(qtyStr, 10) || 1));
-      if (cleanName) {
-        return {
-          name: cleanName,
-          quantity: qty,
-          matchedSyntax: true
-        };
-      }
-    }
-
-    return {
-      name: trimmed,
-      quantity: 1,
-      matchedSyntax: false
-    };
-  }
-
-  // ==========================================================================
-  // 5. THUẬT TOÁN TẠO LÁT CẮT (SLICES) & TRỘN XEN KẼ (INTERLEAVE / SHUFFLE)
-  // ==========================================================================
-  function getActiveItems() {
-    const preset = getCurrentPreset();
-    return preset.items.filter(item => item.visible && item.quantity >= 1);
-  }
-
-  function getTotalWeight(activeItems) {
-    return activeItems.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
-  }
-
-  function generateInterleavedDuplicateSlices(activeItems, seedOffset = 0) {
-    const totalSlices = getTotalWeight(activeItems);
-    if (totalSlices === 0) return [];
-
-    const pool = activeItems.map((item, idx) => ({
-      item,
-      remaining: Number(item.quantity) || 1,
-      total: Number(item.quantity) || 1,
-      orderIndex: (idx + seedOffset) % activeItems.length
-    }));
-
-    const resultItems = [];
-
-    for (let step = 0; step < totalSlices; step++) {
-      const prevItem = resultItems.length > 0 ? resultItems[resultItems.length - 1] : null;
-      const firstItem = resultItems.length > 0 ? resultItems[0] : null;
-      const isLastStep = step === totalSlices - 1 && totalSlices > 2;
-
-      const available = pool.filter(p => p.remaining > 0);
-
-      let candidates = available.filter(p => {
-        if (prevItem && p.item.id === prevItem.id) return false;
-        if (isLastStep && firstItem && p.item.id === firstItem.id) return false;
-        return true;
-      });
-
-      if (candidates.length === 0) {
-        candidates = available.filter(p => !prevItem || p.item.id !== prevItem.id);
-      }
-      if (candidates.length === 0) {
-        candidates = available;
-      }
-
-      candidates.sort((a, b) => {
-        if (b.remaining !== a.remaining) return b.remaining - a.remaining;
-        const ratioA = a.remaining / a.total;
-        const ratioB = b.remaining / b.total;
-        if (Math.abs(ratioB - ratioA) > 0.001) return ratioB - ratioA;
-        return a.orderIndex - b.orderIndex;
-      });
-
-      const chosen = candidates[0];
-      resultItems.push(chosen.item);
-      chosen.remaining -= 1;
-      chosen.orderIndex += activeItems.length;
-    }
-
-    return resultItems;
-  }
-
-  function rebuildWheelSlices() {
-    const activeItems = getActiveItems();
-    const totalWeight = getTotalWeight(activeItems);
-
-    if (activeItems.length === 0 || totalWeight === 0) {
-      wheelSlices = [];
-      return;
-    }
-
-    if (appState.displayMode === 'weighted') {
-      let currentAngle = 0;
-      wheelSlices = activeItems.map((item) => {
-        const weight = Number(item.quantity) || 1;
-        const sliceAngle = (weight / totalWeight) * (Math.PI * 2);
-        const slice = {
-          itemId: item.id,
-          name: item.name,
-          color: item.color,
-          quantity: item.quantity,
-          weight: weight,
-          probability: (weight / totalWeight) * 100,
-          startAngle: currentAngle,
-          endAngle: currentAngle + sliceAngle
-        };
-        currentAngle += sliceAngle;
-        return slice;
-      });
-    } else {
-      let orderedItems;
-      if (
-        Array.isArray(appState.customSliceOrder) &&
-        appState.customSliceOrder.length === totalWeight
-      ) {
-        const itemMap = new Map(activeItems.map(i => [i.id, i]));
-        const countCheck = new Map();
-        let valid = true;
-
-        for (const id of appState.customSliceOrder) {
-          if (!itemMap.has(id)) {
-            valid = false;
-            break;
+          // Nếu là biến thể REV-E (Extended Frame), bổ sung 2 byte mở rộng
+          if (variantObj.id === 'REV-E') {
+            bytes.push((timerOnSteps + timerOffSteps) & 0xFF);
+            bytes.push(0xA5);
           }
-          countCheck.set(id, (countCheck.get(id) || 0) + 1);
-        }
-        if (valid) {
-          for (const item of activeItems) {
-            if ((countCheck.get(item.id) || 0) !== Number(item.quantity)) {
-              valid = false;
-              break;
+
+          // Byte cuối: Tính toán động Checksum (Tổng Modulo 256 XOR seed)
+          const sum = bytes.reduce((acc, b) => (acc + b) & 0xFF, 0);
+          const checksum = (sum ^ variantObj.xorSeed) & 0xFF;
+          bytes.push(checksum);
+
+          // Mã hóa mảng Byte sang mảng xung micro-giây [mark, space, ...]
+          const mult = variantObj.timingMult;
+          const hMark = Math.round(profile.headerMark * mult);
+          const hSpace = Math.round(profile.headerSpace * mult);
+          const bMark = Math.round(profile.bitMark * mult);
+          const zSpace = Math.round(profile.zeroSpace * mult);
+          const oSpace = Math.round(profile.oneSpace * mult);
+
+          const pulses = [hMark, hSpace];
+
+          for (let i = 0; i < bytes.length; i++) {
+            const byteVal = bytes[i];
+            // Truyền từng bit theo thứ tự LSB-first (tiêu chuẩn hồng ngoại điều hòa)
+            for (let bit = 0; bit < 8; bit++) {
+              const isOne = (byteVal >> bit) & 1;
+              pulses.push(bMark);
+              pulses.push(isOne ? oSpace : zSpace);
             }
           }
-        }
-        if (valid) {
-          orderedItems = appState.customSliceOrder.map(id => itemMap.get(id));
-        }
-      }
 
-      if (!orderedItems) {
-        orderedItems = generateInterleavedDuplicateSlices(activeItems, appState.interleaveSeed);
-        appState.customSliceOrder = orderedItems.map(i => i.id);
-      }
+          // Stop bit & Inter-frame gap
+          pulses.push(bMark);
+          pulses.push(10000);
 
-      const sliceAngle = (Math.PI * 2) / totalWeight;
-      wheelSlices = orderedItems.map((item, idx) => ({
-        itemId: item.id,
-        name: item.name,
-        color: item.color,
-        quantity: item.quantity,
-        weight: 1,
-        probability: (item.quantity / totalWeight) * 100,
-        startAngle: idx * sliceAngle,
-        endAngle: (idx + 1) * sliceAngle
-      }));
-    }
-  }
+          const hexFormatted = bytes
+            .map(b => b.toString(16).toUpperCase().padStart(2, '0'))
+            .join(' ');
 
-  // ==========================================================================
-  // 6. VẼ VÒNG QUAY PHONG CÁCH ĐỒNG HỒ HIỆN ĐẠI - TRẦM ẤM - SANG TRỌNG
-  // ==========================================================================
-  const canvas = document.getElementById('wheelCanvas');
-  const ctx = canvas.getContext('2d');
+          return {
+            frequency: CARRIER_FREQ_HZ,
+            bytes,
+            checksum,
+            hexString: hexFormatted,
+            pulses
+          };
+        },
 
-  function getSliceIndexAtPointer(rotationRad) {
-    if (wheelSlices.length === 0) return -1;
-    const twoPi = Math.PI * 2;
-    const localAngle = (((POINTER_RAD - rotationRad) % twoPi) + twoPi) % twoPi;
+        /**
+         * Giải mã chuỗi Raw IR (micro-giây phân cách bởi dấu phẩy/khoảng trắng)
+         * hoặc chuỗi Pronto Hex (0000 006D ...) sang mảng số nguyên micro-giây
+         */
+        parseCustomRawOrPronto(rawText) {
+          const trimmed = (rawText || '').trim();
+          if (!trimmed) return null;
 
-    for (let i = 0; i < wheelSlices.length; i++) {
-      const s = wheelSlices[i];
-      if (localAngle >= s.startAngle && localAngle < s.endAngle) {
-        return i;
-      }
-    }
-    return wheelSlices.length - 1;
-  }
-
-  function getFontScaleMultiplier() {
-    if (appState.fontScaleMode === 'xlarge') return 1.32;
-    if (appState.fontScaleMode === 'large') return 1.16;
-    return 1.0;
-  }
-
-  function resizeAndDrawWheel() {
-    const shell = document.querySelector('.mobile-app-shell');
-    const shellWidth = shell ? shell.clientWidth : window.innerWidth;
-    const shellHeight = shell ? shell.clientHeight : window.innerHeight;
-
-    const maxByWidth = shellWidth - 28;
-    const maxByHeight = Math.max(255, shellHeight - 320);
-    const cssSize = Math.min(380, Math.max(260, Math.min(maxByWidth, maxByHeight)));
-
-    const dpr = Math.max(2, window.devicePixelRatio || 1);
-    canvas.style.width = `${cssSize}px`;
-    canvas.style.height = `${cssSize}px`;
-    canvas.width = Math.floor(cssSize * dpr);
-    canvas.height = Math.floor(cssSize * dpr);
-
-    drawWheelFrame();
-  }
-
-  function drawWheelFrame() {
-    const dpr = Math.max(2, window.devicePixelRatio || 1);
-    const width = canvas.width / dpr;
-    const height = canvas.height / dpr;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const outerRadius = Math.min(centerX, centerY) - 4;
-
-    // Viền ngoài kiểu mặt đồng hồ tối giản hiện đại (8px), không có đèn hội chợ cổ điển
-    const rimThickness = 8;
-    const wheelRadius = outerRadius - rimThickness;
-
-    ctx.save();
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, width, height);
-
-    // 1. Vẽ viền ngoài Matte Espresso / Warm Bronze sang trọng
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
-    ctx.fillStyle = appState.theme === 'dark' ? '#26211e' : '#dcd3c4';
-    ctx.fill();
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = appState.theme === 'dark' ? 'rgba(224, 159, 90, 0.35)' : 'rgba(180, 83, 9, 0.25)';
-    ctx.stroke();
-
-    // 2. Vẽ các lát cắt tông trầm ấm hiện đại
-    if (wheelSlices.length === 0) {
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
-      ctx.fillStyle = appState.theme === 'dark' ? '#1c1917' : '#ece5d8';
-      ctx.fill();
-
-      ctx.fillStyle = appState.theme === 'dark' ? '#a8a29e' : '#57534e';
-      ctx.font = '700 15px "Be Vietnam Pro", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('Chưa có biến số hiển thị', centerX, centerY - 50);
-    } else {
-      ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate(wheelRotation);
-
-      const sliceCount = wheelSlices.length;
-      const fontMult = getFontScaleMultiplier();
-
-      wheelSlices.forEach((slice) => {
-        const start = slice.startAngle;
-        const end = slice.endAngle;
-        const mid = (start + end) / 2;
-        const arcSpan = end - start;
-
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, wheelRadius, start, end);
-        ctx.closePath();
-
-        ctx.fillStyle = slice.color;
-        ctx.fill();
-
-        // Đường chia ô mảnh, sắc thái trầm ấm đồng nhất với nền
-        ctx.lineWidth = sliceCount > 24 ? 1.2 : 2;
-        ctx.strokeStyle = appState.theme === 'dark' ? '#181513' : '#f9f6f0';
-        ctx.stroke();
-
-        // Vẽ chữ TO, RÕ, SẮC NÉT màu kem ấm (#faf7f2)
-        if (arcSpan > 0.045) {
-          ctx.save();
-          ctx.rotate(mid);
-          ctx.textAlign = 'right';
-          ctx.textBaseline = 'middle';
-
-          const textRadius = wheelRadius - 13;
-          const maxTextWidth = wheelRadius * 0.66;
-
-          let baseFontSize = 15.5;
-          if (width >= 345) baseFontSize = 16.5;
-
-          if (sliceCount <= 8) {
-            baseFontSize += 2;
-          } else if (sliceCount >= 18 && appState.displayMode === 'duplicate') {
-            baseFontSize = Math.max(12.5, baseFontSize - 2.2);
-          } else if (sliceCount > 12 && appState.displayMode === 'duplicate') {
-            baseFontSize = Math.max(13.5, baseFontSize - 1.2);
+          // Kiểm tra định dạng Pronto Hex (bắt đầu bằng 0000)
+          if (/^0000\s+[0-9a-fA-F]{4}/i.test(trimmed)) {
+            const words = trimmed.split(/\s+/).map(w => parseInt(w, 16)).filter(n => !isNaN(n));
+            if (words.length < 6) return null;
+            const freqCode = words[1] || 0x006D;
+            const carrierHz = Math.round(1000000 / (freqCode * 0.241246));
+            const pulseWords = words.slice(4);
+            const unitUs = 1000000 / carrierHz;
+            const pulses = pulseWords.map(cycles => Math.max(100, Math.round(cycles * unitUs)));
+            return {
+              frequency: carrierHz,
+              pulses,
+              hexString: 'PRONTO HEX CUSTOM PACKET'
+            };
           }
 
-          if (appState.displayMode === 'weighted') {
-            if (arcSpan > 0.65) baseFontSize += 2;
-            else if (arcSpan < 0.20) baseFontSize = Math.max(12, baseFontSize - 2);
+          // Định dạng mảng micro-giây trực tiếp
+          const nums = trimmed
+            .split(/[\s,;]+/)
+            .map(s => Math.abs(parseInt(s, 10)))
+            .filter(n => !isNaN(n) && n >= 50 && n <= 100000);
+
+          if (nums.length < 4) return null;
+          if (nums.length % 2 !== 0) {
+            nums.push(10000); // Đảm bảo cặp chẵn Mark/Space
           }
 
-          const maxAllowedByArc = Math.max(11.5, Math.sin(arcSpan / 2) * (wheelRadius * 0.62) * 1.45);
-          const finalFontSize = Math.min(maxAllowedByArc, baseFontSize * fontMult);
+          return {
+            frequency: CARRIER_FREQ_HZ,
+            pulses: nums,
+            hexString: `RAW TIMINGS (${nums.length} PULSES)`
+          };
+        }
+      };
 
-          ctx.font = `700 ${finalFontSize.toFixed(1)}px "Be Vietnam Pro", sans-serif`;
-          ctx.fillStyle = '#faf7f2';
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
-          ctx.shadowBlur = 2;
-          ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = 1;
+      // ========================================================================
+      // 3. CẦU NỐI PHẦN CỨNG ANDROID (IRBRIDGE) & OSCILLOSCOPE DEBUGGER
+      // ========================================================================
+      let audioCtx = null;
 
-          const displayLabel = truncateTextToFit(ctx, slice.name, maxTextWidth);
+      function playAcPiezoBeep(isDouble = false) {
+        if (!appState.beepEnabled) return;
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          if (!audioCtx) audioCtx = new AudioContextClass();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
 
-          if (appState.displayMode === 'weighted' && arcSpan > 0.28) {
-            ctx.fillText(displayLabel, textRadius, -finalFontSize * 0.44);
-            const subFontSize = Math.max(11, finalFontSize * 0.75);
-            ctx.font = `600 ${subFontSize.toFixed(1)}px "Be Vietnam Pro", sans-serif`;
-            ctx.fillStyle = 'rgba(250, 247, 242, 0.85)';
-            ctx.fillText(`x${slice.quantity} (${Math.round(slice.probability)}%)`, textRadius, finalFontSize * 0.56);
+          const now = audioCtx.currentTime;
+          const beepOnce = (startTime, duration) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(2650, startTime); // Tần số còi piezo dàn lạnh Daikin/Panasonic
+            gain.gain.setValueAtTime(0.12, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+          };
+
+          beepOnce(now, 0.065);
+          if (isDouble) {
+            beepOnce(now + 0.095, 0.085);
+          }
+        } catch (err) {}
+      }
+
+      function triggerHapticAndLed(vibratePattern = 30) {
+        try {
+          if (navigator.vibrate) {
+            navigator.vibrate(vibratePattern);
+          }
+          if (window.AndroidIR && typeof window.AndroidIR.vibrate === 'function') {
+            const ms = Array.isArray(vibratePattern) ? (vibratePattern[0] || 30) : Number(vibratePattern) || 30;
+            window.AndroidIR.vibrate(ms);
+          }
+        } catch (e) {}
+
+        const led = document.getElementById('irBlasterLed');
+        if (led) {
+          led.classList.add('transmitting');
+          setTimeout(() => led.classList.remove('transmitting'), 140);
+        }
+      }
+
+      const IRBridge = {
+        transmitPacket(packet, vibratePattern = 30, doubleBeep = false) {
+          if (!packet || !Array.isArray(packet.pulses)) return;
+
+          triggerHapticAndLed(vibratePattern);
+          playAcPiezoBeep(doubleBeep);
+
+          const freq = packet.frequency || CARRIER_FREQ_HZ;
+          const patternJson = JSON.stringify(packet.pulses);
+          let usedNativeHardware = false;
+
+          // Gọi trực tiếp cầu nối Android Native ConsumerIrManager nếu có
+          if (window.AndroidIR && typeof window.AndroidIR.transmit === 'function') {
+            try {
+              window.AndroidIR.transmit(freq, patternJson);
+              usedNativeHardware = true;
+            } catch (err) {
+              console.error('AndroidIR transmit error:', err);
+            }
+          }
+
+          this.renderDebugOscilloscope(packet, usedNativeHardware);
+        },
+
+        renderDebugOscilloscope(packet, isNative) {
+          const bridgeEl = document.getElementById('debugBridgeModeText');
+          const statsEl = document.getElementById('debugPulseStatsText');
+          const hexEl = document.getElementById('debugHexPacketText');
+          const canvas = document.getElementById('irWaveformCanvas');
+
+          const totalUs = packet.pulses.reduce((a, b) => a + b, 0);
+          const totalMs = (totalUs / 1000).toFixed(1);
+
+          bridgeEl.textContent = isNative
+            ? '🟢 IR Hardware: Android ConsumerIrManager'
+            : '🔵 IR Simulator: Oscilloscope Active';
+          statsEl.textContent = `${(packet.frequency / 1000).toFixed(1)} kHz • ${packet.pulses.length} xung • ${totalMs} ms`;
+          hexEl.textContent = `HEX: [${packet.hexString}]`;
+
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          const w = canvas.width;
+          const h = canvas.height;
+          ctx.clearRect(0, 0, w, h);
+
+          // Vẽ lưới nền Oscilloscope
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, h / 2);
+          ctx.lineTo(w, h / 2);
+          ctx.stroke();
+
+          // Vẽ dạng sóng xung vuông (Mark = Cao, Space = Thấp)
+          const previewPulses = packet.pulses.slice(0, 64);
+          const sliceUs = previewPulses.reduce((a, b) => a + b, 0) || 1;
+
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+
+          let currentX = 2;
+          const highY = 5;
+          const lowY = h - 5;
+
+          ctx.moveTo(currentX, lowY);
+
+          for (let i = 0; i < previewPulses.length; i++) {
+            const isMark = (i % 2 === 0);
+            const segWidth = Math.max(1.5, (previewPulses[i] / sliceUs) * (w - 4));
+            const targetY = isMark ? highY : lowY;
+
+            ctx.lineTo(currentX, targetY);
+            ctx.lineTo(currentX + segWidth, targetY);
+            currentX += segWidth;
+          }
+
+          ctx.lineTo(currentX, lowY);
+          ctx.stroke();
+        }
+      };
+
+      // ========================================================================
+      // 4. QUẢN LÝ TRẠNG THÁI PHÒNG (ZERO-CLICK PERSISTENCE)
+      // ========================================================================
+      function createDefaultRooms() {
+        return [
+          {
+            id: 'room_bedroom',
+            name: '🛏️ Phòng ngủ',
+            brand: 'Daikin',
+            protocolVariant: 'REV-A',
+            power: true,
+            mode: 'cool',
+            temp: 25.0,
+            tempStep: 0.5,
+            fan: 'AUTO',
+            swingV: 'AUTO',
+            swingH: 'AUTO',
+            energySavingLevel: 0,
+            features: { powerful: false, econo: true, quiet: true, sensor: false, moldProof: false, led: true },
+            timerOnMinutes: 0,
+            timerOffMinutes: 0,
+            timerDeadlineMs: 0
+          },
+          {
+            id: 'room_living',
+            name: '🛋️ Phòng khách',
+            brand: 'Casper',
+            protocolVariant: 'REV-A',
+            power: true,
+            mode: 'cool',
+            temp: 24.0,
+            tempStep: 0.5,
+            fan: 'BẬC 3',
+            swingV: 'AUTO',
+            swingH: 'GÓC RỘNG',
+            energySavingLevel: 0,
+            features: { turbo: false, ifeel: true, xfan: true, led: true, sleep: false, eco: false },
+            timerOnMinutes: 0,
+            timerOffMinutes: 0,
+            timerDeadlineMs: 0
+          },
+          {
+            id: 'room_study',
+            name: '📚 Phòng học',
+            brand: 'LG',
+            protocolVariant: 'REV-A',
+            power: true,
+            mode: 'cool',
+            temp: 26.0,
+            tempStep: 1.0,
+            fan: 'QUIET',
+            swingV: 'CAO',
+            swingH: 'GIỮA',
+            energySavingLevel: 2, // 60%
+            features: { jetCool: false, energySaving: true, comfortAir: true, ionizer: true, quiet: true, led: false },
+            timerOnMinutes: 0,
+            timerOffMinutes: 0,
+            timerDeadlineMs: 0
+          }
+        ];
+      }
+
+      let appState = {
+        activeRoomId: 'room_bedroom',
+        beepEnabled: true,
+        rooms: createDefaultRooms(),
+        sleepCurve: {
+          active: false,
+          wakeLockEnabled: true,
+          steps: [
+            { id: 'sc_1', time: '23:00', temp: 25.0, mode: 'cool', fan: 'AUTO', action: 'apply', doneToday: false },
+            { id: 'sc_2', time: '01:30', temp: 27.0, mode: 'cool', fan: 'QUIET', action: 'apply_quiet_no_led', doneToday: false },
+            { id: 'sc_3', time: '05:30', temp: 27.0, mode: 'fan', fan: 'BẬC 2', action: 'dry_coil_then_off', doneToday: false }
+          ]
+        }
+      };
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.rooms) && parsed.rooms.length > 0) {
+            appState.rooms = parsed.rooms;
+            appState.activeRoomId = parsed.activeRoomId || parsed.rooms[0].id;
+            appState.beepEnabled = parsed.beepEnabled !== false;
+            if (parsed.sleepCurve) {
+              appState.sleepCurve = parsed.sleepCurve;
+            }
+          }
+        } catch (err) {}
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        } catch (err) {}
+      }
+
+      function getActiveRoom() {
+        let r = appState.rooms.find(rm => rm.id === appState.activeRoomId);
+        if (!r) {
+          r = appState.rooms[0];
+          appState.activeRoomId = r.id;
+        }
+        return r;
+      }
+
+      function transmitCurrentRoomState(vibratePattern = 30, doubleBeep = false) {
+        const room = getActiveRoom();
+        saveState();
+        renderAllUI();
+        const packet = IRProtocolEngine.encodeStateToPulses(room);
+        IRBridge.transmitPacket(packet, vibratePattern, doubleBeep);
+      }
+
+      // ========================================================================
+      // 5. RENDER GIAO DIỆN TRUNG TÂM, LCD & KHAY TÍNH NĂNG THEO HÃNG
+      // ========================================================================
+      function applyModeAccentColors(mode, isPowerOn) {
+        const root = document.documentElement;
+        const palettes = {
+          cool: { accent: '#38bdf8', glow: 'rgba(56, 189, 248, 0.18)', border: 'rgba(56, 189, 248, 0.36)' },
+          heat: { accent: '#fb923c', glow: 'rgba(251, 146, 60, 0.18)', border: 'rgba(251, 146, 60, 0.36)' },
+          dry:  { accent: '#a78bfa', glow: 'rgba(167, 139, 250, 0.18)', border: 'rgba(167, 139, 250, 0.36)' },
+          fan:  { accent: '#34d399', glow: 'rgba(52, 211, 153, 0.18)', border: 'rgba(52, 211, 153, 0.36)' },
+          auto: { accent: '#2dd4bf', glow: 'rgba(45, 212, 191, 0.18)', border: 'rgba(45, 212, 191, 0.36)' }
+        };
+        const pal = palettes[mode] || palettes.cool;
+        root.style.setProperty('--lcd-accent', pal.accent);
+        root.style.setProperty('--lcd-glow', isPowerOn ? pal.glow : 'rgba(15,23,42,0.1)');
+        root.style.setProperty('--lcd-border', isPowerOn ? pal.border : 'rgba(148,163,184,0.15)');
+      }
+
+      function renderRoomTabs() {
+        const container = document.getElementById('roomTabsContainer');
+        container.innerHTML = '';
+
+        appState.rooms.forEach((rm) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `room-tab ${rm.id === appState.activeRoomId ? 'active' : ''}`;
+          btn.innerHTML = `
+            <span class="room-power-dot ${rm.power ? 'on' : ''}"></span>
+            <span>${rm.name}</span>
+            <span style="font-size: 10px; opacity: 0.7;">${rm.temp.toFixed(1)}°</span>
+          `;
+          btn.addEventListener('click', () => {
+            appState.activeRoomId = rm.id;
+            saveState();
+            renderAllUI();
+            triggerHapticAndLed(20);
+          });
+          container.appendChild(btn);
+        });
+
+        // Nút thêm phòng mới nhanh
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'room-tab';
+        addBtn.textContent = '＋ Phòng';
+        addBtn.addEventListener('click', () => {
+          const name = window.prompt('Nhập tên phòng mới (VD: Phòng làm việc):', '🏢 Phòng làm việc');
+          if (!name || !name.trim()) return;
+          const newRoom = {
+            ...JSON.parse(JSON.stringify(getActiveRoom())),
+            id: 'room_' + Date.now(),
+            name: name.trim()
+          };
+          appState.rooms.push(newRoom);
+          appState.activeRoomId = newRoom.id;
+          saveState();
+          renderAllUI();
+        });
+        container.appendChild(addBtn);
+      }
+
+      function renderLcdAndPrimaryControls() {
+        const room = getActiveRoom();
+        const lcd = document.getElementById('lcdScreen');
+
+        applyModeAccentColors(room.mode, room.power);
+
+        if (room.power) {
+          lcd.classList.remove('power-off');
+        } else {
+          lcd.classList.add('power-off');
+        }
+
+        document.getElementById('brandSelect').value = room.brand;
+        document.getElementById('lcdRoomAndBrandText').textContent =
+          `${room.name.toUpperCase()} • ${room.brand.toUpperCase()} (${room.protocolVariant})`;
+
+        // Mode Pills
+        document.querySelectorAll('[data-mode-pill]').forEach(el => {
+          if (el.getAttribute('data-mode-pill') === room.mode) {
+            el.classList.add('active');
           } else {
-            ctx.fillText(displayLabel, textRadius, 0);
+            el.classList.remove('active');
+          }
+        });
+
+        // Temperature Integer & Decimal
+        const tempVal = Number(room.temp) || 25;
+        const intPart = Math.floor(tempVal);
+        const decPart = (tempVal % 1 !== 0) ? '.5' : '.0';
+        document.getElementById('lcdTempInt').textContent = String(intPart);
+        document.getElementById('lcdTempDec').textContent = decPart;
+
+        // Fan & Swing
+        document.getElementById('lcdFanText').textContent = room.fan;
+        document.getElementById('lcdSwingVText').textContent = room.swingV;
+        document.getElementById('lcdSwingHText').textContent = room.swingH;
+
+        // Temp Step Badge
+        document.getElementById('tempStepBadge').textContent = `(±${room.tempStep.toFixed(1)}°C)`;
+
+        // Power Button
+        const powerBtn = document.getElementById('powerBtn');
+        const powerLabel = document.getElementById('powerBtnLabel');
+        if (room.power) {
+          powerBtn.classList.add('power-on');
+          powerLabel.textContent = 'NGUỒN: BẬT';
+        } else {
+          powerBtn.classList.remove('power-on');
+          powerLabel.textContent = 'NGUỒN: TẮT';
+        }
+
+        // Active Feature Flags on LCD
+        const flagsContainer = document.getElementById('lcdActiveFlagsContainer');
+        flagsContainer.innerHTML = '';
+        const profile = BRAND_PROFILES[room.brand] || BRAND_PROFILES.Daikin;
+
+        profile.features.forEach(feat => {
+          if (room.features && room.features[feat.key]) {
+            const tag = document.createElement('span');
+            tag.className = 'lcd-flag-tag';
+            if (feat.multiLevel && room.energySavingLevel > 0) {
+              const pcts = ['OFF', '40%', '60%', '80%'];
+              tag.textContent = `${feat.label}: ${pcts[room.energySavingLevel] || '60%'}`;
+            } else {
+              tag.textContent = feat.label;
+            }
+            flagsContainer.appendChild(tag);
+          }
+        });
+
+        if (appState.sleepCurve.active) {
+          const scTag = document.createElement('span');
+          scTag.className = 'lcd-flag-tag';
+          scTag.style.color = '#fbbf24';
+          scTag.textContent = '🌙 SLEEP CURVE';
+          flagsContainer.appendChild(scTag);
+        }
+
+        if (flagsContainer.children.length === 0) {
+          const defaultTag = document.createElement('span');
+          defaultTag.style.color = 'var(--text-dim)';
+          defaultTag.textContent = room.power ? 'Chế độ tiêu chuẩn' : 'Đã tắt máy (Standby)';
+          flagsContainer.appendChild(defaultTag);
+        }
+
+        // Blind Mode Sync
+        document.getElementById('blindModeRoomText').textContent =
+          `${room.name.toUpperCase()} • ${room.power ? room.mode.toUpperCase() : 'ĐANG TẮT'}`;
+        document.getElementById('blindModeBigTemp').textContent = `${tempVal.toFixed(1)}°C`;
+      }
+
+      function renderDynamicBrandDrawer() {
+        const room = getActiveRoom();
+        const profile = BRAND_PROFILES[room.brand] || BRAND_PROFILES.Daikin;
+
+        document.getElementById('brandDrawerTitle').textContent =
+          `TÍNH NĂNG CHUYÊN BIỆT: ${room.brand.toUpperCase()}`;
+        document.getElementById('protocolVariantBadge').textContent =
+          `PROTO: ${room.protocolVariant}`;
+
+        const grid = document.getElementById('brandFeaturesGrid');
+        grid.innerHTML = '';
+
+        profile.features.forEach((feat) => {
+          const isActive = Boolean(room.features && room.features[feat.key]);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `feature-chip-btn ${isActive ? 'active' : ''}`;
+
+          let subText = feat.sub;
+          if (feat.multiLevel && isActive) {
+            const pcts = ['OFF', 'Mức 40%', 'Mức 60%', 'Mức 80%'];
+            subText = pcts[room.energySavingLevel] || 'Mức 60%';
           }
 
-          ctx.restore();
-        }
-      });
-
-      ctx.restore();
-    }
-
-    // Vòng chỉ mảnh bên trong viền tạo chiều sâu tinh tế
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = 'rgba(224, 159, 90, 0.22)';
-    ctx.stroke();
-
-    ctx.restore();
-    updateLivePointerIndicator();
-  }
-
-  function updateLivePointerIndicator() {
-    const labelEl = document.getElementById('livePointerLabel');
-    const dotEl = document.getElementById('livePointerColorDot');
-    if (!labelEl || !dotEl) return;
-
-    const idx = getSliceIndexAtPointer(wheelRotation);
-    if (idx >= 0 && wheelSlices[idx]) {
-      const slice = wheelSlices[idx];
-      labelEl.textContent = `${slice.name} (x${slice.quantity})`;
-      dotEl.style.backgroundColor = slice.color;
-    } else {
-      labelEl.textContent = 'Chưa có biến số';
-      dotEl.style.backgroundColor = '#a8a29e';
-    }
-  }
-
-  function truncateTextToFit(context, text, maxWidth) {
-    if (context.measureText(text).width <= maxWidth) return text;
-    let truncated = text;
-    while (truncated.length > 2 && context.measureText(truncated + '…').width > maxWidth) {
-      truncated = truncated.slice(0, -1);
-    }
-    return truncated + '…';
-  }
-
-  // ==========================================================================
-  // 7. VẬT LÝ QUAY CUBIC-BEZIER THEO THỜI GIAN TÙY CHỈNH
-  // ==========================================================================
-  function createCubicBezierEasing(x1, y1, x2, y2) {
-    function sampleCurveX(t) {
-      return ((1 - 3 * x2 + 3 * x1) * t * t * t) + ((3 * x2 - 6 * x1) * t * t) + (3 * x1 * t);
-    }
-    function sampleCurveY(t) {
-      return ((1 - 3 * y2 + 3 * y1) * t * t * t) + ((3 * y2 - 6 * y1) * t * t) + (3 * y1 * t);
-    }
-    function sampleCurveDerivativeX(t) {
-      return (3 * (1 - 3 * x2 + 3 * x1) * t * t) + (2 * (3 * x2 - 6 * x1) * t) + (3 * x1);
-    }
-    function solveCurveX(x) {
-      let t2 = x;
-      for (let i = 0; i < 8; i++) {
-        const x2Val = sampleCurveX(t2) - x;
-        if (Math.abs(x2Val) < 1e-6) return t2;
-        const d2 = sampleCurveDerivativeX(t2);
-        if (Math.abs(d2) < 1e-6) break;
-        t2 = t2 - x2Val / d2;
-      }
-      return t2;
-    }
-    return function (x) {
-      if (x <= 0) return 0;
-      if (x >= 1) return 1;
-      return sampleCurveY(solveCurveX(x));
-    };
-  }
-
-  const spinBezierEasing = createCubicBezierEasing(0.12, 0.82, 0.16, 1.0);
-
-  function triggerPointerBounce(speedRatio = 0.5) {
-    const pointerEl = document.getElementById('wheelPointer');
-    if (!pointerEl) return;
-
-    const kickAngle = -12 - Math.min(1, Math.max(0.15, speedRatio)) * 16;
-    pointerEl.style.transform = `rotate(${kickAngle.toFixed(1)}deg)`;
-
-    if (pointerBounceTimeout) clearTimeout(pointerBounceTimeout);
-    pointerBounceTimeout = setTimeout(() => {
-      pointerEl.style.transform = 'rotate(0deg)';
-    }, 55);
-  }
-
-  function startSpin() {
-    if (isSpinning) return;
-    if (wheelSlices.length === 0) {
-      showToast('Hãy thêm hoặc bật ít nhất 1 biến số để quay!', 'warning');
-      return;
-    }
-
-    getAudioContext();
-    isSpinning = true;
-    const spinBtn = document.getElementById('spinBtn');
-    if (spinBtn) spinBtn.disabled = true;
-
-    const durationMs = Math.max(1, Number(appState.spinDurationSec) || 5) * 1000;
-    const startRotation = wheelRotation;
-
-    // Số vòng quay tự động điều chỉnh mượt theo số giây người dùng chọn
-    const baseSpins = Math.max(3, Math.round(appState.spinDurationSec * 1.4));
-    const extraSpins = baseSpins + Math.floor(Math.random() * 2);
-    const randomAngle = Math.random() * Math.PI * 2;
-    const totalDeltaRotation = extraSpins * Math.PI * 2 + randomAngle;
-
-    const startTime = performance.now();
-    lastSliceIndexUnderPointer = getSliceIndexAtPointer(startRotation);
-
-    function animateFrame(now) {
-      const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / durationMs);
-      const easedProgress = spinBezierEasing(progress);
-
-      wheelRotation = startRotation + totalDeltaRotation * easedProgress;
-      const remainingRatio = Math.max(0.05, 1 - easedProgress * 0.92);
-
-      const currentSliceIdx = getSliceIndexAtPointer(wheelRotation);
-      if (currentSliceIdx !== lastSliceIndexUnderPointer && currentSliceIdx !== -1) {
-        lastSliceIndexUnderPointer = currentSliceIdx;
-        playTickSound(remainingRatio);
-        triggerPointerBounce(remainingRatio);
-      }
-
-      drawWheelFrame();
-
-      if (progress < 1) {
-        requestAnimationFrame(animateFrame);
-      } else {
-        wheelRotation = wheelRotation % (Math.PI * 2);
-        isSpinning = false;
-        if (spinBtn) spinBtn.disabled = false;
-        drawWheelFrame();
-
-        const winnerIdx = getSliceIndexAtPointer(wheelRotation);
-        if (winnerIdx >= 0 && wheelSlices[winnerIdx]) {
-          handleSpinComplete(wheelSlices[winnerIdx]);
-        }
-      }
-    }
-
-    requestAnimationFrame(animateFrame);
-  }
-
-  // Điều khiển thanh trượt và nút chọn nhanh Thời gian quay
-  const spinDurationSlider = document.getElementById('spinDurationSlider');
-  const spinDurationValueText = document.getElementById('spinDurationValueText');
-  const durPresetBtns = document.querySelectorAll('.dur-preset-btn');
-
-  function updateSpinDurationUI() {
-    if (spinDurationSlider) spinDurationSlider.value = appState.spinDurationSec;
-    if (spinDurationValueText) spinDurationValueText.textContent = `${appState.spinDurationSec}s`;
-
-    durPresetBtns.forEach((btn) => {
-      const val = parseInt(btn.getAttribute('data-dur'), 10);
-      if (val === appState.spinDurationSec) {
-        btn.className = 'dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold btn-warm-primary';
-      } else {
-        btn.className = 'dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold glass-subcard opacity-75 hover:opacity-100';
-      }
-    });
-  }
-
-  if (spinDurationSlider) {
-    spinDurationSlider.addEventListener('input', (e) => {
-      appState.spinDurationSec = Math.min(20, Math.max(1, parseInt(e.target.value, 10) || 5));
-      saveStateToStorage();
-      updateSpinDurationUI();
-    });
-  }
-
-  durPresetBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const val = parseInt(btn.getAttribute('data-dur'), 10);
-      if (!isNaN(val)) {
-        appState.spinDurationSec = val;
-        saveStateToStorage();
-        updateSpinDurationUI();
-        showToast(`Đã đặt thời gian quay: ${val} giây`, 'info');
-      }
-    });
-  });
-
-  // ==========================================================================
-  // 8. KẾT QUẢ TRÚNG THƯỞNG, PHÁO GIẤY & MODAL 3 NÚT HÀNH ĐỘNG
-  // ==========================================================================
-  function handleSpinComplete(winningSlice) {
-    currentWinnerSlice = winningSlice;
-    playVictoryFanfare();
-    triggerCelebrationConfetti(winningSlice.color);
-
-    const preset = getCurrentPreset();
-    const historyEntry = {
-      id: 'spin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      itemId: winningSlice.itemId,
-      name: winningSlice.name,
-      color: winningSlice.color,
-      quantityAtSpin: winningSlice.quantity,
-      probabilityAtSpin: Number(winningSlice.probability.toFixed(1)),
-      presetName: preset.name,
-      timestamp: Date.now()
-    };
-
-    appState.history.unshift(historyEntry);
-    if (appState.history.length > 200) {
-      appState.history = appState.history.slice(0, 200);
-    }
-    saveStateToStorage();
-    renderHistoryAndStats();
-    updateCountersUI();
-    openWinnerModal(winningSlice);
-  }
-
-  function triggerCelebrationConfetti(winnerColor) {
-    if (typeof confetti !== 'function') return;
-    const colors = [winnerColor, '#d97706', '#e09f5a', '#4a7c6f', '#c25e4a'];
-    confetti({
-      particleCount: 60,
-      spread: 68,
-      origin: { y: 0.6 },
-      colors: colors
-    });
-  }
-
-  function openWinnerModal(slice) {
-    const modal = document.getElementById('winnerModal');
-    const nameEl = document.getElementById('winnerNameText');
-    const dotEl = document.getElementById('winnerColorDot');
-    const multEl = document.getElementById('winnerMultiplierBadge');
-    const probEl = document.getElementById('winnerProbabilityBadge');
-    const cardEl = document.getElementById('winnerPrizeCard');
-    const glowEl = document.getElementById('winnerModalGlow');
-    const decreaseBtnText = document.getElementById('modalDecreaseBtnText');
-
-    const preset = getCurrentPreset();
-    const item = preset.items.find(i => i.id === slice.itemId);
-    const currentQty = item ? item.quantity : slice.quantity;
-
-    nameEl.textContent = slice.name;
-    dotEl.style.backgroundColor = slice.color;
-    multEl.textContent = `Hệ số: x${currentQty}`;
-    probEl.textContent = `(${slice.probability.toFixed(1)}%)`;
-    cardEl.style.borderColor = slice.color;
-    glowEl.style.backgroundColor = slice.color;
-
-    if (currentQty > 1) {
-      decreaseBtnText.textContent = `Giảm 1 lượt (x${currentQty} → x${currentQty - 1})`;
-    } else {
-      decreaseBtnText.textContent = `Giảm 1 lượt (Đang x1 → Ẩn mục này)`;
-    }
-
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  }
-
-  function closeWinnerModal() {
-    const modal = document.getElementById('winnerModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
-
-  document.getElementById('modalKeepBtn').addEventListener('click', closeWinnerModal);
-
-  document.getElementById('modalDecreaseOneBtn').addEventListener('click', () => {
-    if (!currentWinnerSlice) return;
-    const preset = getCurrentPreset();
-    const item = preset.items.find(i => i.id === currentWinnerSlice.itemId);
-
-    if (item) {
-      if (item.quantity > 1) {
-        item.quantity -= 1;
-        showToast(`Đã giảm "${item.name}" xuống x${item.quantity}`, 'info');
-      } else {
-        item.visible = false;
-        showToast(`Đã ẩn "${item.name}" khỏi vòng quay`, 'warning');
-      }
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    }
-    closeWinnerModal();
-  });
-
-  document.getElementById('modalRemoveCompletelyBtn').addEventListener('click', () => {
-    if (!currentWinnerSlice) return;
-    const preset = getCurrentPreset();
-    const item = preset.items.find(i => i.id === currentWinnerSlice.itemId);
-
-    if (item) {
-      item.visible = false;
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-      showToast(`Đã loại bỏ "${item.name}" khỏi vòng quay`, 'warning');
-    }
-    closeWinnerModal();
-  });
-
-  // ==========================================================================
-  // 9. DANH SÁCH BIẾN SỐ (ITEM CARDS) & NHÂN SỐ LƯỢNG
-  // ==========================================================================
-  function renderItemsList() {
-    const container = document.getElementById('itemsListContainer');
-    const preset = getCurrentPreset();
-    const activeItems = getActiveItems();
-    const totalWeight = getTotalWeight(activeItems);
-
-    document.getElementById('visibleRatioText').textContent =
-      `${activeItems.length}/${preset.items.length} hiển thị`;
-
-    if (preset.items.length === 0) {
-      container.innerHTML = `
-        <div class="glass-subcard rounded-2xl p-5 text-center opacity-70">
-          <p class="text-xs font-semibold">Danh sách trống. Hãy thêm biến số mới ở trên!</p>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = '';
-
-    preset.items.forEach((item) => {
-      const weight = item.visible ? (Number(item.quantity) || 1) : 0;
-      const percent = (totalWeight > 0 && item.visible)
-        ? ((weight / totalWeight) * 100).toFixed(1)
-        : '0.0';
-
-      const card = document.createElement('div');
-      card.className = `glass-subcard rounded-2xl p-2.5 flex flex-col gap-2 ${
-        item.visible ? '' : 'opacity-45'
-      }`;
-
-      card.innerHTML = `
-        <div class="flex items-center gap-2">
-          <input
-            type="color"
-            value="${item.color}"
-            data-action="color"
-            data-id="${item.id}"
-            class="color-swatch-input"
-          />
-          <input
-            type="text"
-            value="${escapeHtml(item.name)}"
-            data-action="rename"
-            data-id="${item.id}"
-            placeholder="Tên biến số..."
-            class="bg-transparent border-b border-transparent focus:border-amber-500 focus:outline-none text-xs font-bold flex-1 min-w-0 py-0.5 truncate"
-          />
-          <div class="flex items-center gap-1 flex-shrink-0">
-            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300">
-              x${item.quantity}
-            </span>
-            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-stone-500/20 text-stone-300 min-w-[42px] text-center">
-              ${percent}%
-            </span>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
-          <div class="flex items-center gap-1 bg-stone-950/50 rounded-xl p-0.5 border border-white/10">
-            <button
-              type="button"
-              data-action="dec-qty"
-              data-id="${item.id}"
-              class="w-7 h-6 rounded-lg flex items-center justify-center font-black text-xs hover:bg-amber-500/20 active:scale-90 transition"
-            >
-              -
-            </button>
-            <div class="flex items-center px-1 text-[11px] font-bold">
-              <span class="text-amber-400 font-extrabold">x</span>
-              <input
-                type="number"
-                min="1"
-                max="500"
-                value="${item.quantity}"
-                data-action="input-qty"
-                data-id="${item.id}"
-                class="w-10 text-center bg-transparent font-extrabold text-xs text-amber-400 focus:outline-none"
-              />
-            </div>
-            <button
-              type="button"
-              data-action="inc-qty"
-              data-id="${item.id}"
-              class="w-7 h-6 rounded-lg flex items-center justify-center font-black text-xs hover:bg-amber-500/20 active:scale-90 transition"
-            >
-              +
-            </button>
-          </div>
-
-          <div class="flex items-center gap-1">
-            <button
-              type="button"
-              data-action="toggle-visible"
-              data-id="${item.id}"
-              class="px-2.5 py-1 rounded-xl text-[11px] font-semibold glass-subcard flex items-center gap-1 ${
-                item.visible ? 'text-emerald-400' : 'text-stone-400'
-              }"
-            >
-              <i data-lucide="${item.visible ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
-              <span>${item.visible ? 'Hiện' : 'Ẩn'}</span>
-            </button>
-            <button
-              type="button"
-              data-action="delete"
-              data-id="${item.id}"
-              class="p-1.5 rounded-xl glass-subcard text-rose-400"
-            >
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        </div>
-      `;
-
-      container.appendChild(card);
-    });
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  document.getElementById('itemsListContainer').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-action]');
-    if (!btn) return;
-    const action = btn.getAttribute('data-action');
-    const itemId = btn.getAttribute('data-id');
-    const preset = getCurrentPreset();
-    const itemIndex = preset.items.findIndex(i => i.id === itemId);
-    if (itemIndex === -1) return;
-    const item = preset.items[itemIndex];
-
-    if (action === 'inc-qty') {
-      item.quantity = Math.min(500, (Number(item.quantity) || 1) + 1);
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    } else if (action === 'dec-qty') {
-      if (item.quantity > 1) {
-        item.quantity -= 1;
-        appState.customSliceOrder = null;
-        saveStateToStorage();
-        refreshAllUI();
-      } else {
-        showToast('Số lượng tối thiểu là x1', 'info');
-      }
-    } else if (action === 'toggle-visible') {
-      item.visible = !item.visible;
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    } else if (action === 'delete') {
-      preset.items.splice(itemIndex, 1);
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    }
-  });
-
-  document.getElementById('itemsListContainer').addEventListener('change', (e) => {
-    const input = e.target.closest('input[data-action]');
-    if (!input) return;
-    const action = input.getAttribute('data-action');
-    const itemId = input.getAttribute('data-id');
-    const preset = getCurrentPreset();
-    const item = preset.items.find(i => i.id === itemId);
-    if (!item) return;
-
-    if (action === 'color') {
-      item.color = input.value;
-      saveStateToStorage();
-      refreshAllUI();
-    } else if (action === 'rename') {
-      const parsed = parseItemInputSyntax(input.value);
-      if (parsed) {
-        item.name = parsed.name;
-        if (parsed.matchedSyntax) item.quantity = parsed.quantity;
-      }
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    } else if (action === 'input-qty') {
-      item.quantity = Math.min(500, Math.max(1, parseInt(input.value, 10) || 1));
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    }
-  });
-
-  // ==========================================================================
-  // 10. FORM THÊM NHANH & NHẬP VĂN BẢN HÀNG LOẠT
-  // ==========================================================================
-  const quickAddInput = document.getElementById('quickAddInput');
-  const syntaxPreviewBadge = document.getElementById('syntaxPreviewBadge');
-
-  quickAddInput.addEventListener('input', () => {
-    const parsed = parseItemInputSyntax(quickAddInput.value);
-    if (parsed && parsed.matchedSyntax) {
-      syntaxPreviewBadge.textContent = `x${parsed.quantity}`;
-      syntaxPreviewBadge.classList.remove('hidden');
-    } else {
-      syntaxPreviewBadge.classList.add('hidden');
-    }
-  });
-
-  document.getElementById('quickAddItemForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const raw = quickAddInput.value.trim();
-    if (!raw) return;
-
-    const parsed = parseItemInputSyntax(raw);
-    if (!parsed) return;
-
-    const preset = getCurrentPreset();
-    const nextColor = WARM_MODERN_PALETTE[preset.items.length % WARM_MODERN_PALETTE.length];
-
-    preset.items.unshift({
-      id: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      name: parsed.name,
-      color: nextColor,
-      quantity: parsed.quantity,
-      visible: true
-    });
-
-    quickAddInput.value = '';
-    syntaxPreviewBadge.classList.add('hidden');
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-    showToast(`Đã thêm "${parsed.name}" (x${parsed.quantity})`, 'success');
-  });
-
-  const bulkEditContainer = document.getElementById('bulkEditContainer');
-  const bulkTextarea = document.getElementById('bulkTextarea');
-
-  document.getElementById('toggleBulkEditBtn').addEventListener('click', () => {
-    const isHidden = bulkEditContainer.classList.contains('hidden');
-    if (isHidden) {
-      const preset = getCurrentPreset();
-      bulkTextarea.value = preset.items.map(i => `${i.name} * ${i.quantity}`).join('\n');
-      bulkEditContainer.classList.remove('hidden');
-    } else {
-      bulkEditContainer.classList.add('hidden');
-    }
-  });
-
-  document.getElementById('cancelBulkBtn').addEventListener('click', () => {
-    bulkEditContainer.classList.add('hidden');
-  });
-
-  document.getElementById('applyBulkBtn').addEventListener('click', () => {
-    const lines = bulkTextarea.value.split(/\r?\n/);
-    const preset = getCurrentPreset();
-    const newItems = [];
-
-    lines.forEach((line, index) => {
-      const parsed = parseItemInputSyntax(line);
-      if (parsed) {
-        const existing = preset.items.find(i => i.name.toLowerCase() === parsed.name.toLowerCase());
-        newItems.push({
-          id: existing ? existing.id : ('item_' + Date.now() + '_' + index),
-          name: parsed.name,
-          color: existing ? existing.color : WARM_MODERN_PALETTE[index % WARM_MODERN_PALETTE.length],
-          quantity: parsed.quantity,
-          visible: true
+          btn.innerHTML = `
+            <span>${feat.label}</span>
+            <span style="font-size: 9.5px; opacity: 0.72; font-weight: 600;">${subText}</span>
+          `;
+
+          btn.addEventListener('click', () => {
+            if (!room.features) room.features = {};
+            if (feat.multiLevel) {
+              // Xoay vòng kiểm soát năng lượng: Off (0) -> 40% (1) -> 60% (2) -> 80% (3) -> Off
+              room.energySavingLevel = ((Number(room.energySavingLevel) || 0) + 1) % 4;
+              room.features[feat.key] = room.energySavingLevel > 0;
+            } else {
+              room.features[feat.key] = !room.features[feat.key];
+            }
+            transmitCurrentRoomState(30, false);
+          });
+
+          grid.appendChild(btn);
         });
       }
-    });
 
-    if (newItems.length === 0) return;
-    preset.items = newItems;
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-    bulkEditContainer.classList.add('hidden');
-    showToast(`Đã lưu ${newItems.length} biến số!`, 'success');
-  });
-
-  document.getElementById('showAllItemsBtn').addEventListener('click', () => {
-    const preset = getCurrentPreset();
-    preset.items.forEach(i => { i.visible = true; });
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-    showToast('Đã hiện tất cả các mục', 'success');
-  });
-
-  document.getElementById('resetMultipliersBtn').addEventListener('click', () => {
-    const preset = getCurrentPreset();
-    preset.items.forEach(i => { i.quantity = 1; });
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-    showToast('Đã đặt lại tất cả về x1', 'info');
-  });
-
-  // ==========================================================================
-  // 11. CHẾ ĐỘ HIỂN THỊ, TRỘN XEN KẼ & CỠ CHỮ VÒNG QUAY
-  // ==========================================================================
-  function updateModeButtonsUI() {
-    const dupBtn = document.getElementById('modeDuplicateBtn');
-    const weightBtn = document.getElementById('modeWeightedBtn');
-
-    if (appState.displayMode === 'duplicate') {
-      dupBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all btn-warm-primary';
-      weightBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all opacity-70';
-    } else {
-      weightBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all btn-warm-primary';
-      dupBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all opacity-70';
-    }
-  }
-
-  function updateFontSizeBadgeUI() {
-    const badge = document.getElementById('fontSizeBadgeText');
-    if (!badge) return;
-    const labels = {
-      normal: 'Chữ: Vừa',
-      large: 'Chữ: Lớn',
-      xlarge: 'Chữ: Rất lớn'
-    };
-    badge.textContent = labels[appState.fontScaleMode] || 'Chữ: Lớn';
-  }
-
-  document.getElementById('fontSizeCycleBtn').addEventListener('click', () => {
-    const order = ['normal', 'large', 'xlarge'];
-    const nextIdx = (order.indexOf(appState.fontScaleMode) + 1) % order.length;
-    appState.fontScaleMode = order[nextIdx];
-    saveStateToStorage();
-    updateFontSizeBadgeUI();
-    drawWheelFrame();
-  });
-
-  document.getElementById('modeDuplicateBtn').addEventListener('click', () => {
-    if (appState.displayMode === 'duplicate') return;
-    appState.displayMode = 'duplicate';
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-  });
-
-  document.getElementById('modeWeightedBtn').addEventListener('click', () => {
-    if (appState.displayMode === 'weighted') return;
-    appState.displayMode = 'weighted';
-    saveStateToStorage();
-    refreshAllUI();
-  });
-
-  document.getElementById('interleaveBtn').addEventListener('click', () => {
-    if (isSpinning) return;
-    const activeItems = getActiveItems();
-    if (activeItems.length <= 1) return;
-
-    if (appState.displayMode === 'weighted') {
-      const preset = getCurrentPreset();
-      const sorted = [...preset.items].sort((a, b) => b.quantity - a.quantity);
-      const interleaved = [];
-      let left = 0, right = sorted.length - 1;
-      while (left <= right) {
-        if (left === right) interleaved.push(sorted[left]);
-        else interleaved.push(sorted[left], sorted[right]);
-        left++;
-        right--;
+      function renderAllUI() {
+        renderRoomTabs();
+        renderLcdAndPrimaryControls();
+        renderDynamicBrandDrawer();
       }
-      preset.items = interleaved;
-      saveStateToStorage();
-      refreshAllUI();
-      showToast('Đã xếp xen kẽ các ô lớn - nhỏ', 'success');
-      return;
-    }
 
-    appState.interleaveSeed = (appState.interleaveSeed + 1) % 97;
-    const interleavedSlices = generateInterleavedDuplicateSlices(activeItems, appState.interleaveSeed);
-    appState.customSliceOrder = interleavedSlices.map(i => i.id);
-    rebuildWheelSlices();
-    drawWheelFrame();
-    showToast('Đã trộn xen kẽ đều các ô!', 'success');
-  });
+      // ========================================================================
+      // 6. XỬ LÝ SỰ KIỆN NÚT BẤM TRUNG TÂM & VUỐT CHUYỂN PHÒNG TRÊN LCD
+      // ========================================================================
+      document.getElementById('brandSelect').addEventListener('change', (e) => {
+        const room = getActiveRoom();
+        room.brand = e.target.value;
+        const profile = BRAND_PROFILES[room.brand];
+        room.tempStep = profile && profile.halfDegree ? 0.5 : 1.0;
+        if (!profile.halfDegree) {
+          room.temp = Math.round(room.temp);
+        }
+        transmitCurrentRoomState(30, false);
+      });
 
-  document.getElementById('randomShuffleBtn').addEventListener('click', () => {
-    if (isSpinning) return;
-    rebuildWheelSlices();
-    if (wheelSlices.length <= 1) return;
+      document.getElementById('beepToggleBtn').addEventListener('click', () => {
+        appState.beepEnabled = !appState.beepEnabled;
+        document.getElementById('beepIconText').textContent = appState.beepEnabled ? '🔊 Bíp' : '🔇 Tắt bíp';
+        saveState();
+        if (appState.beepEnabled) playAcPiezoBeep(false);
+      });
 
-    if (appState.displayMode === 'weighted') {
-      const preset = getCurrentPreset();
-      for (let i = preset.items.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [preset.items[i], preset.items[j]] = [preset.items[j], preset.items[i]];
+      document.getElementById('powerBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = !room.power;
+        transmitCurrentRoomState([45, 40, 65], true);
+      });
+
+      document.getElementById('tempUpBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        room.temp = Math.min(30.0, Number((room.temp + room.tempStep).toFixed(1)));
+        transmitCurrentRoomState(30, false);
+      });
+
+      document.getElementById('tempDownBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        room.temp = Math.max(16.0, Number((room.temp - room.tempStep).toFixed(1)));
+        transmitCurrentRoomState(30, false);
+      });
+
+      document.getElementById('tempStepModeToggle').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.tempStep = room.tempStep === 0.5 ? 1.0 : 0.5;
+        if (room.tempStep === 1.0) {
+          room.temp = Math.round(room.temp);
+        }
+        saveState();
+        renderAllUI();
+        triggerHapticAndLed(20);
+      });
+
+      document.getElementById('modeCycleBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        const nextIdx = (MODES.indexOf(room.mode) + 1) % MODES.length;
+        room.mode = MODES[nextIdx];
+        transmitCurrentRoomState(30, false);
+      });
+
+      document.getElementById('fanCycleBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        const nextIdx = (FAN_SPEEDS.indexOf(room.fan) + 1) % FAN_SPEEDS.length;
+        room.fan = FAN_SPEEDS[nextIdx];
+        transmitCurrentRoomState(30, false);
+      });
+
+      document.getElementById('swingVCycleBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        const nextIdx = (SWING_V_MODES.indexOf(room.swingV) + 1) % SWING_V_MODES.length;
+        room.swingV = SWING_V_MODES[nextIdx];
+        transmitCurrentRoomState(30, false);
+      });
+
+      document.getElementById('swingHCycleBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        const nextIdx = (SWING_H_MODES.indexOf(room.swingH) + 1) % SWING_H_MODES.length;
+        room.swingH = SWING_H_MODES[nextIdx];
+        transmitCurrentRoomState(30, false);
+      });
+
+      // Vuốt ngang (Swipe Left / Right) trên màn hình LCD để chuyển phòng
+      let lcdTouchStartX = 0;
+      const lcdScreenEl = document.getElementById('lcdScreen');
+      lcdScreenEl.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          lcdTouchStartX = e.touches[0].clientX;
+        }
+      }, { passive: true });
+
+      lcdScreenEl.addEventListener('touchend', (e) => {
+        if (!e.changedTouches || !e.changedTouches[0]) return;
+        const deltaX = e.changedTouches[0].clientX - lcdTouchStartX;
+        if (Math.abs(deltaX) > 55 && appState.rooms.length > 1) {
+          const curIdx = appState.rooms.findIndex(r => r.id === appState.activeRoomId);
+          const nextIdx = deltaX < 0
+            ? (curIdx + 1) % appState.rooms.length
+            : (curIdx - 1 + appState.rooms.length) % appState.rooms.length;
+          appState.activeRoomId = appState.rooms[nextIdx].id;
+          saveState();
+          renderAllUI();
+          triggerHapticAndLed(25);
+        }
+      }, { passive: true });
+
+      // ========================================================================
+      // 7. 3 NÚT KỊCH BẢN 1-CHẠM (1-TAP MACROS)
+      // ========================================================================
+      // Macro 1: Làm lạnh Cấp tốc (Turbo Cool: Cool + 18°C + Quạt Max + Đảo gió)
+      document.getElementById('macroTurboCoolBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        room.mode = 'cool';
+        room.temp = 18.0;
+        room.fan = 'TURBO';
+        room.swingV = 'AUTO';
+        room.swingH = 'AUTO';
+        if (!room.features) room.features = {};
+        room.features.powerful = true;
+        room.features.turbo = true;
+        room.features.jetCool = true;
+        transmitCurrentRoomState([40, 30, 60], true);
+      });
+
+      // Macro 2: Học tập / Tập trung (Cool + 26°C + Gió êm + Tắt đèn LED)
+      document.getElementById('macroFocusStudyBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        room.mode = 'cool';
+        room.temp = 26.0;
+        room.fan = 'QUIET';
+        room.swingV = 'CAO';
+        if (!room.features) room.features = {};
+        room.features.quiet = true;
+        room.features.comfortAir = true;
+        room.features.led = false;
+        room.features.powerful = false;
+        room.features.turbo = false;
+        transmitCurrentRoomState([35, 35], false);
+      });
+
+      // Macro 3: Sấy khô chống mốc (Chạy quạt gió Fan + Hẹn tắt sau 15 phút)
+      document.getElementById('macroAntiMoldBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.power = true;
+        room.mode = 'fan';
+        room.fan = 'BẬC 3';
+        room.timerOffMinutes = 15;
+        room.timerDeadlineMs = Date.now() + 15 * 60 * 1000;
+        if (!room.features) room.features = {};
+        room.features.moldProof = true;
+        room.features.xfan = true;
+        transmitCurrentRoomState([40, 40, 80], true);
+      });
+
+      // ========================================================================
+      // 8. HỆ THỐNG HẸN GIỜ KÉP (DUAL-MODE TIMER: HARDWARE IR & SLEEP CURVE)
+      // ========================================================================
+      const timerModal = document.getElementById('timerModal');
+      const hwOnSelect = document.getElementById('hwTimerOnSelect');
+      const hwOffSelect = document.getElementById('hwTimerOffSelect');
+
+      function populateTimerSelectOptions() {
+        let htmlOn = '<option value="0">Không hẹn bật (Tắt)</option>';
+        let htmlOff = '<option value="0">Không hẹn tắt (Tắt)</option>';
+        for (let h = 0.5; h <= 24.0; h += 0.5) {
+          const mins = Math.round(h * 60);
+          htmlOn += `<option value="${mins}">Sau ${h.toFixed(1)} giờ (${mins} phút)</option>`;
+          htmlOff += `<option value="${mins}">Sau ${h.toFixed(1)} giờ (${mins} phút)</option>`;
+        }
+        hwOnSelect.innerHTML = htmlOn;
+        hwOffSelect.innerHTML = htmlOff;
       }
-      saveStateToStorage();
-      refreshAllUI();
-    } else {
-      const ids = wheelSlices.map(s => s.itemId);
-      for (let i = ids.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [ids[i], ids[j]] = [ids[j], ids[i]];
-      }
-      appState.customSliceOrder = ids;
-      rebuildWheelSlices();
-      drawWheelFrame();
-    }
-    showToast('Đã xáo trộn ngẫu nhiên!', 'info');
-  });
 
-  // ==========================================================================
-  // 12. QUẢN LÝ BỘ LƯU (PRESETS) & LỊCH SỬ
-  // ==========================================================================
-  function renderPresetsUI() {
-    const currentPreset = getCurrentPreset();
-    const quickSelect = document.getElementById('quickPresetSelect');
-    const badgeEl = document.getElementById('currentPresetBadge');
-    const listContainer = document.getElementById('presetsListContainer');
+      populateTimerSelectOptions();
 
-    if (badgeEl) badgeEl.textContent = currentPreset.name;
+      document.getElementById('openTimerModalBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        hwOnSelect.value = String(room.timerOnMinutes || 0);
+        hwOffSelect.value = String(room.timerOffMinutes || 0);
+        renderSleepCurveModalUI();
+        timerModal.classList.add('open');
+      });
 
-    quickSelect.innerHTML = appState.presets
-      .map(p => `<option value="${p.id}" class="bg-stone-900 text-stone-100" ${p.id === currentPreset.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`)
-      .join('');
+      document.getElementById('closeTimerModalBtn').addEventListener('click', () => {
+        timerModal.classList.remove('open');
+      });
 
-    listContainer.innerHTML = '';
-    appState.presets.forEach((preset) => {
-      const isActive = preset.id === currentPreset.id;
-      const totalMultipliers = preset.items.reduce((acc, i) => acc + (Number(i.quantity) || 1), 0);
+      // Chuyển tab trong Modal Hẹn giờ
+      document.getElementById('tabBtnHwTimer').addEventListener('click', () => {
+        document.getElementById('tabBtnHwTimer').classList.add('active');
+        document.getElementById('tabBtnSleepCurve').classList.remove('active');
+        document.getElementById('panelHwTimer').style.display = 'flex';
+        document.getElementById('panelSleepCurve').style.display = 'none';
+      });
 
-      const card = document.createElement('div');
-      card.className = `glass-subcard rounded-2xl p-3 ${
-        isActive ? 'border-amber-500/60 ring-1 ring-amber-500/30' : ''
-      }`;
+      document.getElementById('tabBtnSleepCurve').addEventListener('click', () => {
+        document.getElementById('tabBtnSleepCurve').classList.add('active');
+        document.getElementById('tabBtnHwTimer').classList.remove('active');
+        document.getElementById('panelSleepCurve').style.display = 'flex';
+        document.getElementById('panelHwTimer').style.display = 'none';
+      });
 
-      card.innerHTML = `
-        <div class="flex items-center justify-between gap-2">
-          <div class="min-w-0 flex-1">
-            <h4 class="text-xs font-extrabold truncate">${escapeHtml(preset.name)}</h4>
-            <p class="text-[10px] opacity-65 mt-0.5">
-              ${preset.items.length} mục • Tổng hệ số: <b>${totalMultipliers} ô</b>
-            </p>
-          </div>
-          <div class="flex items-center gap-1 flex-shrink-0">
-            ${
-              !isActive
-                ? `<button type="button" data-preset-action="select" data-id="${preset.id}" class="btn-warm-primary text-[11px] font-bold px-2.5 py-1.5 rounded-xl">
-                    Chọn
-                  </button>`
-                : `<span class="px-2 py-1 rounded-xl text-[10px] font-bold bg-amber-500/20 text-amber-300">
-                    Đang dùng
-                  </span>`
+      // Chế độ 1: Kích hoạt Hẹn giờ trên Bo mạch Điều hòa (Hardware IR Packet Timer)
+      document.getElementById('activateHwTimerBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        const onMins = parseInt(hwOnSelect.value, 10) || 0;
+        const offMins = parseInt(hwOffSelect.value, 10) || 0;
+
+        room.timerOnMinutes = onMins;
+        room.timerOffMinutes = offMins;
+
+        const activeMins = offMins > 0 ? offMins : onMins;
+        room.timerDeadlineMs = activeMins > 0 ? (Date.now() + activeMins * 60 * 1000) : 0;
+
+        transmitCurrentRoomState([40, 40, 80], true);
+        timerModal.classList.remove('open');
+      });
+
+      document.getElementById('cancelHwTimerBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        room.timerOnMinutes = 0;
+        room.timerOffMinutes = 0;
+        room.timerDeadlineMs = 0;
+        hwOnSelect.value = '0';
+        hwOffSelect.value = '0';
+        transmitCurrentRoomState(40, false);
+        timerModal.classList.remove('open');
+      });
+
+      // Chế độ 2: Hẹn giờ Đường cong Giấc ngủ (Smart Sleep Curve)
+      let wakeLockSentinel = null;
+
+      async function updateScreenWakeLock() {
+        try {
+          if (appState.sleepCurve.active && appState.sleepCurve.wakeLockEnabled && 'wakeLock' in navigator) {
+            if (!wakeLockSentinel) {
+              wakeLockSentinel = await navigator.wakeLock.request('screen');
             }
-            <button type="button" data-preset-action="rename" data-id="${preset.id}" class="p-1.5 rounded-xl glass-subcard">
-              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-            </button>
-            <button type="button" data-preset-action="delete" data-id="${preset.id}" class="p-1.5 rounded-xl glass-subcard text-rose-400">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        </div>
-      `;
-      listContainer.appendChild(card);
-    });
-
-    if (window.lucide) window.lucide.createIcons();
-  }
-
-  document.getElementById('quickPresetSelect').addEventListener('change', (e) => {
-    appState.currentPresetId = e.target.value;
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-  });
-
-  document.getElementById('createPresetForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = document.getElementById('newPresetNameInput');
-    const name = input.value.trim();
-    if (!name) return;
-
-    const newPreset = {
-      id: 'preset_' + Date.now(),
-      name: name,
-      updatedAt: Date.now(),
-      items: [
-        { id: 'item_' + Date.now() + '_1', name: 'Mục A', color: '#c25e4a', quantity: 1, visible: true },
-        { id: 'item_' + Date.now() + '_2', name: 'Mục B', color: '#d48c46', quantity: 2, visible: true },
-        { id: 'item_' + Date.now() + '_3', name: 'Mục C', color: '#4a7c6f', quantity: 3, visible: true }
-      ]
-    };
-
-    appState.presets.unshift(newPreset);
-    appState.currentPresetId = newPreset.id;
-    appState.customSliceOrder = null;
-    input.value = '';
-    saveStateToStorage();
-    refreshAllUI();
-    showToast(`Đã tạo bộ "${name}"`, 'success');
-  });
-
-  document.getElementById('duplicateCurrentPresetBtn').addEventListener('click', () => {
-    const current = getCurrentPreset();
-    const copy = {
-      id: 'preset_' + Date.now(),
-      name: `${current.name} (Bản sao)`,
-      updatedAt: Date.now(),
-      items: current.items.map((item, idx) => ({ ...item, id: 'item_' + Date.now() + '_' + idx }))
-    };
-    appState.presets.unshift(copy);
-    appState.currentPresetId = copy.id;
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-    showToast('Đã nhân bản bộ vòng quay', 'success');
-  });
-
-  document.getElementById('restoreDefaultPresetsBtn').addEventListener('click', () => {
-    const defaults = createDefaultPresets();
-    defaults.forEach(def => {
-      const idx = appState.presets.findIndex(p => p.id === def.id);
-      if (idx !== -1) appState.presets[idx] = def;
-      else appState.presets.push(def);
-    });
-    appState.currentPresetId = defaults[0].id;
-    appState.customSliceOrder = null;
-    saveStateToStorage();
-    refreshAllUI();
-    showToast('Đã khôi phục 2 bộ mẫu!', 'success');
-  });
-
-  document.getElementById('presetsListContainer').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-preset-action]');
-    if (!btn) return;
-    const action = btn.getAttribute('data-preset-action');
-    const id = btn.getAttribute('data-id');
-    const idx = appState.presets.findIndex(p => p.id === id);
-    if (idx === -1) return;
-    const targetPreset = appState.presets[idx];
-
-    if (action === 'select') {
-      appState.currentPresetId = id;
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-      switchMobileTab('wheel');
-    } else if (action === 'rename') {
-      const newName = window.prompt('Nhập tên mới:', targetPreset.name);
-      if (newName && newName.trim()) {
-        targetPreset.name = newName.trim();
-        saveStateToStorage();
-        refreshAllUI();
+          } else if (wakeLockSentinel) {
+            await wakeLockSentinel.release();
+            wakeLockSentinel = null;
+          }
+        } catch (err) {}
       }
-    } else if (action === 'delete') {
-      if (appState.presets.length <= 1) {
-        showToast('Cần giữ ít nhất 1 bộ vòng quay!', 'warning');
-        return;
+
+      function renderSleepCurveModalUI() {
+        const listEl = document.getElementById('sleepCurveStepsList');
+        const toggleBtn = document.getElementById('toggleSleepCurveActiveBtn');
+        document.getElementById('sleepWakeLockToggle').checked = appState.sleepCurve.wakeLockEnabled;
+
+        listEl.innerHTML = '';
+        appState.sleepCurve.steps.forEach((step, idx) => {
+          const row = document.createElement('div');
+          row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 6px; background: #090d16; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border-subtle); font-size: 11px;';
+
+          const desc = step.action === 'dry_coil_then_off'
+            ? 'Chạy Fan 10p sấy dàn lạnh -> Tắt máy'
+            : `Đặt ${step.mode.toUpperCase()} • ${step.temp}°C • Quạt ${step.fan}`;
+
+          row.innerHTML = `
+            <input type="time" value="${step.time}" data-sc-idx="${idx}" class="sc-time-input" style="background: #1e293b; color: #38bdf8; border: none; border-radius: 6px; padding: 4px 6px; font-weight: 800; font-family: var(--font-mono);" />
+            <span style="flex: 1; font-weight: 600; color: #e2e8f0;">${desc}</span>
+          `;
+          listEl.appendChild(row);
+        });
+
+        listEl.querySelectorAll('.sc-time-input').forEach(inp => {
+          inp.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.getAttribute('data-sc-idx'), 10);
+            if (appState.sleepCurve.steps[idx]) {
+              appState.sleepCurve.steps[idx].time = e.target.value;
+              saveState();
+            }
+          });
+        });
+
+        if (appState.sleepCurve.active) {
+          toggleBtn.textContent = '⏹️ Đang chạy Đường Cong Giấc Ngủ (Bấm để Tắt)';
+          toggleBtn.style.background = 'linear-gradient(135deg, #d97706, #b45309)';
+        } else {
+          toggleBtn.textContent = '🌙 Bật Đường Cong Giấc Ngủ Đêm Nay';
+          toggleBtn.style.background = 'linear-gradient(135deg, #0284c7, #2563eb)';
+        }
       }
-      appState.presets.splice(idx, 1);
-      if (appState.currentPresetId === id) appState.currentPresetId = appState.presets[0].id;
-      appState.customSliceOrder = null;
-      saveStateToStorage();
-      refreshAllUI();
-    }
-  });
 
-  function renderHistoryAndStats() {
-    const statsContainer = document.getElementById('statsLeaderboardContainer');
-    const timelineContainer = document.getElementById('historyTimelineContainer');
-    const totalSpins = appState.history.length;
-    document.getElementById('totalSpinsStat').textContent = totalSpins;
+      document.getElementById('sleepWakeLockToggle').addEventListener('change', (e) => {
+        appState.sleepCurve.wakeLockEnabled = e.target.checked;
+        saveState();
+        updateScreenWakeLock();
+      });
 
-    if (totalSpins === 0) {
-      statsContainer.innerHTML = `<p class="text-xs opacity-60 text-center py-2">Chưa có dữ liệu thống kê.</p>`;
-      timelineContainer.innerHTML = `<p class="text-xs opacity-60 text-center py-4">Chưa có lịch sử quay.</p>`;
-      return;
-    }
+      document.getElementById('toggleSleepCurveActiveBtn').addEventListener('click', () => {
+        appState.sleepCurve.active = !appState.sleepCurve.active;
+        appState.sleepCurve.steps.forEach(s => { s.doneToday = false; });
+        saveState();
+        updateScreenWakeLock();
+        renderSleepCurveModalUI();
+        renderAllUI();
+        triggerHapticAndLed(40);
+      });
 
-    const freqMap = new Map();
-    appState.history.forEach((entry) => {
-      if (!freqMap.has(entry.name)) {
-        freqMap.set(entry.name, { name: entry.name, color: entry.color, count: 0 });
+      function executeSleepCurveCheckpoint(step) {
+        const room = getActiveRoom();
+        if (step.action === 'dry_coil_then_off') {
+          room.power = true;
+          room.mode = 'fan';
+          room.fan = 'BẬC 2';
+          room.timerOffMinutes = 10;
+          room.timerDeadlineMs = Date.now() + 10 * 60 * 1000;
+          transmitCurrentRoomState([50, 40, 90], true);
+        } else {
+          room.power = true;
+          room.mode = step.mode;
+          room.temp = step.temp;
+          room.fan = step.fan;
+          if (step.action === 'apply_quiet_no_led' && room.features) {
+            room.features.quiet = true;
+            room.features.led = false;
+          }
+          transmitCurrentRoomState(40, false);
+        }
       }
-      freqMap.get(entry.name).count += 1;
-    });
 
-    const sortedStats = Array.from(freqMap.values()).sort((a, b) => b.count - a.count);
-    statsContainer.innerHTML = sortedStats
-      .map((stat) => {
-        const ratio = ((stat.count / totalSpins) * 100).toFixed(1);
-        return `
-          <div class="space-y-1">
-            <div class="flex items-center justify-between text-xs">
-              <div class="flex items-center gap-1.5 truncate pr-2">
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${stat.color}"></span>
-                <span class="font-bold truncate">${escapeHtml(stat.name)}</span>
-              </div>
-              <span class="font-extrabold text-[11px] text-amber-400">${stat.count} lần (${ratio}%)</span>
-            </div>
-            <div class="w-full h-1.5 bg-stone-800/60 rounded-full overflow-hidden">
-              <div class="h-full rounded-full" style="width:${ratio}%; background:${stat.color}"></div>
-            </div>
-          </div>
-        `;
-      })
-      .join('');
+      // Nút Chạy thử chuỗi Sleep Curve ngay lập tức (2 giây / mốc)
+      document.getElementById('demoSleepCurveNowBtn').addEventListener('click', () => {
+        timerModal.classList.remove('open');
+        const steps = appState.sleepCurve.steps;
+        steps.forEach((step, idx) => {
+          setTimeout(() => {
+            executeSleepCurveCheckpoint(step);
+          }, idx * 1800);
+        });
+      });
 
-    timelineContainer.innerHTML = appState.history
-      .map((entry, idx) => {
-        const spinNumber = totalSpins - idx;
-        const d = new Date(entry.timestamp);
-        const timeStr = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        return `
-          <div class="glass-subcard rounded-xl p-2.5 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">#${spinNumber}</span>
-              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${entry.color}"></span>
-              <div class="min-w-0">
-                <p class="text-xs font-bold truncate">${escapeHtml(entry.name)}</p>
-                <p class="text-[10px] opacity-60 truncate">Hệ số lúc trúng: x${entry.quantityAtSpin}</p>
-              </div>
-            </div>
-            <span class="text-[11px] font-bold text-amber-400 flex-shrink-0">${timeStr}</span>
-          </div>
-        `;
-      })
-      .join('');
-  }
+      // Đồng hồ đếm ngược 1 giây cho cả Hardware Timer & Sleep Curve
+      setInterval(() => {
+        const room = getActiveRoom();
+        const countdownEl = document.getElementById('lcdTimerCountdownText');
 
-  document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-    appState.history = [];
-    saveStateToStorage();
-    renderHistoryAndStats();
-    updateCountersUI();
-    showToast('Đã xóa lịch sử', 'info');
-  });
+        if (room.timerDeadlineMs && room.timerDeadlineMs > Date.now()) {
+          const remainSec = Math.max(0, Math.floor((room.timerDeadlineMs - Date.now()) / 1000));
+          const hh = String(Math.floor(remainSec / 3600)).padStart(2, '0');
+          const mm = String(Math.floor((remainSec % 3600) / 60)).padStart(2, '0');
+          const ss = String(remainSec % 60).padStart(2, '0');
+          const prefix = room.timerOffMinutes > 0 ? 'TẮT SAU' : 'BẬT SAU';
+          countdownEl.textContent = `⏱️ ${prefix}: ${hh}:${mm}:${ss}`;
+        } else if (room.timerDeadlineMs && room.timerDeadlineMs <= Date.now()) {
+          // Hoàn tất đếm ngược
+          if (room.timerOffMinutes > 0) room.power = false;
+          else if (room.timerOnMinutes > 0) room.power = true;
+          room.timerOnMinutes = 0;
+          room.timerOffMinutes = 0;
+          room.timerDeadlineMs = 0;
+          countdownEl.textContent = '';
+          transmitCurrentRoomState([80, 50, 80], true);
+        } else {
+          countdownEl.textContent = '';
+        }
 
-  // ==========================================================================
-  // 13. ĐIỀU HƯỚNG BOTTOM BAR & CHẾ ĐỘ SÁNG/TỐI TRẦM ẤM
-  // ==========================================================================
-  const tabButtons = document.querySelectorAll('.studio-tab-btn');
-  const tabPanels = {
-    wheel: document.getElementById('tabPanel-wheel'),
-    items: document.getElementById('tabPanel-items'),
-    presets: document.getElementById('tabPanel-presets'),
-    history: document.getElementById('tabPanel-history')
-  };
+        // Kiểm tra mốc giờ thực cho Smart Sleep Curve
+        if (appState.sleepCurve.active) {
+          const now = new Date();
+          const curHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          appState.sleepCurve.steps.forEach((step) => {
+            if (step.time === curHM && !step.doneToday) {
+              step.doneToday = true;
+              executeSleepCurveCheckpoint(step);
+            }
+          });
+        }
+      }, 1000);
 
-  function switchMobileTab(targetTab) {
-    tabButtons.forEach((b) => {
-      const isMatch = b.getAttribute('data-tab') === targetTab;
-      if (isMatch) {
-        b.className = 'studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-bold transition-all btn-warm-primary';
-      } else {
-        b.className = 'studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-semibold transition-all opacity-65 hover:opacity-100';
+      // ========================================================================
+      // 9. CHẾ ĐỘ ĐIỀU KHIỂN MÙ BAN ĐÊM (BLIND GESTURE MODE - OLED BLACK)
+      // ========================================================================
+      const blindOverlay = document.getElementById('blindGestureOverlay');
+      const blindFeedback = document.getElementById('blindModeFeedback');
+      let blindTouchStartY = 0;
+      let blindTouchStartTime = 0;
+      let blindLongPressTimer = null;
+      let blindLastTapTime = 0;
+      let blindGestureHandled = false;
+
+      document.getElementById('openBlindModeBtn').addEventListener('click', () => {
+        renderAllUI();
+        blindFeedback.textContent = 'Chế độ OLED Black đã bật';
+        blindOverlay.classList.add('open');
+        triggerHapticAndLed(30);
+      });
+
+      document.getElementById('exitBlindModeBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        blindOverlay.classList.remove('open');
+      });
+
+      blindOverlay.addEventListener('pointerdown', (e) => {
+        if (e.target.id === 'exitBlindModeBtn') return;
+        blindTouchStartY = e.clientY;
+        blindTouchStartTime = Date.now();
+        blindGestureHandled = false;
+
+        clearTimeout(blindLongPressTimer);
+        blindLongPressTimer = setTimeout(() => {
+          // Chạm giữ (Long Press >= 600ms): Kích hoạt ngay chế độ Ngủ đêm (27°C + Quiet + Tắt LED)
+          blindGestureHandled = true;
+          const room = getActiveRoom();
+          room.power = true;
+          room.mode = 'cool';
+          room.temp = 27.0;
+          room.fan = 'QUIET';
+          if (!room.features) room.features = {};
+          room.features.quiet = true;
+          room.features.led = false;
+          blindFeedback.textContent = '🌙 Đã bật Ngủ Đêm: 27.0°C • Quiet • Tắt LED';
+          transmitCurrentRoomState([60, 50, 60, 50, 140], true);
+        }, 600);
+      });
+
+      blindOverlay.addEventListener('pointerup', (e) => {
+        if (e.target.id === 'exitBlindModeBtn') return;
+        clearTimeout(blindLongPressTimer);
+        if (blindGestureHandled) return;
+
+        const deltaY = e.clientY - blindTouchStartY;
+        const now = Date.now();
+
+        // Kiểm tra Vuốt lên / Vuốt xuống
+        if (Math.abs(deltaY) > 45) {
+          const room = getActiveRoom();
+          room.power = true;
+          if (deltaY < 0) {
+            // Vuốt lên: Tăng 1°C (Rung 1 nhịp ngắn)
+            room.temp = Math.min(30.0, room.temp + 1.0);
+            blindFeedback.textContent = `⬆️ Tăng +1°C → ${room.temp.toFixed(1)}°C`;
+          } else {
+            // Vuốt xuống: Giảm 1°C (Rung 1 nhịp ngắn)
+            room.temp = Math.max(16.0, room.temp - 1.0);
+            blindFeedback.textContent = `⬇️ Giảm -1°C → ${room.temp.toFixed(1)}°C`;
+          }
+          transmitCurrentRoomState(45, false);
+          return;
+        }
+
+        // Kiểm tra Chạm đúp (Double Tap): Bật / Tắt nguồn (Rung 2 nhịp dài)
+        if (now - blindLastTapTime < 320) {
+          const room = getActiveRoom();
+          room.power = !room.power;
+          blindFeedback.textContent = room.power ? '⚡ Đã BẬT nguồn điều hòa' : '🌑 Đã TẮT nguồn điều hòa';
+          transmitCurrentRoomState([120, 80, 120], true);
+          blindLastTapTime = 0;
+        } else {
+          blindLastTapTime = now;
+        }
+      });
+
+      // ========================================================================
+      // 10. TRÌNH DÒ MÃ TỰ ĐỘNG (AUTO-SCANNER 1.5s) & CUSTOM RAW IR / PRONTO HEX
+      // ========================================================================
+      const scannerModal = document.getElementById('scannerModal');
+      let autoScanInterval = null;
+      let currentScanIndex = 0;
+
+      function updateScannerDisplay() {
+        const room = getActiveRoom();
+        const variant = PROTOCOL_VARIANTS[currentScanIndex] || PROTOCOL_VARIANTS[0];
+        document.getElementById('scannerCurrentBrandText').textContent = room.brand;
+        document.getElementById('scannerVariantDisplay').textContent = variant.name;
+        document.getElementById('scannerProgressText').textContent =
+          `Biến thể ${currentScanIndex + 1} / ${PROTOCOL_VARIANTS.length} • Chu kỳ 1.5s`;
       }
-    });
 
-    Object.keys(tabPanels).forEach((key) => {
-      if (key === targetTab) {
-        tabPanels[key].classList.remove('hidden');
-        tabPanels[key].classList.add('flex');
-      } else {
-        tabPanels[key].classList.add('hidden');
-        tabPanels[key].classList.remove('flex');
+      function stopAutoScanner() {
+        if (autoScanInterval) {
+          clearInterval(autoScanInterval);
+          autoScanInterval = null;
+        }
+        const btn = document.getElementById('startStopAutoScanBtn');
+        if (btn) btn.textContent = '▶️ Bắt đầu Tự động Dò (1.5s / mã)';
       }
-    });
 
-    if (targetTab === 'wheel') {
-      requestAnimationFrame(resizeAndDrawWheel);
-    }
-  }
+      document.getElementById('openScannerModalBtn').addEventListener('click', () => {
+        stopAutoScanner();
+        const room = getActiveRoom();
+        currentScanIndex = Math.max(0, PROTOCOL_VARIANTS.findIndex(v => v.id === room.protocolVariant));
+        updateScannerDisplay();
+        scannerModal.classList.add('open');
+      });
 
-  tabButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      switchMobileTab(btn.getAttribute('data-tab'));
-    });
-  });
+      document.getElementById('closeScannerModalBtn').addEventListener('click', () => {
+        stopAutoScanner();
+        scannerModal.classList.remove('open');
+      });
 
-  document.getElementById('goToItemsQuickBtn').addEventListener('click', () => {
-    switchMobileTab('items');
-  });
+      document.getElementById('startStopAutoScanBtn').addEventListener('click', () => {
+        if (autoScanInterval) {
+          stopAutoScanner();
+          return;
+        }
 
-  function applyThemeUI() {
-    const body = document.body;
-    const themeBtn = document.getElementById('themeToggleBtn');
+        const btn = document.getElementById('startStopAutoScanBtn');
+        btn.textContent = '⏸️ Đang phát thử mỗi 1.5s... (Bấm để dừng)';
 
-    if (appState.theme === 'light') {
-      body.classList.remove('dark-theme');
-      body.classList.add('light-theme');
-      document.documentElement.classList.remove('dark');
-      if (themeBtn) {
-        themeBtn.innerHTML = `<i data-lucide="moon" class="w-4 h-4 text-amber-700"></i>`;
-      }
-    } else {
-      body.classList.remove('light-theme');
-      body.classList.add('dark-theme');
-      document.documentElement.classList.add('dark');
-      if (themeBtn) {
-        themeBtn.innerHTML = `<i data-lucide="sun" class="w-4 h-4 text-amber-400"></i>`;
-      }
-    }
-    if (window.lucide) window.lucide.createIcons();
-    drawWheelFrame();
-  }
+        const fireCurrentScanStep = () => {
+          const room = getActiveRoom();
+          const variant = PROTOCOL_VARIANTS[currentScanIndex];
+          room.protocolVariant = variant.id;
+          room.power = true;
+          updateScannerDisplay();
+          transmitCurrentRoomState(35, false);
+        };
 
-  function applySoundUI() {
-    const soundBtn = document.getElementById('soundToggleBtn');
-    if (soundBtn) {
-      soundBtn.innerHTML = appState.soundEnabled
-        ? `<i data-lucide="volume-2" class="w-4 h-4 text-amber-400"></i>`
-        : `<i data-lucide="volume-x" class="w-4 h-4 text-stone-400"></i>`;
-    }
-    if (window.lucide) window.lucide.createIcons();
-  }
+        fireCurrentScanStep();
+        autoScanInterval = setInterval(() => {
+          currentScanIndex = (currentScanIndex + 1) % PROTOCOL_VARIANTS.length;
+          fireCurrentScanStep();
+        }, 1500);
+      });
 
-  document.getElementById('themeToggleBtn').addEventListener('click', () => {
-    appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
-    saveStateToStorage();
-    applyThemeUI();
-  });
+      document.getElementById('lockScannedProtocolBtn').addEventListener('click', () => {
+        stopAutoScanner();
+        const room = getActiveRoom();
+        const variant = PROTOCOL_VARIANTS[currentScanIndex] || PROTOCOL_VARIANTS[0];
+        room.protocolVariant = variant.id;
+        saveState();
+        renderAllUI();
+        triggerHapticAndLed([50, 40, 80]);
+        scannerModal.classList.remove('open');
+      });
 
-  document.getElementById('soundToggleBtn').addEventListener('click', () => {
-    appState.soundEnabled = !appState.soundEnabled;
-    saveStateToStorage();
-    applySoundUI();
-    if (appState.soundEnabled) playTickSound(0.7);
-  });
+      // Modal Nạp mã Raw IR / Pronto Hex
+      const rawIrModal = document.getElementById('rawIrModal');
+      const rawIrTextarea = document.getElementById('rawIrInputTextarea');
 
-  function updateCountersUI() {
-    const preset = getCurrentPreset();
-    const activeItems = getActiveItems();
-    const totalWeight = getTotalWeight(activeItems);
+      document.getElementById('openRawIrModalBtn').addEventListener('click', () => {
+        if (!rawIrTextarea.value.trim()) {
+          const packet = IRProtocolEngine.encodeStateToPulses(getActiveRoom());
+          rawIrTextarea.value = packet.pulses.slice(0, 48).join(', ');
+        }
+        rawIrModal.classList.add('open');
+      });
 
-    document.getElementById('activeItemsCountBadge').textContent = `${activeItems.length} mục`;
-    document.getElementById('totalSlicesCountBadge').textContent =
-      appState.displayMode === 'duplicate' ? `${totalWeight} ô quay` : `Tổng x${totalWeight}`;
+      document.getElementById('closeRawIrModalBtn').addEventListener('click', () => {
+        rawIrModal.classList.remove('open');
+      });
 
-    document.getElementById('tabItemsCount').textContent = preset.items.length;
-    document.getElementById('tabPresetsCount').textContent = appState.presets.length;
-    document.getElementById('tabHistoryCount').textContent = appState.history.length;
-  }
+      document.getElementById('fillSampleProntoBtn').addEventListener('click', () => {
+        rawIrTextarea.value =
+          '0000 006D 0012 0000 00AC 00AC 0016 0040 0016 0016 0016 0040 0016 0016 0016 0016 0016 0040 0016 0016 0016 0040 0016 0016 0016 0040 0016 0016 0016 0040 0016 0040 0016 0016 0016 0040 0016 0016 0016 0380';
+      });
 
-  function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    const borderColors = {
-      success: 'border-emerald-500/40 text-emerald-300',
-      warning: 'border-amber-500/40 text-amber-300',
-      info: 'border-amber-500/30 text-stone-200'
-    };
-    toast.className = `glass-card px-3.5 py-2 rounded-2xl text-xs font-bold border shadow-lg transition-all duration-300 text-center ${
-      borderColors[type] || borderColors.info
-    }`;
-    toast.textContent = message;
-    container.appendChild(toast);
+      document.getElementById('fireCustomRawIrBtn').addEventListener('click', () => {
+        const parsed = IRProtocolEngine.parseCustomRawOrPronto(rawIrTextarea.value);
+        if (!parsed) {
+          alert('Dữ liệu xung hoặc Pronto Hex không hợp lệ! Hãy nhập ít nhất 4 giá trị xung.');
+          return;
+        }
+        IRBridge.transmitPacket(parsed, [40, 30, 60], true);
+        rawIrModal.classList.remove('open');
+      });
 
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 250);
-    }, 2000);
-  }
-
-  function escapeHtml(str) {
-    return String(str || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function refreshAllUI() {
-    rebuildWheelSlices();
-    updateSpinDurationUI();
-    updateModeButtonsUI();
-    updateFontSizeBadgeUI();
-    updateCountersUI();
-    renderItemsList();
-    renderPresetsUI();
-    renderHistoryAndStats();
-    drawWheelFrame();
-  }
-
-  document.getElementById('spinBtn').addEventListener('click', startSpin);
-  canvas.addEventListener('click', () => {
-    if (!isSpinning) startSpin();
-  });
-
-  window.addEventListener('resize', resizeAndDrawWheel);
-
-  // ==========================================================================
-  // 14. KHỞI CHẠY ỨNG DỤNG
-  // ==========================================================================
-  loadStateFromStorage();
-  applyThemeUI();
-  applySoundUI();
-  refreshAllUI();
-  resizeAndDrawWheel();
-})();
-
-</script>
+      // ========================================================================
+      // 11. KHỞI CHẠY TỨC THÌ (ZERO-CLICK LAUNCH < 0.1s)
+      // ========================================================================
+      loadState();
+      document.getElementById('beepIconText').textContent = appState.beepEnabled ? '🔊 Bíp' : '🔇 Tắt bíp';
+      renderAllUI();
+      // Khởi tạo sẵn đồ thị xung của trạng thái hiện tại trên thanh Oscilloscope
+      const initialPacket = IRProtocolEngine.encodeStateToPulses(getActiveRoom());
+      IRBridge.renderDebugOscilloscope(
+        initialPacket,
+        Boolean(window.AndroidIR && typeof window.AndroidIR.transmit === 'function')
+      );
+    })();
+  </script>
 </body>
 </html>
