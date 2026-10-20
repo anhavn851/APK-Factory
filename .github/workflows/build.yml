@@ -1,19 +1,6 @@
 name: Build Android APK
 on:
   workflow_dispatch:
-    inputs:
-      app_name:
-        description: 'App Name'
-        required: true
-        default: 'My Web App'
-      package_id:
-        description: 'Package ID'
-        required: true
-        default: 'com.antigravity.webapp'
-      orientation:
-        description: 'Orientation'
-        required: true
-        default: 'portrait'
 permissions:
   contents: write
 jobs:
@@ -27,21 +14,50 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install Cordova & Build APK
+      - name: Build Cordova APK
         run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           npm install -g cordova
-          cordova create build_app "${{ github.event.inputs.package_id }}" "${{ github.event.inputs.app_name }}"
+          PACKAGE_ID=$(node -pe "JSON.parse(fs.readFileSync('www/app-config.json','utf8')).packageId || 'com.apkfactory.webapp'")
+          APP_NAME=$(node -pe "JSON.parse(fs.readFileSync('www/app-config.json','utf8')).appName || 'MyWebApp'")
+          cordova create build_app "$PACKAGE_ID" "$APP_NAME"
+          rm -rf build_app/www/*
           cp -r www/* build_app/www/
           cd build_app
-          # Cấu hình icon, hướng màn hình và cho phép tải CDN mạng ngoài
-          sed -i 's|</widget>|  <preference name="Orientation" value="${{ github.event.inputs.orientation }}" />\n  <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/icon.png" />\n  <icon src="www/icon.png" />\n  <allow-navigation href="*" />\n  <access origin="*" />\n</widget>|g' config.xml
-          cordova platform add android
+          node -e "
+            const fs = require('fs');
+            let xml = fs.readFileSync('config.xml', 'utf8');
+            let orient = 'portrait';
+            try { orient = JSON.parse(fs.readFileSync('www/app-config.json', 'utf8')).orientation || 'portrait'; } catch(e) {}
+            const extra = '<icon src=\"www/icon.png\" /><preference name=\"Orientation\" value=\"' + orient + '\" /><access origin=\"*\" /><allow-navigation href=\"*\" /><allow-intent href=\"http://*/*\" /><allow-intent href=\"https://*/*\" /><preference name=\"AndroidInsecureFileModeEnabled\" value=\"true\" />';
+            xml = xml.replace('</widget>', extra + '</widget>');
+            fs.writeFileSync('config.xml', xml);
+            if (fs.existsSync('www/index.html')) {
+              let html = fs.readFileSync('www/index.html', 'utf8');
+              html = html.replace(/<meta[^>]+Content-Security-Policy[^>]*>/gi, '');
+              fs.writeFileSync('www/index.html', html);
+            }
+          "
+          cordova platform add android@13.0.0
+          node -e "
+            const fs = require('fs');
+            const mfPath = 'platforms/android/app/src/main/AndroidManifest.xml';
+            if (fs.existsSync(mfPath)) {
+              let mf = fs.readFileSync(mfPath, 'utf8');
+              if (!mf.includes('usesCleartextTraffic')) {
+                mf = mf.replace('<application', '<application android:usesCleartextTraffic=\"true\"');
+                fs.writeFileSync(mfPath, mf);
+              }
+            }
+          "
           cordova build android --debug
           cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../app-release.apk
       - name: Publish APK to GitHub Releases
@@ -49,4 +65,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG_NAME="v$(date +%Y%m%d%H%M%S)"
-          gh release create "$TAG_NAME" app-release.apk --title "${{ github.event.inputs.app_name }} ($TAG_NAME)" --notes "Auto-built APK from HTML" --latest
+          gh release create "$TAG_NAME" app-release.apk --title "APK Release $TAG_NAME" --notes "Auto-built APK" --latest
