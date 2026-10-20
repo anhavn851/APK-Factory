@@ -2,7 +2,7 @@
 <html lang="vi" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#12100e" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -39,25 +39,6 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="styles.css" />
-
-<!-- [APK Factory Studio] Auto-Injected Mobile Touch & Viewport Optimization -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<style id="apk-factory-touch-css">
-  *, *::before, *::after {
-    -webkit-tap-highlight-color: transparent !important;
-    -webkit-touch-callout: none;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  input, textarea, select, [contenteditable="true"] {
-    user-select: text !important;
-    -webkit-user-select: text !important;
-  }
-  html, body {
-    overscroll-behavior-y: none;
-    touch-action: manipulation;
-  }
-</style>
 </head>
 <body class="dark-theme">
 
@@ -424,25 +405,5 @@
 
   <!-- Application Script -->
   <script src="app.js"></script>
-
-<!-- [APK Factory Studio] Auto-Injected Screen WakeLock -->
-<script id="apk-factory-wakelock-js">
-(function() {
-  let wakeLockRef = null;
-  async function requestScreenWakeLock() {
-    try {
-      if ('wakeLock' in navigator) {
-        wakeLockRef = await navigator.wakeLock.request('screen');
-      }
-    } catch (err) {}
-  }
-  requestScreenWakeLock();
-  document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-      requestScreenWakeLock();
-    }
-  });
-})();
-</script>
 </body>
 </html>
