@@ -1879,11 +1879,16 @@
         } else {
           dotEl.style.background = '#fbbf24';
           dotEl.style.boxShadow = '0 0 8px #fbbf24';
-          msgEl.textContent = '⚠️ Chế độ Web (Cần đóng gói APK kèm MainActivity.kt để phát IR)';
+          const isAndroidWv = /;\s*wv\)|Version\/\d+\.\d+.*Chrome/i.test(navigator.userAgent || '');
+          msgEl.textContent = isAndroidWv
+            ? '⚠️ Bản APK này chưa có cầu nối IR (Hãy F5 APK Factory Studio & Tạo APK lại!)'
+            : '⚠️ Chế độ Web (Hãy đóng gói APK bằng APK Factory Studio mới)';
           msgEl.style.color = '#fde68a';
-          if (badgeEl) badgeEl.textContent = 'GIẢ LẬP WEB';
+          if (badgeEl) badgeEl.textContent = 'CHƯA CÓ BRIDGE';
         }
       }
+      setTimeout(updateHardwareDiagnosticBanner, 250);
+      setTimeout(updateHardwareDiagnosticBanner, 800);
 
       function playAcPiezoBeep(isDouble = false) {
         if (!appState.beepEnabled) return;
