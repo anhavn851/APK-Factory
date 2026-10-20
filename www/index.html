@@ -807,6 +807,19 @@
     <!-- 2. MAIN REMOTE BODY -->
     <main class="remote-main-body">
 
+      <!-- HARDWARE IR DIAGNOSTIC & PROTOCOL QUICK SWITCH BAR -->
+      <div id="hwDiagnosticBanner" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 11px; border-radius: 12px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.28); font-size: 11px;">
+        <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+          <span id="hwStatusDot" style="width: 8px; height: 8px; border-radius: 999px; background: #fbbf24; flex-shrink: 0;"></span>
+          <span id="hwStatusMessage" style="font-weight: 700; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Đang kiểm tra mắt hồng ngoại...
+          </span>
+        </div>
+        <button id="quickCycleProtocolBtn" type="button" style="flex-shrink: 0; padding: 4px 8px; border-radius: 8px; background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; font-size: 10.5px; font-weight: 800; cursor: pointer;">
+          Đổi mã: <span id="quickProtocolBadge">REV-A (Đa tần)</span>
+        </button>
+      </div>
+
       <!-- MODERN GLASSMORPHISM LCD DISPLAY -->
       <section id="lcdScreen" class="lcd-screen" title="Vuốt ngang trên màn hình LCD để chuyển phòng nhanh">
         <div class="lcd-top-row">
@@ -1347,11 +1360,11 @@
       };
 
       const PROTOCOL_VARIANTS = [
-        { id: 'REV-A', name: 'Model Protocol REV-A (Standard Inverter)', timingMult: 1.00, xorSeed: 0x00 },
-        { id: 'REV-B', name: 'Model Protocol REV-B (Smart Series V2)', timingMult: 1.04, xorSeed: 0x55 },
-        { id: 'REV-C', name: 'Model Protocol REV-C (Multi-Split Commercial)', timingMult: 0.96, xorSeed: 0xAA },
-        { id: 'REV-D', name: 'Model Protocol REV-D (Domestic Japan 100V)', timingMult: 1.08, xorSeed: 0x3C },
-        { id: 'REV-E', name: 'Model Protocol REV-E (Extended 21-Byte State)', timingMult: 0.94, xorSeed: 0xF0 }
+        { id: 'REV-A', name: 'REV-A • Đa Tần Tự Động (Bắn gộp các đời mã chính của hãng)', badge: 'REV-A (Đa tần)' },
+        { id: 'REV-B', name: 'REV-B • Chuẩn OEM Đời 1 (Gree YBOF / Daikin ARC433 / LG 0x88)', badge: 'REV-B (Đời 1)' },
+        { id: 'REV-C', name: 'REV-C • Chuẩn OEM Đời 2 (Midea R51 / Daikin ARC477 / LG2 Inv)', badge: 'REV-C (Đời 2)' },
+        { id: 'REV-D', name: 'REV-D • Chuẩn OEM Đời 3 (AUX-TCL 14B / Pana KDK / Toshiba)', badge: 'REV-D (Đời 3)' },
+        { id: 'REV-E', name: 'REV-E • Chuẩn OEM Đời 4 (Inverter Mở Rộng / Nội Địa)', badge: 'REV-E (Đời 4)' }
       ];
 
       const MODES = ['auto', 'cool', 'dry', 'fan', 'heat'];
@@ -1360,113 +1373,429 @@
       const SWING_H_MODES = ['AUTO', 'TRÁI', 'GIỮA', 'PHẢI', 'GÓC RỘNG'];
 
       // ========================================================================
-      // 2. MODULE ĐỘC LẬP: IR PROTOCOL ENGINE (STATEFUL PACKET GENERATOR)
+      // 2. MODULE ĐỘC LẬP: IR PROTOCOL ENGINE (CHUẨN PHẦN CỨNG IRremoteESP8266)
       // ========================================================================
       const IRProtocolEngine = {
         /**
-         * Tính toán động gói tin trạng thái (Stateful Packet) gồm mảng Byte + Checksum
-         * và mã hóa sang mảng độ rộng xung micro-giây [mark1, space1, mark2, space2...]
+         * Chuyển mảng byte sang mảng xung [Mark, Space...] theo chuẩn LSB-first hoặc MSB-first
          */
-        encodeStateToPulses(roomState) {
-          const brandName = roomState.brand || 'Daikin';
-          const profile = BRAND_PROFILES[brandName] || BRAND_PROFILES.Daikin;
-          const variantObj = PROTOCOL_VARIANTS.find(v => v.id === roomState.protocolVariant) || PROTOCOL_VARIANTS[0];
-
-          const modeIdx = Math.max(0, MODES.indexOf(roomState.mode));
-          const fanIdx = Math.max(0, FAN_SPEEDS.indexOf(roomState.fan));
-          const swingVIdx = Math.max(0, SWING_V_MODES.indexOf(roomState.swingV));
-          const swingHIdx = Math.max(0, SWING_H_MODES.indexOf(roomState.swingH));
-
-          const clampedTemp = Math.min(30, Math.max(16, Number(roomState.temp) || 25));
-          const tempInt = Math.floor(clampedTemp) - 16; // 0..14
-          const hasHalfDeg = (clampedTemp % 1 !== 0) ? 1 : 0;
-
-          // Byte 2: Power (bit 7) | Mode (bits 4..6) | SwingV (bits 0..3)
-          const byte2 = ((roomState.power ? 1 : 0) << 7) | ((modeIdx & 0x07) << 4) | (swingVIdx & 0x0F);
-
-          // Byte 3: Half-degree (bit 7) | EnergySaving Level (bits 5..6) | Temp (bits 0..4)
-          const energyLevel = Number(roomState.energySavingLevel) || 0; // 0: Off, 1: 40%, 2: 60%, 3: 80%
-          const byte3 = (hasHalfDeg << 7) | ((energyLevel & 0x03) << 5) | (tempInt & 0x1F);
-
-          // Byte 4: Fan (bits 4..7) | SwingH (bits 0..3)
-          const byte4 = ((fanIdx & 0x0F) << 4) | (swingHIdx & 0x0F);
-
-          // Byte 5 & 6: Hardware Timer ON & Timer OFF (số bước 10 phút + cờ kích hoạt ở bit 7)
-          const timerOnSteps = roomState.timerOnMinutes > 0
-            ? Math.min(127, Math.round(roomState.timerOnMinutes / 10))
-            : 0;
-          const timerOffSteps = roomState.timerOffMinutes > 0
-            ? Math.min(127, Math.round(roomState.timerOffMinutes / 10))
-            : 0;
-          const byte5 = timerOnSteps > 0 ? (0x80 | timerOnSteps) : 0x00;
-          const byte6 = timerOffSteps > 0 ? (0x80 | timerOffSteps) : 0x00;
-
-          // Byte 7: Brand-Specific Feature Flags
-          let extFlags = 0;
-          const flags = roomState.features || {};
-          profile.features.forEach(feat => {
-            if (flags[feat.key]) {
-              extFlags |= (1 << feat.bit);
+        bytesToPulses(bytes, timing, msbFirst = false) {
+          const pulses = [timing.hMark, timing.hSpace];
+          for (let i = 0; i < bytes.length; i++) {
+            const b = bytes[i] & 0xFF;
+            if (msbFirst) {
+              for (let bit = 7; bit >= 0; bit--) {
+                pulses.push(timing.bMark);
+                pulses.push(((b >> bit) & 1) ? timing.oSpace : timing.zSpace);
+              }
+            } else {
+              for (let bit = 0; bit < 8; bit++) {
+                pulses.push(timing.bMark);
+                pulses.push(((b >> bit) & 1) ? timing.oSpace : timing.zSpace);
+              }
             }
-          });
+          }
+          pulses.push(timing.bMark);
+          pulses.push(timing.gapUs || 10000);
+          return pulses;
+        },
 
-          // Đóng gói mảng Byte
-          const bytes = [
-            profile.vendorCode[0],
-            profile.vendorCode[1] ^ variantObj.xorSeed,
-            byte2,
-            byte3,
-            byte4,
-            byte5,
-            byte6,
-            extFlags
-          ];
+        /**
+         * 1. Chuẩn Midea / Casper (R51/RG57) / Funiki / Nagakawa / Komeco (48-bit Inverted Byte MSB-first)
+         * Khung 6 byte: [B0, ~B0, B1, ~B1, B2, ~B2] với B0 = 0xB2, truyền 2 lần
+         */
+        encodeMideaR51(roomState) {
+          const tempGrayMap = {
+            16: 0x0, 17: 0x0, 18: 0x1, 19: 0x3, 20: 0x2, 21: 0x6, 22: 0x7, 23: 0x5,
+            24: 0x4, 25: 0xC, 26: 0xD, 27: 0x9, 28: 0x8, 29: 0xA, 30: 0xB
+          };
+          const tInt = Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)));
+          let b0 = 0xB2;
+          let b1 = 0xBF;
+          let b2 = 0x00;
 
-          // Nếu là biến thể REV-E (Extended Frame), bổ sung 2 byte mở rộng
-          if (variantObj.id === 'REV-E') {
-            bytes.push((timerOnSteps + timerOffSteps) & 0xFF);
-            bytes.push(0xA5);
+          if (!roomState.power) {
+            // Mã tắt nguồn chuẩn Midea/Casper R51: B2 4D 7B 84 E0 1F
+            b1 = 0x7B;
+            b2 = 0xE0;
+          } else {
+            const fanMap = {
+              'AUTO': 0xA0, 'QUIET': 0x80, 'BẬC 1': 0x80, 'BẬC 2': 0x40,
+              'BẬC 3': 0x20, 'BẬC 4': 0x20, 'TURBO': 0x20
+            };
+            b1 = (fanMap[roomState.fan] || 0xA0) | 0x1F;
+
+            const modeMap = { 'cool': 0x00, 'dry': 0x04, 'auto': 0x08, 'heat': 0x0C, 'fan': 0x04 };
+            const tempNibble = roomState.mode === 'fan' ? 0x0E : (tempGrayMap[tInt] ?? 0x0C);
+            b2 = (tempNibble << 4) | (modeMap[roomState.mode] ?? 0x00);
           }
 
-          // Byte cuối: Tính toán động Checksum (Tổng Modulo 256 XOR seed)
-          const sum = bytes.reduce((acc, b) => (acc + b) & 0xFF, 0);
-          const checksum = (sum ^ variantObj.xorSeed) & 0xFF;
-          bytes.push(checksum);
+          const bytes = [b0, b0 ^ 0xFF, b1, b1 ^ 0xFF, b2, b2 ^ 0xFF];
+          const timing = { hMark: 4400, hSpace: 4400, bMark: 560, oSpace: 1680, zSpace: 560, gapUs: 5200 };
+          const singleFrame = this.bytesToPulses(bytes, timing, true);
+          return { bytes, subFrames: [singleFrame, singleFrame] };
+        },
 
-          // Mã hóa mảng Byte sang mảng xung micro-giây [mark, space, ...]
-          const mult = variantObj.timingMult;
-          const hMark = Math.round(profile.headerMark * mult);
-          const hSpace = Math.round(profile.headerSpace * mult);
-          const bMark = Math.round(profile.bitMark * mult);
-          const zSpace = Math.round(profile.zeroSpace * mult);
-          const oSpace = Math.round(profile.oneSpace * mult);
+        /**
+         * 2. Chuẩn Gree / Casper (YBOF / YAP1F / YAN1F) 67-bit LSB-first
+         * 4 byte đầu + 3 bit '010' + khoảng nghỉ 19980us + 4 byte cuối (có Nibble Checksum ở Byte 7)
+         */
+        encodeGreeYbof(roomState) {
+          const modeMap = { 'auto': 0, 'cool': 1, 'dry': 2, 'fan': 3, 'heat': 4 };
+          const mVal = modeMap[roomState.mode] ?? 1;
+          const pwrBit = roomState.power ? (1 << 3) : 0;
+          const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
+          const fanBits = (fanIdx <= 0 ? 0 : fanIdx <= 2 ? 1 : fanIdx <= 4 ? 2 : 3) << 4;
+          const swingBit = (roomState.swingV === 'AUTO') ? (1 << 6) : 0;
+          const sleepBit = (roomState.features && roomState.features.sleep) ? (1 << 7) : 0;
 
+          const b0 = mVal | pwrBit | fanBits | swingBit | sleepBit;
+          const tInt = Math.min(30, Math.max(16, Math.floor(Number(roomState.temp) || 25))) - 16;
+          const halfBit = ((Number(roomState.temp) || 25) % 1 !== 0) ? (1 << 4) : 0;
+          const b1 = (tInt & 0x0F) | halfBit;
+
+          const f = roomState.features || {};
+          const turboBit = (f.turbo || roomState.fan === 'TURBO') ? (1 << 4) : 0;
+          const ledBit = (f.led !== false) ? (1 << 5) : 0;
+          const xfanBit = f.xfan ? (1 << 7) : 0;
+          const b2 = turboBit | ledBit | xfanBit;
+          const b3 = 0x50;
+          const b4 = (roomState.swingV === 'AUTO') ? 0x01 : 0x00;
+          const b5 = f.ifeel ? 0x24 : 0x20;
+          const b6 = 0x00;
+
+          // Nibble Checksum chuẩn Gree YBOF
+          const chk = (
+            (b0 & 0x0F) +
+            (b1 & 0x0F) +
+            (b2 & 0x0F) +
+            (b3 & 0x0F) +
+            ((b5 >> 4) & 0x0F) +
+            ((b6 >> 4) & 0x0F) +
+            10
+          ) & 0x0F;
+          const b7 = (chk << 4);
+          const bytes = [b0, b1, b2, b3, b4, b5, b6, b7];
+
+          const hMark = 9000, hSpace = 4500, bMark = 620, oSpace = 1600, zSpace = 540;
+          const pulses = [hMark, hSpace];
+          for (let i = 0; i < 4; i++) {
+            for (let bit = 0; bit < 8; bit++) {
+              pulses.push(bMark, ((bytes[i] >> bit) & 1) ? oSpace : zSpace);
+            }
+          }
+          // 3 bit nối '0, 1, 0' + khoảng nghỉ 19980us
+          pulses.push(bMark, zSpace, bMark, oSpace, bMark, zSpace, bMark, 19980);
+          for (let i = 4; i < 8; i++) {
+            for (let bit = 0; bit < 8; bit++) {
+              pulses.push(bMark, ((bytes[i] >> bit) & 1) ? oSpace : zSpace);
+            }
+          }
+          pulses.push(bMark, 10000);
+          return { bytes, subFrames: [pulses] };
+        },
+
+        /**
+         * 3. Chuẩn AUX / TCL / Casper / Funiki / Nagakawa 14-Byte (112-bit LSB-first)
+         * Header: [0x23, 0xCB, 0x26, 0x01, 0x00, ...] + Byte 13 Checksum = Sum(B[0..12]) & 0xFF
+         */
+        encodeAuxTcl14(roomState) {
+          const pwr = roomState.power ? 0x24 : 0x20;
+          const modeMap = { 'auto': 0x08, 'cool': 0x03, 'dry': 0x02, 'fan': 0x07, 'heat': 0x01 };
+          const mByte = modeMap[roomState.mode] ?? 0x03;
+          const tInt = (31 - Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)))) & 0x0F;
+          const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
+          const fanVal = fanIdx <= 0 ? 0x00 : fanIdx <= 2 ? 0x02 : fanIdx <= 4 ? 0x03 : 0x05;
+          const swingV = roomState.swingV === 'AUTO' ? 0x38 : 0x00;
+
+          const bytes = [
+            0x23, 0xCB, 0x26, 0x01, 0x00,
+            pwr,
+            mByte,
+            tInt,
+            swingV | fanVal,
+            0x00, 0x00, 0x00, 0x80
+          ];
+          const chk = bytes.reduce((a, b) => (a + b) & 0xFF, 0);
+          bytes.push(chk);
+
+          const timing = { hMark: 3100, hSpace: 1650, bMark: 400, oSpace: 1200, zSpace: 400, gapUs: 10000 };
+          return { bytes, subFrames: [this.bytesToPulses(bytes, timing, false)] };
+        },
+
+        /**
+         * 4. Chuẩn Daikin (ARC433 3-Frame & ARC477 2-Frame LSB-first)
+         */
+        encodeDaikin(roomState, isTwoFrame = false) {
+          const sf1 = [0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00, 0xD7];
+          const sf2 = [0x11, 0xDA, 0x27, 0x00, 0x42, 0x00, 0x00, 0x54];
+
+          const modeMap = { 'auto': 0x00, 'dry': 0x20, 'cool': 0x30, 'heat': 0x40, 'fan': 0x60 };
+          const mBits = modeMap[roomState.mode] ?? 0x30;
+          const pwrBit = roomState.power ? 0x01 : 0x00;
+          const tOnBit = roomState.timerOnMinutes > 0 ? 0x04 : 0x00;
+          const tOffBit = roomState.timerOffMinutes > 0 ? 0x02 : 0x00;
+          const b5 = mBits | 0x08 | pwrBit | tOnBit | tOffBit;
+
+          const clampedTemp = Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)));
+          const b6 = (clampedTemp * 2) & 0xFF;
+
+          const fanMap = {
+            'AUTO': 0xA0, 'QUIET': 0xB0, 'BẬC 1': 0x30, 'BẬC 2': 0x40,
+            'BẬC 3': 0x50, 'BẬC 4': 0x60, 'TURBO': 0x70
+          };
+          const swingV = roomState.swingV === 'AUTO' ? 0x0F : 0x00;
+          const b8 = (fanMap[roomState.fan] || 0xA0) | swingV;
+          const b9 = roomState.swingH === 'AUTO' ? 0x0F : 0x00;
+
+          const f = roomState.features || {};
+          const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00);
+          const b16 = f.econo ? 0x84 : 0x80;
+
+          const sf3 = [
+            0x11, 0xDA, 0x27, 0x00, 0x00,
+            b5, b6, 0x00, b8, b9,
+            0x00, 0x06, 0x60, b13, 0x00, 0xC1, b16, 0x00
+          ];
+          const chk3 = sf3.reduce((a, b) => (a + b) & 0xFF, 0);
+          sf3.push(chk3);
+
+          const timing = { hMark: 3450, hSpace: 1720, bMark: 430, oSpace: 1300, zSpace: 430, gapUs: 10000 };
+          const p1 = this.bytesToPulses(sf1, timing, false);
+          const p2 = this.bytesToPulses(sf2, timing, false);
+          const p3 = this.bytesToPulses(sf3, timing, false);
+
+          return {
+            bytes: sf3,
+            subFrames: isTwoFrame ? [p2, p3] : [p1, p2, p3]
+          };
+        },
+
+        /**
+         * 5. Chuẩn Panasonic CS/CU (2-Frame: 8 Byte + 19 Byte Kaseikyo LSB-first)
+         */
+        encodePanasonic(roomState) {
+          const sf1 = [0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06];
+          const modeMap = { 'auto': 0x00, 'dry': 0x20, 'cool': 0x30, 'heat': 0x40, 'fan': 0x60 };
+          const b5 = (modeMap[roomState.mode] ?? 0x30) | 0x08 | (roomState.power ? 0x01 : 0x00);
+          const b6 = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) * 2) & 0xFF;
+
+          const fanMap = {
+            'AUTO': 0xA0, 'QUIET': 0x30, 'BẬC 1': 0x30, 'BẬC 2': 0x40,
+            'BẬC 3': 0x50, 'BẬC 4': 0x60, 'TURBO': 0x70
+          };
+          const swingV = roomState.swingV === 'AUTO' ? 0x0F : 0x01;
+          const b8 = (fanMap[roomState.fan] || 0xA0) | swingV;
+          const b9 = roomState.swingH === 'AUTO' ? 0x0D : 0x06;
+          const f = roomState.features || {};
+          const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00);
+
+          const sf2 = [
+            0x02, 0x20, 0xE0, 0x04, 0x00,
+            b5, b6, 0x80, b8, b9,
+            0x00, 0x0E, 0xE0, b13, 0x00, 0x80, 0x00, 0x06
+          ];
+          sf2.push(sf2.reduce((a, b) => (a + b) & 0xFF, 0));
+
+          const timing = { hMark: 3500, hSpace: 1750, bMark: 435, oSpace: 1300, zSpace: 435, gapUs: 10000 };
+          return {
+            bytes: sf2,
+            subFrames: [this.bytesToPulses(sf1, timing, false), this.bytesToPulses(sf2, timing, false)]
+          };
+        },
+
+        /**
+         * 6. Chuẩn Mitsubishi Electric (18-Byte LSB-first, phát lặp 2 lần)
+         */
+        encodeMitsubishi(roomState) {
+          const pwr = roomState.power ? 0x20 : 0x00;
+          const modeMap = { 'heat': 0x08, 'dry': 0x10, 'cool': 0x18, 'auto': 0x20, 'fan': 0x38 };
+          const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 16) & 0x0F;
+          const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
+          const b9 = (fanIdx <= 0 ? 0x00 : Math.min(5, fanIdx)) | (roomState.swingV === 'AUTO' ? 0x38 : 0x08);
+
+          const bytes = [
+            0x23, 0xCB, 0x26, 0x01, 0x00,
+            pwr,
+            modeMap[roomState.mode] ?? 0x18,
+            tVal,
+            0x30,
+            b9,
+            0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00
+          ];
+          bytes.push(bytes.reduce((a, b) => (a + b) & 0xFF, 0));
+
+          const timing = { hMark: 3400, hSpace: 1750, bMark: 450, oSpace: 1300, zSpace: 420, gapUs: 10000 };
+          const frame = this.bytesToPulses(bytes, timing, false);
+          return { bytes, subFrames: [frame, frame] };
+        },
+
+        /**
+         * 7. Chuẩn LG (28-bit MSB-first 0x88 + 4-bit Nibble Checksum)
+         */
+        encodeLG28(roomState, isLg2 = false) {
+          let nibbles;
+          if (!roomState.power) {
+            // Mã tắt nguồn chuẩn LG 28-bit: 0x88C0051
+            nibbles = [0x8, 0x8, 0xC, 0x0, 0x0, 0x5, 0x1];
+          } else {
+            const modeMap = { 'cool': 0x0, 'dry': 0x1, 'fan': 0x2, 'auto': 0x3, 'heat': 0x4 };
+            const n2 = 0x0 | (modeMap[roomState.mode] ?? 0x0);
+            const n3 = (roomState.features && roomState.features.jetCool) ? 0x1 : 0x0;
+            const n4 = (Math.min(30, Math.max(18, Math.round(Number(roomState.temp) || 25))) - 15) & 0x0F;
+            const fanMap = {
+              'AUTO': 0x5, 'QUIET': 0x0, 'BẬC 1': 0x0, 'BẬC 2': 0x2,
+              'BẬC 3': 0x4, 'BẬC 4': 0x4, 'TURBO': 0x4
+            };
+            const n5 = fanMap[roomState.fan] ?? 0x5;
+            const n6 = (n2 + n3 + n4 + n5) & 0x0F;
+            nibbles = [0x8, 0x8, n2, n3, n4, n5, n6];
+          }
+
+          const hMark = isLg2 ? 3200 : 8500;
+          const hSpace = isLg2 ? 9800 : 4250;
+          const bMark = 520, oSpace = 1600, zSpace = 520;
           const pulses = [hMark, hSpace];
 
-          for (let i = 0; i < bytes.length; i++) {
-            const byteVal = bytes[i];
-            // Truyền từng bit theo thứ tự LSB-first (tiêu chuẩn hồng ngoại điều hòa)
-            for (let bit = 0; bit < 8; bit++) {
-              const isOne = (byteVal >> bit) & 1;
-              pulses.push(bMark);
-              pulses.push(isOne ? oSpace : zSpace);
+          for (let n = 0; n < 7; n++) {
+            const val = nibbles[n] & 0x0F;
+            for (let bit = 3; bit >= 0; bit--) {
+              pulses.push(bMark, ((val >> bit) & 1) ? oSpace : zSpace);
             }
           }
+          pulses.push(bMark, 10000);
 
-          // Stop bit & Inter-frame gap
-          pulses.push(bMark);
-          pulses.push(10000);
+          const bytes = [
+            (nibbles[0] << 4) | nibbles[1],
+            (nibbles[2] << 4) | nibbles[3],
+            (nibbles[4] << 4) | nibbles[5],
+            nibbles[6] << 4
+          ];
+          return { bytes, subFrames: [pulses] };
+        },
 
-          const hexFormatted = bytes
-            .map(b => b.toString(16).toUpperCase().padStart(2, '0'))
+        /**
+         * 8. Chuẩn Toshiba (9-Byte MSB-first + XOR Checksum)
+         */
+        encodeToshiba(roomState) {
+          const tVal = (Math.min(30, Math.max(17, Math.round(Number(roomState.temp) || 25))) - 17) << 4;
+          const modeMap = { 'auto': 0x00, 'cool': 0x01, 'dry': 0x02, 'heat': 0x03, 'fan': 0x04 };
+          const mVal = roomState.power ? (modeMap[roomState.mode] ?? 0x01) : 0x07;
+          const fanIdx = Math.max(0, FAN_SPEEDS.indexOf(roomState.fan));
+          const b6 = ((fanIdx & 0x07) << 5) | mVal;
+          const bytes = [0xF2, 0x0D, 0x03, 0xFC, 0x01, tVal, b6, 0x00];
+          bytes.push(bytes[4] ^ bytes[5] ^ bytes[6] ^ bytes[7]);
+
+          const timing = { hMark: 4400, hSpace: 4300, bMark: 540, oSpace: 1620, zSpace: 540, gapUs: 7400 };
+          const frame = this.bytesToPulses(bytes, timing, true);
+          return { bytes, subFrames: [frame, frame] };
+        },
+
+        /**
+         * 9. Chuẩn Samsung (14-Byte / 21-Byte LSB-first)
+         */
+        encodeSamsung(roomState) {
+          const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 16) << 4;
+          const modeMap = { 'auto': 0x00, 'cool': 0x01, 'dry': 0x02, 'fan': 0x03, 'heat': 0x04 };
+          const b11 = tVal | (modeMap[roomState.mode] ?? 0x01);
+          const b12 = roomState.power ? 0xF0 : 0xC0;
+          const bytes = [0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0, 0x01, 0xD2, 0x0F, 0x00, b11, b12, 0xF0];
+          const timing = { hMark: 3000, hSpace: 9000, bMark: 500, oSpace: 1500, zSpace: 500, gapUs: 10000 };
+          return { bytes, subFrames: [this.bytesToPulses(bytes, timing, false)] };
+        },
+
+        /**
+         * 10. Chuẩn Sharp (13-Byte LSB-first + XOR Nibble Checksum)
+         */
+        encodeSharp(roomState) {
+          const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 15) & 0x0F;
+          const pwr = roomState.power ? 0x31 : 0x21;
+          const modeMap = { 'auto': 0x00, 'heat': 0x01, 'cool': 0x02, 'dry': 0x03, 'fan': 0x02 };
+          const b6 = 0x20 | (modeMap[roomState.mode] ?? 0x02);
+          const bytes = [0xAA, 0x5A, 0xCF, 0x10, tVal, pwr, b6, 0x00, 0x08, 0x80, 0x00, 0xF0, 0x01];
+          let xorNib = 0;
+          for (let i = 0; i < 12; i++) {
+            xorNib ^= (bytes[i] & 0x0F) ^ ((bytes[i] >> 4) & 0x0F);
+          }
+          xorNib ^= (bytes[12] & 0x0F);
+          bytes[12] = ((xorNib & 0x0F) << 4) | 0x01;
+          const timing = { hMark: 3800, hSpace: 1900, bMark: 420, oSpace: 1400, zSpace: 420, gapUs: 10000 };
+          return { bytes, subFrames: [this.bytesToPulses(bytes, timing, false)] };
+        },
+
+        /**
+         * Hàm chính: Đóng gói gói tin hồng ngoại theo đúng Hãng & Biến thể REV-A..REV-E
+         * Khi ở REV-A (Đa tần tự động), tự động ghép nối các bộ mã OEM phổ biến nhất của hãng đó tại Việt Nam!
+         */
+        encodeStateToPulses(roomState) {
+          const brand = roomState.brand || 'Daikin';
+          const rev = roomState.protocolVariant || 'REV-A';
+          let encodedList = [];
+
+          if (['Casper', 'Gree', 'Midea', 'Funiki', 'Nagakawa'].includes(brand)) {
+            if (rev === 'REV-B') {
+              encodedList = [this.encodeGreeYbof(roomState)];
+            } else if (rev === 'REV-C') {
+              encodedList = [this.encodeMideaR51(roomState)];
+            } else if (rev === 'REV-D') {
+              encodedList = [this.encodeAuxTcl14(roomState)];
+            } else if (rev === 'REV-E') {
+              encodedList = [this.encodeMitsubishi(roomState)];
+            } else {
+              // REV-A (Mặc định): Bắn liên hoàn cả 3 bo mạch OEM của Casper/Funiki/Midea/Gree/Nagakawa (Midea R51 + Gree YBOF + AUX 14B)
+              encodedList = [
+                this.encodeMideaR51(roomState),
+                this.encodeGreeYbof(roomState),
+                this.encodeAuxTcl14(roomState)
+              ];
+            }
+          } else if (brand === 'Daikin') {
+            if (rev === 'REV-B') {
+              encodedList = [this.encodeDaikin(roomState, false)];
+            } else if (rev === 'REV-C') {
+              encodedList = [this.encodeDaikin(roomState, true)];
+            } else {
+              encodedList = [this.encodeDaikin(roomState, false), this.encodeDaikin(roomState, true)];
+            }
+          } else if (brand === 'Panasonic') {
+            encodedList = [this.encodePanasonic(roomState)];
+          } else if (brand === 'Mitsubishi') {
+            encodedList = [this.encodeMitsubishi(roomState), this.encodeAuxTcl14(roomState)];
+          } else if (brand === 'LG') {
+            if (rev === 'REV-B') {
+              encodedList = [this.encodeLG28(roomState, false)];
+            } else if (rev === 'REV-C') {
+              encodedList = [this.encodeLG28(roomState, true)];
+            } else {
+              encodedList = [this.encodeLG28(roomState, false), this.encodeLG28(roomState, true), this.encodeMideaR51(roomState)];
+            }
+          } else if (brand === 'Toshiba') {
+            encodedList = [this.encodeToshiba(roomState), this.encodeMideaR51(roomState)];
+          } else if (brand === 'Samsung') {
+            encodedList = [this.encodeSamsung(roomState), this.encodeMideaR51(roomState)];
+          } else if (brand === 'Sharp') {
+            encodedList = [this.encodeSharp(roomState)];
+          } else {
+            encodedList = [this.encodeMideaR51(roomState), this.encodeGreeYbof(roomState)];
+          }
+
+          const allSubFrames = [];
+          encodedList.forEach(item => {
+            item.subFrames.forEach(sf => allSubFrames.push(sf));
+          });
+
+          const primaryBytes = encodedList[0].bytes;
+          const hexFormatted = primaryBytes
+            .map(b => (b & 0xFF).toString(16).toUpperCase().padStart(2, '0'))
             .join(' ');
 
           return {
             frequency: CARRIER_FREQ_HZ,
-            bytes,
-            checksum,
-            hexString: hexFormatted,
-            pulses
+            bytes: primaryBytes,
+            checksum: primaryBytes[primaryBytes.length - 1],
+            hexString: `${brand.toUpperCase()} [${rev}] (${allSubFrames.length} khung): ${hexFormatted}`,
+            pulses: allSubFrames[0],
+            subFrames: allSubFrames
           };
         },
 
@@ -1478,7 +1807,6 @@
           const trimmed = (rawText || '').trim();
           if (!trimmed) return null;
 
-          // Kiểm tra định dạng Pronto Hex (bắt đầu bằng 0000)
           if (/^0000\s+[0-9a-fA-F]{4}/i.test(trimmed)) {
             const words = trimmed.split(/\s+/).map(w => parseInt(w, 16)).filter(n => !isNaN(n));
             if (words.length < 6) return null;
@@ -1490,11 +1818,11 @@
             return {
               frequency: carrierHz,
               pulses,
+              subFrames: [pulses],
               hexString: 'PRONTO HEX CUSTOM PACKET'
             };
           }
 
-          // Định dạng mảng micro-giây trực tiếp
           const nums = trimmed
             .split(/[\s,;]+/)
             .map(s => Math.abs(parseInt(s, 10)))
@@ -1502,12 +1830,13 @@
 
           if (nums.length < 4) return null;
           if (nums.length % 2 !== 0) {
-            nums.push(10000); // Đảm bảo cặp chẵn Mark/Space
+            nums.push(10000);
           }
 
           return {
             frequency: CARRIER_FREQ_HZ,
             pulses: nums,
+            subFrames: [nums],
             hexString: `RAW TIMINGS (${nums.length} PULSES)`
           };
         }
@@ -1517,6 +1846,44 @@
       // 3. CẦU NỐI PHẦN CỨNG ANDROID (IRBRIDGE) & OSCILLOSCOPE DEBUGGER
       // ========================================================================
       let audioCtx = null;
+      let burstTimeouts = [];
+
+      function updateHardwareDiagnosticBanner() {
+        const dotEl = document.getElementById('hwStatusDot');
+        const msgEl = document.getElementById('hwStatusMessage');
+        const badgeEl = document.getElementById('irStatusBadgeText');
+        if (!dotEl || !msgEl) return;
+
+        const hasBridge = !!(window.AndroidIR && typeof window.AndroidIR.transmit === 'function');
+        let hasEmitter = false;
+        if (hasBridge && typeof window.AndroidIR.hasIrEmitter === 'function') {
+          try {
+            hasEmitter = !!window.AndroidIR.hasIrEmitter();
+          } catch (e) {
+            hasEmitter = true;
+          }
+        }
+
+        if (hasBridge && hasEmitter) {
+          dotEl.style.background = '#34d399';
+          dotEl.style.boxShadow = '0 0 8px #34d399';
+          msgEl.textContent = '🟢 Đã kết nối Mắt Hồng Ngoại phần cứng (Sẵn sàng điều khiển)';
+          msgEl.style.color = '#6ee7b7';
+          if (badgeEl) badgeEl.textContent = 'IR SẴN SÀNG';
+        } else if (hasBridge && !hasEmitter) {
+          dotEl.style.background = '#f43f5e';
+          dotEl.style.boxShadow = '0 0 8px #f43f5e';
+          msgEl.textContent = '🔴 Điện thoại này không có cổng Hồng ngoại (IR Blaster)';
+          msgEl.style.color = '#fda4af';
+          if (badgeEl) badgeEl.textContent = 'KHÔNG CÓ IR';
+        } else {
+          dotEl.style.background = '#fbbf24';
+          dotEl.style.boxShadow = '0 0 8px #fbbf24';
+          msgEl.textContent = '⚠️ Chế độ Web (Cần đóng gói APK kèm MainActivity.kt để phát IR)';
+          msgEl.style.color = '#fde68a';
+          if (badgeEl) badgeEl.textContent = 'GIẢ LẬP WEB';
+        }
+      }
 
       function playAcPiezoBeep(isDouble = false) {
         if (!appState.beepEnabled) return;
@@ -1531,7 +1898,7 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(2650, startTime); // Tần số còi piezo dàn lạnh Daikin/Panasonic
+            osc.frequency.setValueAtTime(2650, startTime);
             gain.gain.setValueAtTime(0.12, startTime);
             gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
             osc.connect(gain);
@@ -1561,7 +1928,7 @@
         const led = document.getElementById('irBlasterLed');
         if (led) {
           led.classList.add('transmitting');
-          setTimeout(() => led.classList.remove('transmitting'), 140);
+          setTimeout(() => led.classList.remove('transmitting'), 220);
         }
       }
 
@@ -1573,17 +1940,28 @@
           playAcPiezoBeep(doubleBeep);
 
           const freq = packet.frequency || CARRIER_FREQ_HZ;
-          const patternJson = JSON.stringify(packet.pulses);
+          const frames = Array.isArray(packet.subFrames) && packet.subFrames.length > 0
+            ? packet.subFrames
+            : [packet.pulses];
           let usedNativeHardware = false;
 
-          // Gọi trực tiếp cầu nối Android Native ConsumerIrManager nếu có
+          // Hủy các khung truyền cũ nếu người dùng bấm liên tục
+          burstTimeouts.forEach(t => clearTimeout(t));
+          burstTimeouts = [];
+
+          // Truyền từng khung (sub-frame) cách nhau 95ms để không bao giờ tràn bộ đệm phần cứng IR trên Xiaomi/Redmi/Android
           if (window.AndroidIR && typeof window.AndroidIR.transmit === 'function') {
-            try {
-              window.AndroidIR.transmit(freq, patternJson);
-              usedNativeHardware = true;
-            } catch (err) {
-              console.error('AndroidIR transmit error:', err);
-            }
+            usedNativeHardware = true;
+            frames.forEach((framePulses, idx) => {
+              const tId = setTimeout(() => {
+                try {
+                  window.AndroidIR.transmit(freq, JSON.stringify(framePulses));
+                } catch (err) {
+                  console.error('AndroidIR transmit error:', err);
+                }
+              }, idx * 95);
+              burstTimeouts.push(tId);
+            });
           }
 
           this.renderDebugOscilloscope(packet, usedNativeHardware);
@@ -2530,12 +2908,27 @@
         rawIrModal.classList.remove('open');
       });
 
+      // Nút chuyển nhanh Đời mã hồng ngoại (REV-A..REV-E) ngay trên thanh trạng thái
+      document.getElementById('quickCycleProtocolBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        const idx = PROTOCOL_VARIANTS.findIndex(v => v.id === room.protocolVariant);
+        const nextVar = PROTOCOL_VARIANTS[(idx + 1) % PROTOCOL_VARIANTS.length];
+        room.protocolVariant = nextVar.id;
+        const qBadge = document.getElementById('quickProtocolBadge');
+        if (qBadge) qBadge.textContent = nextVar.badge || nextVar.id;
+        transmitCurrentRoomState(35, true);
+      });
+
       // ========================================================================
       // 11. KHỞI CHẠY TỨC THÌ (ZERO-CLICK LAUNCH < 0.1s)
       // ========================================================================
       loadState();
       document.getElementById('beepIconText').textContent = appState.beepEnabled ? '🔊 Bíp' : '🔇 Tắt bíp';
+      updateHardwareDiagnosticBanner();
       renderAllUI();
+      const activeVar = PROTOCOL_VARIANTS.find(v => v.id === getActiveRoom().protocolVariant) || PROTOCOL_VARIANTS[0];
+      const qBadgeInit = document.getElementById('quickProtocolBadge');
+      if (qBadgeInit) qBadgeInit.textContent = activeVar.badge || activeVar.id;
       // Khởi tạo sẵn đồ thị xung của trạng thái hiện tại trên thanh Oscilloscope
       const initialPacket = IRProtocolEngine.encodeStateToPulses(getActiveRoom());
       IRBridge.renderDebugOscilloscope(
