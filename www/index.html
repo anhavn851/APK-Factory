@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Vòng Quay" />
-  <link rel="manifest" href="manifest.json" />
 
   <title>Lucky Wheel Studio</title>
 
@@ -38,7 +37,347 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+/* ==========================================================================
+   Lucky Wheel Studio - Warm Modern Mobile UI (Hiện đại, Trầm ấm, Tinh tế)
+   ========================================================================== */
+
+:root {
+  --font-main: 'Be Vietnam Pro', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior-y: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input, textarea, select {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ==========================================================================
+   1. TÔNG MÀU TRẦM ẤM - HIỆN ĐẠI (WARM ESPRESSO DARK & OAT CREAM LIGHT)
+   ========================================================================== */
+body.dark-theme {
+  background-color: #12100e;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.09) 0%, transparent 55%),
+    radial-gradient(circle at 85% 90%, rgba(194, 94, 74, 0.07) 0%, transparent 50%),
+    linear-gradient(180deg, #161311 0%, #12100e 100%);
+  color: #f5f2eb;
+}
+
+body.light-theme {
+  background-color: #f4EFE6;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, #f9f6f0 0%, #efe9de 100%);
+  color: #292524;
+}
+
+/* Khung Điện Thoại (Mobile App Shell) */
+.mobile-app-shell {
+  width: 100%;
+  max-width: 440px;
+  height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: rgba(24, 21, 19, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+body.light-theme .mobile-app-shell {
+  background: rgba(251, 248, 243, 0.94);
+}
+
+/* Hiển thị khung điện thoại sang trọng khi mở trên màn hình lớn */
+@media (min-width: 500px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .mobile-app-shell {
+    height: min(93dvh, 860px);
+    border-radius: 40px;
+    border: 6px solid #292524;
+    box-shadow: 
+      0 30px 70px -15px rgba(0, 0, 0, 0.75),
+      0 0 0 1px rgba(245, 242, 235, 0.07);
+  }
+
+  body.light-theme .mobile-app-shell {
+    border-color: #d6cfc2;
+    box-shadow: 
+      0 25px 60px -15px rgba(68, 64, 60, 0.16),
+      0 0 0 1px rgba(41, 37, 36, 0.05);
+  }
+}
+
+/* Thẻ bề mặt trầm ấm (Warm Glass & Matte Surfaces) */
+.glass-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(33, 29, 26, 0.82);
+  border: 1px solid rgba(245, 242, 235, 0.07);
+}
+
+body.light-theme .glass-card {
+  background: rgba(255, 253, 249, 0.92);
+  border: 1px solid rgba(214, 207, 194, 0.75);
+}
+
+.glass-subcard {
+  background: rgba(41, 36, 33, 0.65);
+  border: 1px solid rgba(245, 242, 235, 0.065);
+  transition: all 0.2s ease;
+}
+
+body.light-theme .glass-subcard {
+  background: #f3ede2;
+  border: 1px solid #e2d9c8;
+}
+
+.glass-input {
+  background: rgba(20, 18, 16, 0.65);
+  border: 1px solid rgba(245, 242, 235, 0.1);
+  color: #f5f2eb;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: #d97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+}
+
+body.light-theme .glass-input {
+  background: #ffffff;
+  border: 1px solid #d6cfc2;
+  color: #292524;
+}
+
+body.light-theme .glass-input:focus {
+  border-color: #b45309;
+  box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.12);
+}
+
+/* Nút màu nhấn trầm ấm (Warm Amber / Terracotta Accent) */
+.btn-warm-primary {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #fffbeb;
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.28);
+  transition: all 0.18s ease;
+}
+
+.btn-warm-primary:hover {
+  filter: brightness(1.06);
+}
+
+.btn-warm-primary:active {
+  transform: scale(0.96);
+}
+
+/* ==========================================================================
+   2. NÚT 'QUAY' & KIM CHỈ HIỆN ĐẠI, SANG TRỌNG (KHÔNG CỔ ĐIỂN)
+   ========================================================================== */
+.spin-btn-modern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 68px;
+  height: 68px;
+  border-radius: 9999px;
+  background: #1c1917;
+  border: 3px solid #e09f5a;
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(28, 25, 23, 0.85),
+    inset 0 1px 2px rgba(255, 247, 237, 0.15);
+  color: #f5f2eb;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease;
+}
+
+body.light-theme .spin-btn-modern {
+  background: #292524;
+  border-color: #d97706;
+  box-shadow:
+    0 8px 20px rgba(41, 37, 36, 0.28),
+    0 0 0 4px rgba(251, 248, 243, 0.92);
+}
+
+.spin-btn-modern:hover:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.05);
+  border-color: #f59e0b;
+}
+
+.spin-btn-modern:active:not(:disabled) {
+  transform: translate(-50%, -50%) scale(0.94);
+}
+
+.spin-btn-modern:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Kim chỉ hiện đại (Sleek Watch-Hand Pointer) ở vị trí 12 giờ */
+.wheel-pointer-wrapper {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  pointer-events: none;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.45));
+}
+
+.wheel-pointer {
+  transform-origin: 50% 11px;
+  transition: transform 0.055s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Thanh trượt thời gian quay (Warm Range Slider) */
+input[type="range"].warm-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(245, 242, 235, 0.14);
+  outline: none;
+}
+
+body.light-theme input[type="range"].warm-slider {
+  background: rgba(41, 37, 36, 0.15);
+}
+
+input[type="range"].warm-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #d97706;
+  border: 2px solid #f5f2eb;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Color Picker Input */
+input[type="color"].color-swatch-input {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+input[type="color"].color-swatch-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"].color-swatch-input::-webkit-color-swatch {
+  border: 1.5px solid rgba(245, 242, 235, 0.45);
+  border-radius: 8px;
+}
+
+body.light-theme input[type="color"].color-swatch-input::-webkit-color-swatch {
+  border: 1.5px solid rgba(41, 37, 36, 0.2);
+}
+
+/* Hide Number Input Spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(168, 162, 158, 0.22);
+  border-radius: 9999px;
+}
+
+/* Modal Pop Animation */
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-pop {
+  animation: modalPopIn 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Light Mode Typography Overrides */
+body.light-theme .text-amber-300,
+body.light-theme .text-amber-400 {
+  color: #b45309 !important;
+}
+body.light-theme .text-stone-300 {
+  color: #57534e !important;
+}
+body.light-theme .text-emerald-400 {
+  color: #047857 !important;
+}
+body.light-theme .text-rose-400 {
+  color: #be123c !important;
+}
+body.light-theme .bg-stone-950\/50 {
+  background-color: #e7e0d3 !important;
+  border-color: #d6cfc2 !important;
+}
+
+</style>
 </head>
 <body class="dark-theme">
 
@@ -404,6 +743,1644 @@
   </div>
 
   <!-- Application Script -->
-  <script src="app.js"></script>
+  <script>
+/**
+ * ============================================================================
+ * LUCKY WHEEL STUDIO - WARM MODERN MOBILE EDITION
+ * Phong cách Hiện đại, Trầm ấm | Tùy chỉnh thời gian quay | Chữ to sắc nét
+ * ============================================================================
+ */
+
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'lucky_wheel_studio_warm_v3';
+  const POINTER_RAD = -Math.PI / 2; // Kim chỉ ở góc 12 giờ
+
+  // Bảng màu Hiện đại - Trầm ấm - Có gu (Warm Modern Designer Palette)
+  const WARM_MODERN_PALETTE = [
+    '#c25e4a', // Terracotta (Đỏ đất ấm)
+    '#d48c46', // Warm Ochre (Vàng hổ phách trầm)
+    '#4a7c6f', // Deep Sage (Xanh rêu trầm)
+    '#3d5a6c', // Slate Teal (Xanh khói trầm)
+    '#8c5868', // Dusty Plum (Tím mận trầm)
+    '#6b705c', // Olive Stone (Xanh ô-liu trầm)
+    '#b56551', // Cinnamon Rust (Nâu quế ấm)
+    '#5c6478'  // Warm Dusk (Xám lam chiều tà)
+  ];
+
+  // ==========================================================================
+  // 1. KHỞI TẠO 2 BỘ MẪU (SAMPLE PRESETS) TÔNG MÀU TRẦM ẤM HIỆN ĐẠI
+  // ==========================================================================
+  function createDefaultPresets() {
+    return [
+      {
+        id: 'preset_event_lucky_draw',
+        name: '🎁 Bốc Thăm Sự Kiện',
+        updatedAt: Date.now(),
+        items: [
+          { id: 'item_1', name: 'iPhone 16 Pro', color: '#c25e4a', quantity: 1, visible: true },
+          { id: 'item_2', name: 'AirPods Pro 2', color: '#d48c46', quantity: 2, visible: true },
+          { id: 'item_3', name: 'Loa Marshall', color: '#4a7c6f', quantity: 2, visible: true },
+          { id: 'item_4', name: 'Voucher 500K', color: '#3d5a6c', quantity: 3, visible: true },
+          { id: 'item_5', name: 'Áo Thun', color: '#8c5868', quantity: 4, visible: true },
+          { id: 'item_6', name: 'May Mắn Lần Sau', color: '#6b705c', quantity: 3, visible: true }
+        ]
+      },
+      {
+        id: 'preset_food_milktea',
+        name: '🧋 Hôm Nay Ăn Gì?',
+        updatedAt: Date.now() - 3600000,
+        items: [
+          { id: 'food_1', name: 'Lẩu Thái', color: '#c25e4a', quantity: 2, visible: true },
+          { id: 'food_2', name: 'Thịt Nướng BBQ', color: '#d48c46', quantity: 2, visible: true },
+          { id: 'food_3', name: 'Cơm Tấm', color: '#4a7c6f', quantity: 4, visible: true },
+          { id: 'food_4', name: 'Bún Đậu', color: '#3d5a6c', quantity: 3, visible: true },
+          { id: 'food_5', name: 'Trà Sữa', color: '#8c5868', quantity: 4, visible: true },
+          { id: 'food_6', name: 'Pizza Hải Sản', color: '#b56551', quantity: 2, visible: true }
+        ]
+      }
+    ];
+  }
+
+  // ==========================================================================
+  // 2. QUẢN LÝ TRẠNG THÁI (STATE) & LOCALSTORAGE
+  // ==========================================================================
+  let appState = {
+    theme: 'dark', // 'dark' (Trầm tối Espresso) | 'light' (Kem ấm Oat Cream)
+    soundEnabled: true,
+    spinDurationSec: 5, // Thời gian quay tùy chỉnh (mặc định 5 giây)
+    fontScaleMode: 'large', // 'normal' | 'large' | 'xlarge'
+    displayMode: 'duplicate', // 'duplicate' (Nhân bản tách ô) | 'weighted' (Mở rộng diện tích)
+    currentPresetId: 'preset_event_lucky_draw',
+    presets: createDefaultPresets(),
+    history: [],
+    interleaveSeed: 0,
+    customSliceOrder: null
+  };
+
+  let wheelSlices = [];
+  let wheelRotation = 0;
+  let isSpinning = false;
+  let lastSliceIndexUnderPointer = -1;
+  let pointerBounceTimeout = null;
+  let currentWinnerSlice = null;
+
+  function loadStateFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        appState.theme = parsed.theme === 'light' ? 'light' : 'dark';
+        appState.soundEnabled = parsed.soundEnabled !== false;
+        if (typeof parsed.spinDurationSec === 'number' && parsed.spinDurationSec >= 1 && parsed.spinDurationSec <= 30) {
+          appState.spinDurationSec = parsed.spinDurationSec;
+        }
+        if (['normal', 'large', 'xlarge'].includes(parsed.fontScaleMode)) {
+          appState.fontScaleMode = parsed.fontScaleMode;
+        }
+        appState.displayMode = parsed.displayMode === 'weighted' ? 'weighted' : 'duplicate';
+        if (Array.isArray(parsed.presets) && parsed.presets.length > 0) {
+          appState.presets = parsed.presets;
+        }
+        if (parsed.currentPresetId && appState.presets.some(p => p.id === parsed.currentPresetId)) {
+          appState.currentPresetId = parsed.currentPresetId;
+        } else {
+          appState.currentPresetId = appState.presets[0].id;
+        }
+        if (Array.isArray(parsed.history)) {
+          appState.history = parsed.history;
+        }
+      }
+    } catch (err) {
+      console.warn('Không thể đọc LocalStorage:', err);
+    }
+  }
+
+  function saveStateToStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        theme: appState.theme,
+        soundEnabled: appState.soundEnabled,
+        spinDurationSec: appState.spinDurationSec,
+        fontScaleMode: appState.fontScaleMode,
+        displayMode: appState.displayMode,
+        currentPresetId: appState.currentPresetId,
+        presets: appState.presets,
+        history: appState.history
+      }));
+    } catch (err) {
+      console.warn('Không thể lưu LocalStorage:', err);
+    }
+  }
+
+  function getCurrentPreset() {
+    let preset = appState.presets.find(p => p.id === appState.currentPresetId);
+    if (!preset) {
+      preset = appState.presets[0];
+      appState.currentPresetId = preset.id;
+    }
+    return preset;
+  }
+
+  // ==========================================================================
+  // 3. WEB AUDIO API (ÂM THANH TRẦM ẤM, TỰ NHIÊN)
+  // ==========================================================================
+  let audioCtx = null;
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function playTickSound(speedRatio = 0.5) {
+    if (!appState.soundEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // Tiếng gảy gỗ trầm ấm (Warm Wooden Click)
+    osc.type = 'triangle';
+    const startFreq = 380 + Math.min(1, Math.max(0, speedRatio)) * 180;
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(95, now + 0.024);
+
+    const volume = 0.18 + Math.min(1, Math.max(0, speedRatio)) * 0.1;
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.026);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.028);
+  }
+
+  function playVictoryFanfare() {
+    if (!appState.soundEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = [
+      { freq: 440.00, time: 0.00, dur: 0.12, vol: 0.18 }, // A4
+      { freq: 554.37, time: 0.11, dur: 0.12, vol: 0.20 }, // C#5
+      { freq: 659.25, time: 0.22, dur: 0.14, vol: 0.22 }, // E5
+      { freq: 880.00, time: 0.35, dur: 0.48, vol: 0.25 }  // A5
+    ];
+
+    notes.forEach(note => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(note.freq, now + note.time);
+
+      gain.gain.setValueAtTime(0.001, now + note.time);
+      gain.gain.linearRampToValueAtTime(note.vol, now + note.time + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0008, now + note.time + note.dur);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + note.time);
+      osc.stop(now + note.time + note.dur + 0.02);
+    });
+  }
+
+  // ==========================================================================
+  // 4. PARSER CÚ PHÁP NHẬP NHANH: "Tên mục * N" HOẶC "Tên mục xN"
+  // ==========================================================================
+  function parseItemInputSyntax(rawString) {
+    const trimmed = (rawString || '').trim();
+    if (!trimmed) return null;
+
+    const regex = /^(.+?)(?:\s*\*\s*(\d+)|\s+[xX]\s*(\d+))$/;
+    const match = trimmed.match(regex);
+
+    if (match) {
+      const cleanName = match[1].trim();
+      const qtyStr = match[2] || match[3];
+      const qty = Math.min(500, Math.max(1, parseInt(qtyStr, 10) || 1));
+      if (cleanName) {
+        return {
+          name: cleanName,
+          quantity: qty,
+          matchedSyntax: true
+        };
+      }
+    }
+
+    return {
+      name: trimmed,
+      quantity: 1,
+      matchedSyntax: false
+    };
+  }
+
+  // ==========================================================================
+  // 5. THUẬT TOÁN TẠO LÁT CẮT (SLICES) & TRỘN XEN KẼ (INTERLEAVE / SHUFFLE)
+  // ==========================================================================
+  function getActiveItems() {
+    const preset = getCurrentPreset();
+    return preset.items.filter(item => item.visible && item.quantity >= 1);
+  }
+
+  function getTotalWeight(activeItems) {
+    return activeItems.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+  }
+
+  function generateInterleavedDuplicateSlices(activeItems, seedOffset = 0) {
+    const totalSlices = getTotalWeight(activeItems);
+    if (totalSlices === 0) return [];
+
+    const pool = activeItems.map((item, idx) => ({
+      item,
+      remaining: Number(item.quantity) || 1,
+      total: Number(item.quantity) || 1,
+      orderIndex: (idx + seedOffset) % activeItems.length
+    }));
+
+    const resultItems = [];
+
+    for (let step = 0; step < totalSlices; step++) {
+      const prevItem = resultItems.length > 0 ? resultItems[resultItems.length - 1] : null;
+      const firstItem = resultItems.length > 0 ? resultItems[0] : null;
+      const isLastStep = step === totalSlices - 1 && totalSlices > 2;
+
+      const available = pool.filter(p => p.remaining > 0);
+
+      let candidates = available.filter(p => {
+        if (prevItem && p.item.id === prevItem.id) return false;
+        if (isLastStep && firstItem && p.item.id === firstItem.id) return false;
+        return true;
+      });
+
+      if (candidates.length === 0) {
+        candidates = available.filter(p => !prevItem || p.item.id !== prevItem.id);
+      }
+      if (candidates.length === 0) {
+        candidates = available;
+      }
+
+      candidates.sort((a, b) => {
+        if (b.remaining !== a.remaining) return b.remaining - a.remaining;
+        const ratioA = a.remaining / a.total;
+        const ratioB = b.remaining / b.total;
+        if (Math.abs(ratioB - ratioA) > 0.001) return ratioB - ratioA;
+        return a.orderIndex - b.orderIndex;
+      });
+
+      const chosen = candidates[0];
+      resultItems.push(chosen.item);
+      chosen.remaining -= 1;
+      chosen.orderIndex += activeItems.length;
+    }
+
+    return resultItems;
+  }
+
+  function rebuildWheelSlices() {
+    const activeItems = getActiveItems();
+    const totalWeight = getTotalWeight(activeItems);
+
+    if (activeItems.length === 0 || totalWeight === 0) {
+      wheelSlices = [];
+      return;
+    }
+
+    if (appState.displayMode === 'weighted') {
+      let currentAngle = 0;
+      wheelSlices = activeItems.map((item) => {
+        const weight = Number(item.quantity) || 1;
+        const sliceAngle = (weight / totalWeight) * (Math.PI * 2);
+        const slice = {
+          itemId: item.id,
+          name: item.name,
+          color: item.color,
+          quantity: item.quantity,
+          weight: weight,
+          probability: (weight / totalWeight) * 100,
+          startAngle: currentAngle,
+          endAngle: currentAngle + sliceAngle
+        };
+        currentAngle += sliceAngle;
+        return slice;
+      });
+    } else {
+      let orderedItems;
+      if (
+        Array.isArray(appState.customSliceOrder) &&
+        appState.customSliceOrder.length === totalWeight
+      ) {
+        const itemMap = new Map(activeItems.map(i => [i.id, i]));
+        const countCheck = new Map();
+        let valid = true;
+
+        for (const id of appState.customSliceOrder) {
+          if (!itemMap.has(id)) {
+            valid = false;
+            break;
+          }
+          countCheck.set(id, (countCheck.get(id) || 0) + 1);
+        }
+        if (valid) {
+          for (const item of activeItems) {
+            if ((countCheck.get(item.id) || 0) !== Number(item.quantity)) {
+              valid = false;
+              break;
+            }
+          }
+        }
+        if (valid) {
+          orderedItems = appState.customSliceOrder.map(id => itemMap.get(id));
+        }
+      }
+
+      if (!orderedItems) {
+        orderedItems = generateInterleavedDuplicateSlices(activeItems, appState.interleaveSeed);
+        appState.customSliceOrder = orderedItems.map(i => i.id);
+      }
+
+      const sliceAngle = (Math.PI * 2) / totalWeight;
+      wheelSlices = orderedItems.map((item, idx) => ({
+        itemId: item.id,
+        name: item.name,
+        color: item.color,
+        quantity: item.quantity,
+        weight: 1,
+        probability: (item.quantity / totalWeight) * 100,
+        startAngle: idx * sliceAngle,
+        endAngle: (idx + 1) * sliceAngle
+      }));
+    }
+  }
+
+  // ==========================================================================
+  // 6. VẼ VÒNG QUAY PHONG CÁCH ĐỒNG HỒ HIỆN ĐẠI - TRẦM ẤM - SANG TRỌNG
+  // ==========================================================================
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function getSliceIndexAtPointer(rotationRad) {
+    if (wheelSlices.length === 0) return -1;
+    const twoPi = Math.PI * 2;
+    const localAngle = (((POINTER_RAD - rotationRad) % twoPi) + twoPi) % twoPi;
+
+    for (let i = 0; i < wheelSlices.length; i++) {
+      const s = wheelSlices[i];
+      if (localAngle >= s.startAngle && localAngle < s.endAngle) {
+        return i;
+      }
+    }
+    return wheelSlices.length - 1;
+  }
+
+  function getFontScaleMultiplier() {
+    if (appState.fontScaleMode === 'xlarge') return 1.32;
+    if (appState.fontScaleMode === 'large') return 1.16;
+    return 1.0;
+  }
+
+  function resizeAndDrawWheel() {
+    const shell = document.querySelector('.mobile-app-shell');
+    const shellWidth = shell ? shell.clientWidth : window.innerWidth;
+    const shellHeight = shell ? shell.clientHeight : window.innerHeight;
+
+    const maxByWidth = shellWidth - 28;
+    const maxByHeight = Math.max(255, shellHeight - 320);
+    const cssSize = Math.min(380, Math.max(260, Math.min(maxByWidth, maxByHeight)));
+
+    const dpr = Math.max(2, window.devicePixelRatio || 1);
+    canvas.style.width = `${cssSize}px`;
+    canvas.style.height = `${cssSize}px`;
+    canvas.width = Math.floor(cssSize * dpr);
+    canvas.height = Math.floor(cssSize * dpr);
+
+    drawWheelFrame();
+  }
+
+  function drawWheelFrame() {
+    const dpr = Math.max(2, window.devicePixelRatio || 1);
+    const width = canvas.width / dpr;
+    const height = canvas.height / dpr;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const outerRadius = Math.min(centerX, centerY) - 4;
+
+    // Viền ngoài kiểu mặt đồng hồ tối giản hiện đại (8px), không có đèn hội chợ cổ điển
+    const rimThickness = 8;
+    const wheelRadius = outerRadius - rimThickness;
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Vẽ viền ngoài Matte Espresso / Warm Bronze sang trọng
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = appState.theme === 'dark' ? '#26211e' : '#dcd3c4';
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = appState.theme === 'dark' ? 'rgba(224, 159, 90, 0.35)' : 'rgba(180, 83, 9, 0.25)';
+    ctx.stroke();
+
+    // 2. Vẽ các lát cắt tông trầm ấm hiện đại
+    if (wheelSlices.length === 0) {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
+      ctx.fillStyle = appState.theme === 'dark' ? '#1c1917' : '#ece5d8';
+      ctx.fill();
+
+      ctx.fillStyle = appState.theme === 'dark' ? '#a8a29e' : '#57534e';
+      ctx.font = '700 15px "Be Vietnam Pro", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Chưa có biến số hiển thị', centerX, centerY - 50);
+    } else {
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(wheelRotation);
+
+      const sliceCount = wheelSlices.length;
+      const fontMult = getFontScaleMultiplier();
+
+      wheelSlices.forEach((slice) => {
+        const start = slice.startAngle;
+        const end = slice.endAngle;
+        const mid = (start + end) / 2;
+        const arcSpan = end - start;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, wheelRadius, start, end);
+        ctx.closePath();
+
+        ctx.fillStyle = slice.color;
+        ctx.fill();
+
+        // Đường chia ô mảnh, sắc thái trầm ấm đồng nhất với nền
+        ctx.lineWidth = sliceCount > 24 ? 1.2 : 2;
+        ctx.strokeStyle = appState.theme === 'dark' ? '#181513' : '#f9f6f0';
+        ctx.stroke();
+
+        // Vẽ chữ TO, RÕ, SẮC NÉT màu kem ấm (#faf7f2)
+        if (arcSpan > 0.045) {
+          ctx.save();
+          ctx.rotate(mid);
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+
+          const textRadius = wheelRadius - 13;
+          const maxTextWidth = wheelRadius * 0.66;
+
+          let baseFontSize = 15.5;
+          if (width >= 345) baseFontSize = 16.5;
+
+          if (sliceCount <= 8) {
+            baseFontSize += 2;
+          } else if (sliceCount >= 18 && appState.displayMode === 'duplicate') {
+            baseFontSize = Math.max(12.5, baseFontSize - 2.2);
+          } else if (sliceCount > 12 && appState.displayMode === 'duplicate') {
+            baseFontSize = Math.max(13.5, baseFontSize - 1.2);
+          }
+
+          if (appState.displayMode === 'weighted') {
+            if (arcSpan > 0.65) baseFontSize += 2;
+            else if (arcSpan < 0.20) baseFontSize = Math.max(12, baseFontSize - 2);
+          }
+
+          const maxAllowedByArc = Math.max(11.5, Math.sin(arcSpan / 2) * (wheelRadius * 0.62) * 1.45);
+          const finalFontSize = Math.min(maxAllowedByArc, baseFontSize * fontMult);
+
+          ctx.font = `700 ${finalFontSize.toFixed(1)}px "Be Vietnam Pro", sans-serif`;
+          ctx.fillStyle = '#faf7f2';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.28)';
+          ctx.shadowBlur = 2;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 1;
+
+          const displayLabel = truncateTextToFit(ctx, slice.name, maxTextWidth);
+
+          if (appState.displayMode === 'weighted' && arcSpan > 0.28) {
+            ctx.fillText(displayLabel, textRadius, -finalFontSize * 0.44);
+            const subFontSize = Math.max(11, finalFontSize * 0.75);
+            ctx.font = `600 ${subFontSize.toFixed(1)}px "Be Vietnam Pro", sans-serif`;
+            ctx.fillStyle = 'rgba(250, 247, 242, 0.85)';
+            ctx.fillText(`x${slice.quantity} (${Math.round(slice.probability)}%)`, textRadius, finalFontSize * 0.56);
+          } else {
+            ctx.fillText(displayLabel, textRadius, 0);
+          }
+
+          ctx.restore();
+        }
+      });
+
+      ctx.restore();
+    }
+
+    // Vòng chỉ mảnh bên trong viền tạo chiều sâu tinh tế
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, wheelRadius, 0, Math.PI * 2);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(224, 159, 90, 0.22)';
+    ctx.stroke();
+
+    ctx.restore();
+    updateLivePointerIndicator();
+  }
+
+  function updateLivePointerIndicator() {
+    const labelEl = document.getElementById('livePointerLabel');
+    const dotEl = document.getElementById('livePointerColorDot');
+    if (!labelEl || !dotEl) return;
+
+    const idx = getSliceIndexAtPointer(wheelRotation);
+    if (idx >= 0 && wheelSlices[idx]) {
+      const slice = wheelSlices[idx];
+      labelEl.textContent = `${slice.name} (x${slice.quantity})`;
+      dotEl.style.backgroundColor = slice.color;
+    } else {
+      labelEl.textContent = 'Chưa có biến số';
+      dotEl.style.backgroundColor = '#a8a29e';
+    }
+  }
+
+  function truncateTextToFit(context, text, maxWidth) {
+    if (context.measureText(text).width <= maxWidth) return text;
+    let truncated = text;
+    while (truncated.length > 2 && context.measureText(truncated + '…').width > maxWidth) {
+      truncated = truncated.slice(0, -1);
+    }
+    return truncated + '…';
+  }
+
+  // ==========================================================================
+  // 7. VẬT LÝ QUAY CUBIC-BEZIER THEO THỜI GIAN TÙY CHỈNH
+  // ==========================================================================
+  function createCubicBezierEasing(x1, y1, x2, y2) {
+    function sampleCurveX(t) {
+      return ((1 - 3 * x2 + 3 * x1) * t * t * t) + ((3 * x2 - 6 * x1) * t * t) + (3 * x1 * t);
+    }
+    function sampleCurveY(t) {
+      return ((1 - 3 * y2 + 3 * y1) * t * t * t) + ((3 * y2 - 6 * y1) * t * t) + (3 * y1 * t);
+    }
+    function sampleCurveDerivativeX(t) {
+      return (3 * (1 - 3 * x2 + 3 * x1) * t * t) + (2 * (3 * x2 - 6 * x1) * t) + (3 * x1);
+    }
+    function solveCurveX(x) {
+      let t2 = x;
+      for (let i = 0; i < 8; i++) {
+        const x2Val = sampleCurveX(t2) - x;
+        if (Math.abs(x2Val) < 1e-6) return t2;
+        const d2 = sampleCurveDerivativeX(t2);
+        if (Math.abs(d2) < 1e-6) break;
+        t2 = t2 - x2Val / d2;
+      }
+      return t2;
+    }
+    return function (x) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      return sampleCurveY(solveCurveX(x));
+    };
+  }
+
+  const spinBezierEasing = createCubicBezierEasing(0.12, 0.82, 0.16, 1.0);
+
+  function triggerPointerBounce(speedRatio = 0.5) {
+    const pointerEl = document.getElementById('wheelPointer');
+    if (!pointerEl) return;
+
+    const kickAngle = -12 - Math.min(1, Math.max(0.15, speedRatio)) * 16;
+    pointerEl.style.transform = `rotate(${kickAngle.toFixed(1)}deg)`;
+
+    if (pointerBounceTimeout) clearTimeout(pointerBounceTimeout);
+    pointerBounceTimeout = setTimeout(() => {
+      pointerEl.style.transform = 'rotate(0deg)';
+    }, 55);
+  }
+
+  function startSpin() {
+    if (isSpinning) return;
+    if (wheelSlices.length === 0) {
+      showToast('Hãy thêm hoặc bật ít nhất 1 biến số để quay!', 'warning');
+      return;
+    }
+
+    getAudioContext();
+    isSpinning = true;
+    const spinBtn = document.getElementById('spinBtn');
+    if (spinBtn) spinBtn.disabled = true;
+
+    const durationMs = Math.max(1, Number(appState.spinDurationSec) || 5) * 1000;
+    const startRotation = wheelRotation;
+
+    // Số vòng quay tự động điều chỉnh mượt theo số giây người dùng chọn
+    const baseSpins = Math.max(3, Math.round(appState.spinDurationSec * 1.4));
+    const extraSpins = baseSpins + Math.floor(Math.random() * 2);
+    const randomAngle = Math.random() * Math.PI * 2;
+    const totalDeltaRotation = extraSpins * Math.PI * 2 + randomAngle;
+
+    const startTime = performance.now();
+    lastSliceIndexUnderPointer = getSliceIndexAtPointer(startRotation);
+
+    function animateFrame(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / durationMs);
+      const easedProgress = spinBezierEasing(progress);
+
+      wheelRotation = startRotation + totalDeltaRotation * easedProgress;
+      const remainingRatio = Math.max(0.05, 1 - easedProgress * 0.92);
+
+      const currentSliceIdx = getSliceIndexAtPointer(wheelRotation);
+      if (currentSliceIdx !== lastSliceIndexUnderPointer && currentSliceIdx !== -1) {
+        lastSliceIndexUnderPointer = currentSliceIdx;
+        playTickSound(remainingRatio);
+        triggerPointerBounce(remainingRatio);
+      }
+
+      drawWheelFrame();
+
+      if (progress < 1) {
+        requestAnimationFrame(animateFrame);
+      } else {
+        wheelRotation = wheelRotation % (Math.PI * 2);
+        isSpinning = false;
+        if (spinBtn) spinBtn.disabled = false;
+        drawWheelFrame();
+
+        const winnerIdx = getSliceIndexAtPointer(wheelRotation);
+        if (winnerIdx >= 0 && wheelSlices[winnerIdx]) {
+          handleSpinComplete(wheelSlices[winnerIdx]);
+        }
+      }
+    }
+
+    requestAnimationFrame(animateFrame);
+  }
+
+  // Điều khiển thanh trượt và nút chọn nhanh Thời gian quay
+  const spinDurationSlider = document.getElementById('spinDurationSlider');
+  const spinDurationValueText = document.getElementById('spinDurationValueText');
+  const durPresetBtns = document.querySelectorAll('.dur-preset-btn');
+
+  function updateSpinDurationUI() {
+    if (spinDurationSlider) spinDurationSlider.value = appState.spinDurationSec;
+    if (spinDurationValueText) spinDurationValueText.textContent = `${appState.spinDurationSec}s`;
+
+    durPresetBtns.forEach((btn) => {
+      const val = parseInt(btn.getAttribute('data-dur'), 10);
+      if (val === appState.spinDurationSec) {
+        btn.className = 'dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold btn-warm-primary';
+      } else {
+        btn.className = 'dur-preset-btn px-2 py-0.5 rounded-lg text-[10px] font-bold glass-subcard opacity-75 hover:opacity-100';
+      }
+    });
+  }
+
+  if (spinDurationSlider) {
+    spinDurationSlider.addEventListener('input', (e) => {
+      appState.spinDurationSec = Math.min(20, Math.max(1, parseInt(e.target.value, 10) || 5));
+      saveStateToStorage();
+      updateSpinDurationUI();
+    });
+  }
+
+  durPresetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = parseInt(btn.getAttribute('data-dur'), 10);
+      if (!isNaN(val)) {
+        appState.spinDurationSec = val;
+        saveStateToStorage();
+        updateSpinDurationUI();
+        showToast(`Đã đặt thời gian quay: ${val} giây`, 'info');
+      }
+    });
+  });
+
+  // ==========================================================================
+  // 8. KẾT QUẢ TRÚNG THƯỞNG, PHÁO GIẤY & MODAL 3 NÚT HÀNH ĐỘNG
+  // ==========================================================================
+  function handleSpinComplete(winningSlice) {
+    currentWinnerSlice = winningSlice;
+    playVictoryFanfare();
+    triggerCelebrationConfetti(winningSlice.color);
+
+    const preset = getCurrentPreset();
+    const historyEntry = {
+      id: 'spin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      itemId: winningSlice.itemId,
+      name: winningSlice.name,
+      color: winningSlice.color,
+      quantityAtSpin: winningSlice.quantity,
+      probabilityAtSpin: Number(winningSlice.probability.toFixed(1)),
+      presetName: preset.name,
+      timestamp: Date.now()
+    };
+
+    appState.history.unshift(historyEntry);
+    if (appState.history.length > 200) {
+      appState.history = appState.history.slice(0, 200);
+    }
+    saveStateToStorage();
+    renderHistoryAndStats();
+    updateCountersUI();
+    openWinnerModal(winningSlice);
+  }
+
+  function triggerCelebrationConfetti(winnerColor) {
+    if (typeof confetti !== 'function') return;
+    const colors = [winnerColor, '#d97706', '#e09f5a', '#4a7c6f', '#c25e4a'];
+    confetti({
+      particleCount: 60,
+      spread: 68,
+      origin: { y: 0.6 },
+      colors: colors
+    });
+  }
+
+  function openWinnerModal(slice) {
+    const modal = document.getElementById('winnerModal');
+    const nameEl = document.getElementById('winnerNameText');
+    const dotEl = document.getElementById('winnerColorDot');
+    const multEl = document.getElementById('winnerMultiplierBadge');
+    const probEl = document.getElementById('winnerProbabilityBadge');
+    const cardEl = document.getElementById('winnerPrizeCard');
+    const glowEl = document.getElementById('winnerModalGlow');
+    const decreaseBtnText = document.getElementById('modalDecreaseBtnText');
+
+    const preset = getCurrentPreset();
+    const item = preset.items.find(i => i.id === slice.itemId);
+    const currentQty = item ? item.quantity : slice.quantity;
+
+    nameEl.textContent = slice.name;
+    dotEl.style.backgroundColor = slice.color;
+    multEl.textContent = `Hệ số: x${currentQty}`;
+    probEl.textContent = `(${slice.probability.toFixed(1)}%)`;
+    cardEl.style.borderColor = slice.color;
+    glowEl.style.backgroundColor = slice.color;
+
+    if (currentQty > 1) {
+      decreaseBtnText.textContent = `Giảm 1 lượt (x${currentQty} → x${currentQty - 1})`;
+    } else {
+      decreaseBtnText.textContent = `Giảm 1 lượt (Đang x1 → Ẩn mục này)`;
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeWinnerModal() {
+    const modal = document.getElementById('winnerModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  document.getElementById('modalKeepBtn').addEventListener('click', closeWinnerModal);
+
+  document.getElementById('modalDecreaseOneBtn').addEventListener('click', () => {
+    if (!currentWinnerSlice) return;
+    const preset = getCurrentPreset();
+    const item = preset.items.find(i => i.id === currentWinnerSlice.itemId);
+
+    if (item) {
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+        showToast(`Đã giảm "${item.name}" xuống x${item.quantity}`, 'info');
+      } else {
+        item.visible = false;
+        showToast(`Đã ẩn "${item.name}" khỏi vòng quay`, 'warning');
+      }
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    }
+    closeWinnerModal();
+  });
+
+  document.getElementById('modalRemoveCompletelyBtn').addEventListener('click', () => {
+    if (!currentWinnerSlice) return;
+    const preset = getCurrentPreset();
+    const item = preset.items.find(i => i.id === currentWinnerSlice.itemId);
+
+    if (item) {
+      item.visible = false;
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+      showToast(`Đã loại bỏ "${item.name}" khỏi vòng quay`, 'warning');
+    }
+    closeWinnerModal();
+  });
+
+  // ==========================================================================
+  // 9. DANH SÁCH BIẾN SỐ (ITEM CARDS) & NHÂN SỐ LƯỢNG
+  // ==========================================================================
+  function renderItemsList() {
+    const container = document.getElementById('itemsListContainer');
+    const preset = getCurrentPreset();
+    const activeItems = getActiveItems();
+    const totalWeight = getTotalWeight(activeItems);
+
+    document.getElementById('visibleRatioText').textContent =
+      `${activeItems.length}/${preset.items.length} hiển thị`;
+
+    if (preset.items.length === 0) {
+      container.innerHTML = `
+        <div class="glass-subcard rounded-2xl p-5 text-center opacity-70">
+          <p class="text-xs font-semibold">Danh sách trống. Hãy thêm biến số mới ở trên!</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = '';
+
+    preset.items.forEach((item) => {
+      const weight = item.visible ? (Number(item.quantity) || 1) : 0;
+      const percent = (totalWeight > 0 && item.visible)
+        ? ((weight / totalWeight) * 100).toFixed(1)
+        : '0.0';
+
+      const card = document.createElement('div');
+      card.className = `glass-subcard rounded-2xl p-2.5 flex flex-col gap-2 ${
+        item.visible ? '' : 'opacity-45'
+      }`;
+
+      card.innerHTML = `
+        <div class="flex items-center gap-2">
+          <input
+            type="color"
+            value="${item.color}"
+            data-action="color"
+            data-id="${item.id}"
+            class="color-swatch-input"
+          />
+          <input
+            type="text"
+            value="${escapeHtml(item.name)}"
+            data-action="rename"
+            data-id="${item.id}"
+            placeholder="Tên biến số..."
+            class="bg-transparent border-b border-transparent focus:border-amber-500 focus:outline-none text-xs font-bold flex-1 min-w-0 py-0.5 truncate"
+          />
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-500/20 text-amber-300">
+              x${item.quantity}
+            </span>
+            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-stone-500/20 text-stone-300 min-w-[42px] text-center">
+              ${percent}%
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
+          <div class="flex items-center gap-1 bg-stone-950/50 rounded-xl p-0.5 border border-white/10">
+            <button
+              type="button"
+              data-action="dec-qty"
+              data-id="${item.id}"
+              class="w-7 h-6 rounded-lg flex items-center justify-center font-black text-xs hover:bg-amber-500/20 active:scale-90 transition"
+            >
+              -
+            </button>
+            <div class="flex items-center px-1 text-[11px] font-bold">
+              <span class="text-amber-400 font-extrabold">x</span>
+              <input
+                type="number"
+                min="1"
+                max="500"
+                value="${item.quantity}"
+                data-action="input-qty"
+                data-id="${item.id}"
+                class="w-10 text-center bg-transparent font-extrabold text-xs text-amber-400 focus:outline-none"
+              />
+            </div>
+            <button
+              type="button"
+              data-action="inc-qty"
+              data-id="${item.id}"
+              class="w-7 h-6 rounded-lg flex items-center justify-center font-black text-xs hover:bg-amber-500/20 active:scale-90 transition"
+            >
+              +
+            </button>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              data-action="toggle-visible"
+              data-id="${item.id}"
+              class="px-2.5 py-1 rounded-xl text-[11px] font-semibold glass-subcard flex items-center gap-1 ${
+                item.visible ? 'text-emerald-400' : 'text-stone-400'
+              }"
+            >
+              <i data-lucide="${item.visible ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
+              <span>${item.visible ? 'Hiện' : 'Ẩn'}</span>
+            </button>
+            <button
+              type="button"
+              data-action="delete"
+              data-id="${item.id}"
+              class="p-1.5 rounded-xl glass-subcard text-rose-400"
+            >
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  document.getElementById('itemsListContainer').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-action');
+    const itemId = btn.getAttribute('data-id');
+    const preset = getCurrentPreset();
+    const itemIndex = preset.items.findIndex(i => i.id === itemId);
+    if (itemIndex === -1) return;
+    const item = preset.items[itemIndex];
+
+    if (action === 'inc-qty') {
+      item.quantity = Math.min(500, (Number(item.quantity) || 1) + 1);
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    } else if (action === 'dec-qty') {
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+        appState.customSliceOrder = null;
+        saveStateToStorage();
+        refreshAllUI();
+      } else {
+        showToast('Số lượng tối thiểu là x1', 'info');
+      }
+    } else if (action === 'toggle-visible') {
+      item.visible = !item.visible;
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    } else if (action === 'delete') {
+      preset.items.splice(itemIndex, 1);
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    }
+  });
+
+  document.getElementById('itemsListContainer').addEventListener('change', (e) => {
+    const input = e.target.closest('input[data-action]');
+    if (!input) return;
+    const action = input.getAttribute('data-action');
+    const itemId = input.getAttribute('data-id');
+    const preset = getCurrentPreset();
+    const item = preset.items.find(i => i.id === itemId);
+    if (!item) return;
+
+    if (action === 'color') {
+      item.color = input.value;
+      saveStateToStorage();
+      refreshAllUI();
+    } else if (action === 'rename') {
+      const parsed = parseItemInputSyntax(input.value);
+      if (parsed) {
+        item.name = parsed.name;
+        if (parsed.matchedSyntax) item.quantity = parsed.quantity;
+      }
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    } else if (action === 'input-qty') {
+      item.quantity = Math.min(500, Math.max(1, parseInt(input.value, 10) || 1));
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    }
+  });
+
+  // ==========================================================================
+  // 10. FORM THÊM NHANH & NHẬP VĂN BẢN HÀNG LOẠT
+  // ==========================================================================
+  const quickAddInput = document.getElementById('quickAddInput');
+  const syntaxPreviewBadge = document.getElementById('syntaxPreviewBadge');
+
+  quickAddInput.addEventListener('input', () => {
+    const parsed = parseItemInputSyntax(quickAddInput.value);
+    if (parsed && parsed.matchedSyntax) {
+      syntaxPreviewBadge.textContent = `x${parsed.quantity}`;
+      syntaxPreviewBadge.classList.remove('hidden');
+    } else {
+      syntaxPreviewBadge.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('quickAddItemForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const raw = quickAddInput.value.trim();
+    if (!raw) return;
+
+    const parsed = parseItemInputSyntax(raw);
+    if (!parsed) return;
+
+    const preset = getCurrentPreset();
+    const nextColor = WARM_MODERN_PALETTE[preset.items.length % WARM_MODERN_PALETTE.length];
+
+    preset.items.unshift({
+      id: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: parsed.name,
+      color: nextColor,
+      quantity: parsed.quantity,
+      visible: true
+    });
+
+    quickAddInput.value = '';
+    syntaxPreviewBadge.classList.add('hidden');
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+    showToast(`Đã thêm "${parsed.name}" (x${parsed.quantity})`, 'success');
+  });
+
+  const bulkEditContainer = document.getElementById('bulkEditContainer');
+  const bulkTextarea = document.getElementById('bulkTextarea');
+
+  document.getElementById('toggleBulkEditBtn').addEventListener('click', () => {
+    const isHidden = bulkEditContainer.classList.contains('hidden');
+    if (isHidden) {
+      const preset = getCurrentPreset();
+      bulkTextarea.value = preset.items.map(i => `${i.name} * ${i.quantity}`).join('\n');
+      bulkEditContainer.classList.remove('hidden');
+    } else {
+      bulkEditContainer.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('cancelBulkBtn').addEventListener('click', () => {
+    bulkEditContainer.classList.add('hidden');
+  });
+
+  document.getElementById('applyBulkBtn').addEventListener('click', () => {
+    const lines = bulkTextarea.value.split(/\r?\n/);
+    const preset = getCurrentPreset();
+    const newItems = [];
+
+    lines.forEach((line, index) => {
+      const parsed = parseItemInputSyntax(line);
+      if (parsed) {
+        const existing = preset.items.find(i => i.name.toLowerCase() === parsed.name.toLowerCase());
+        newItems.push({
+          id: existing ? existing.id : ('item_' + Date.now() + '_' + index),
+          name: parsed.name,
+          color: existing ? existing.color : WARM_MODERN_PALETTE[index % WARM_MODERN_PALETTE.length],
+          quantity: parsed.quantity,
+          visible: true
+        });
+      }
+    });
+
+    if (newItems.length === 0) return;
+    preset.items = newItems;
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+    bulkEditContainer.classList.add('hidden');
+    showToast(`Đã lưu ${newItems.length} biến số!`, 'success');
+  });
+
+  document.getElementById('showAllItemsBtn').addEventListener('click', () => {
+    const preset = getCurrentPreset();
+    preset.items.forEach(i => { i.visible = true; });
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+    showToast('Đã hiện tất cả các mục', 'success');
+  });
+
+  document.getElementById('resetMultipliersBtn').addEventListener('click', () => {
+    const preset = getCurrentPreset();
+    preset.items.forEach(i => { i.quantity = 1; });
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+    showToast('Đã đặt lại tất cả về x1', 'info');
+  });
+
+  // ==========================================================================
+  // 11. CHẾ ĐỘ HIỂN THỊ, TRỘN XEN KẼ & CỠ CHỮ VÒNG QUAY
+  // ==========================================================================
+  function updateModeButtonsUI() {
+    const dupBtn = document.getElementById('modeDuplicateBtn');
+    const weightBtn = document.getElementById('modeWeightedBtn');
+
+    if (appState.displayMode === 'duplicate') {
+      dupBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all btn-warm-primary';
+      weightBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all opacity-70';
+    } else {
+      weightBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all btn-warm-primary';
+      dupBtn.className = 'flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition-all opacity-70';
+    }
+  }
+
+  function updateFontSizeBadgeUI() {
+    const badge = document.getElementById('fontSizeBadgeText');
+    if (!badge) return;
+    const labels = {
+      normal: 'Chữ: Vừa',
+      large: 'Chữ: Lớn',
+      xlarge: 'Chữ: Rất lớn'
+    };
+    badge.textContent = labels[appState.fontScaleMode] || 'Chữ: Lớn';
+  }
+
+  document.getElementById('fontSizeCycleBtn').addEventListener('click', () => {
+    const order = ['normal', 'large', 'xlarge'];
+    const nextIdx = (order.indexOf(appState.fontScaleMode) + 1) % order.length;
+    appState.fontScaleMode = order[nextIdx];
+    saveStateToStorage();
+    updateFontSizeBadgeUI();
+    drawWheelFrame();
+  });
+
+  document.getElementById('modeDuplicateBtn').addEventListener('click', () => {
+    if (appState.displayMode === 'duplicate') return;
+    appState.displayMode = 'duplicate';
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+  });
+
+  document.getElementById('modeWeightedBtn').addEventListener('click', () => {
+    if (appState.displayMode === 'weighted') return;
+    appState.displayMode = 'weighted';
+    saveStateToStorage();
+    refreshAllUI();
+  });
+
+  document.getElementById('interleaveBtn').addEventListener('click', () => {
+    if (isSpinning) return;
+    const activeItems = getActiveItems();
+    if (activeItems.length <= 1) return;
+
+    if (appState.displayMode === 'weighted') {
+      const preset = getCurrentPreset();
+      const sorted = [...preset.items].sort((a, b) => b.quantity - a.quantity);
+      const interleaved = [];
+      let left = 0, right = sorted.length - 1;
+      while (left <= right) {
+        if (left === right) interleaved.push(sorted[left]);
+        else interleaved.push(sorted[left], sorted[right]);
+        left++;
+        right--;
+      }
+      preset.items = interleaved;
+      saveStateToStorage();
+      refreshAllUI();
+      showToast('Đã xếp xen kẽ các ô lớn - nhỏ', 'success');
+      return;
+    }
+
+    appState.interleaveSeed = (appState.interleaveSeed + 1) % 97;
+    const interleavedSlices = generateInterleavedDuplicateSlices(activeItems, appState.interleaveSeed);
+    appState.customSliceOrder = interleavedSlices.map(i => i.id);
+    rebuildWheelSlices();
+    drawWheelFrame();
+    showToast('Đã trộn xen kẽ đều các ô!', 'success');
+  });
+
+  document.getElementById('randomShuffleBtn').addEventListener('click', () => {
+    if (isSpinning) return;
+    rebuildWheelSlices();
+    if (wheelSlices.length <= 1) return;
+
+    if (appState.displayMode === 'weighted') {
+      const preset = getCurrentPreset();
+      for (let i = preset.items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [preset.items[i], preset.items[j]] = [preset.items[j], preset.items[i]];
+      }
+      saveStateToStorage();
+      refreshAllUI();
+    } else {
+      const ids = wheelSlices.map(s => s.itemId);
+      for (let i = ids.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      }
+      appState.customSliceOrder = ids;
+      rebuildWheelSlices();
+      drawWheelFrame();
+    }
+    showToast('Đã xáo trộn ngẫu nhiên!', 'info');
+  });
+
+  // ==========================================================================
+  // 12. QUẢN LÝ BỘ LƯU (PRESETS) & LỊCH SỬ
+  // ==========================================================================
+  function renderPresetsUI() {
+    const currentPreset = getCurrentPreset();
+    const quickSelect = document.getElementById('quickPresetSelect');
+    const badgeEl = document.getElementById('currentPresetBadge');
+    const listContainer = document.getElementById('presetsListContainer');
+
+    if (badgeEl) badgeEl.textContent = currentPreset.name;
+
+    quickSelect.innerHTML = appState.presets
+      .map(p => `<option value="${p.id}" class="bg-stone-900 text-stone-100" ${p.id === currentPreset.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`)
+      .join('');
+
+    listContainer.innerHTML = '';
+    appState.presets.forEach((preset) => {
+      const isActive = preset.id === currentPreset.id;
+      const totalMultipliers = preset.items.reduce((acc, i) => acc + (Number(i.quantity) || 1), 0);
+
+      const card = document.createElement('div');
+      card.className = `glass-subcard rounded-2xl p-3 ${
+        isActive ? 'border-amber-500/60 ring-1 ring-amber-500/30' : ''
+      }`;
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <h4 class="text-xs font-extrabold truncate">${escapeHtml(preset.name)}</h4>
+            <p class="text-[10px] opacity-65 mt-0.5">
+              ${preset.items.length} mục • Tổng hệ số: <b>${totalMultipliers} ô</b>
+            </p>
+          </div>
+          <div class="flex items-center gap-1 flex-shrink-0">
+            ${
+              !isActive
+                ? `<button type="button" data-preset-action="select" data-id="${preset.id}" class="btn-warm-primary text-[11px] font-bold px-2.5 py-1.5 rounded-xl">
+                    Chọn
+                  </button>`
+                : `<span class="px-2 py-1 rounded-xl text-[10px] font-bold bg-amber-500/20 text-amber-300">
+                    Đang dùng
+                  </span>`
+            }
+            <button type="button" data-preset-action="rename" data-id="${preset.id}" class="p-1.5 rounded-xl glass-subcard">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" data-preset-action="delete" data-id="${preset.id}" class="p-1.5 rounded-xl glass-subcard text-rose-400">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      listContainer.appendChild(card);
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  document.getElementById('quickPresetSelect').addEventListener('change', (e) => {
+    appState.currentPresetId = e.target.value;
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+  });
+
+  document.getElementById('createPresetForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('newPresetNameInput');
+    const name = input.value.trim();
+    if (!name) return;
+
+    const newPreset = {
+      id: 'preset_' + Date.now(),
+      name: name,
+      updatedAt: Date.now(),
+      items: [
+        { id: 'item_' + Date.now() + '_1', name: 'Mục A', color: '#c25e4a', quantity: 1, visible: true },
+        { id: 'item_' + Date.now() + '_2', name: 'Mục B', color: '#d48c46', quantity: 2, visible: true },
+        { id: 'item_' + Date.now() + '_3', name: 'Mục C', color: '#4a7c6f', quantity: 3, visible: true }
+      ]
+    };
+
+    appState.presets.unshift(newPreset);
+    appState.currentPresetId = newPreset.id;
+    appState.customSliceOrder = null;
+    input.value = '';
+    saveStateToStorage();
+    refreshAllUI();
+    showToast(`Đã tạo bộ "${name}"`, 'success');
+  });
+
+  document.getElementById('duplicateCurrentPresetBtn').addEventListener('click', () => {
+    const current = getCurrentPreset();
+    const copy = {
+      id: 'preset_' + Date.now(),
+      name: `${current.name} (Bản sao)`,
+      updatedAt: Date.now(),
+      items: current.items.map((item, idx) => ({ ...item, id: 'item_' + Date.now() + '_' + idx }))
+    };
+    appState.presets.unshift(copy);
+    appState.currentPresetId = copy.id;
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+    showToast('Đã nhân bản bộ vòng quay', 'success');
+  });
+
+  document.getElementById('restoreDefaultPresetsBtn').addEventListener('click', () => {
+    const defaults = createDefaultPresets();
+    defaults.forEach(def => {
+      const idx = appState.presets.findIndex(p => p.id === def.id);
+      if (idx !== -1) appState.presets[idx] = def;
+      else appState.presets.push(def);
+    });
+    appState.currentPresetId = defaults[0].id;
+    appState.customSliceOrder = null;
+    saveStateToStorage();
+    refreshAllUI();
+    showToast('Đã khôi phục 2 bộ mẫu!', 'success');
+  });
+
+  document.getElementById('presetsListContainer').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-preset-action]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-preset-action');
+    const id = btn.getAttribute('data-id');
+    const idx = appState.presets.findIndex(p => p.id === id);
+    if (idx === -1) return;
+    const targetPreset = appState.presets[idx];
+
+    if (action === 'select') {
+      appState.currentPresetId = id;
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+      switchMobileTab('wheel');
+    } else if (action === 'rename') {
+      const newName = window.prompt('Nhập tên mới:', targetPreset.name);
+      if (newName && newName.trim()) {
+        targetPreset.name = newName.trim();
+        saveStateToStorage();
+        refreshAllUI();
+      }
+    } else if (action === 'delete') {
+      if (appState.presets.length <= 1) {
+        showToast('Cần giữ ít nhất 1 bộ vòng quay!', 'warning');
+        return;
+      }
+      appState.presets.splice(idx, 1);
+      if (appState.currentPresetId === id) appState.currentPresetId = appState.presets[0].id;
+      appState.customSliceOrder = null;
+      saveStateToStorage();
+      refreshAllUI();
+    }
+  });
+
+  function renderHistoryAndStats() {
+    const statsContainer = document.getElementById('statsLeaderboardContainer');
+    const timelineContainer = document.getElementById('historyTimelineContainer');
+    const totalSpins = appState.history.length;
+    document.getElementById('totalSpinsStat').textContent = totalSpins;
+
+    if (totalSpins === 0) {
+      statsContainer.innerHTML = `<p class="text-xs opacity-60 text-center py-2">Chưa có dữ liệu thống kê.</p>`;
+      timelineContainer.innerHTML = `<p class="text-xs opacity-60 text-center py-4">Chưa có lịch sử quay.</p>`;
+      return;
+    }
+
+    const freqMap = new Map();
+    appState.history.forEach((entry) => {
+      if (!freqMap.has(entry.name)) {
+        freqMap.set(entry.name, { name: entry.name, color: entry.color, count: 0 });
+      }
+      freqMap.get(entry.name).count += 1;
+    });
+
+    const sortedStats = Array.from(freqMap.values()).sort((a, b) => b.count - a.count);
+    statsContainer.innerHTML = sortedStats
+      .map((stat) => {
+        const ratio = ((stat.count / totalSpins) * 100).toFixed(1);
+        return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-1.5 truncate pr-2">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${stat.color}"></span>
+                <span class="font-bold truncate">${escapeHtml(stat.name)}</span>
+              </div>
+              <span class="font-extrabold text-[11px] text-amber-400">${stat.count} lần (${ratio}%)</span>
+            </div>
+            <div class="w-full h-1.5 bg-stone-800/60 rounded-full overflow-hidden">
+              <div class="h-full rounded-full" style="width:${ratio}%; background:${stat.color}"></div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    timelineContainer.innerHTML = appState.history
+      .map((entry, idx) => {
+        const spinNumber = totalSpins - idx;
+        const d = new Date(entry.timestamp);
+        const timeStr = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `
+          <div class="glass-subcard rounded-xl p-2.5 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">#${spinNumber}</span>
+              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${entry.color}"></span>
+              <div class="min-w-0">
+                <p class="text-xs font-bold truncate">${escapeHtml(entry.name)}</p>
+                <p class="text-[10px] opacity-60 truncate">Hệ số lúc trúng: x${entry.quantityAtSpin}</p>
+              </div>
+            </div>
+            <span class="text-[11px] font-bold text-amber-400 flex-shrink-0">${timeStr}</span>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    appState.history = [];
+    saveStateToStorage();
+    renderHistoryAndStats();
+    updateCountersUI();
+    showToast('Đã xóa lịch sử', 'info');
+  });
+
+  // ==========================================================================
+  // 13. ĐIỀU HƯỚNG BOTTOM BAR & CHẾ ĐỘ SÁNG/TỐI TRẦM ẤM
+  // ==========================================================================
+  const tabButtons = document.querySelectorAll('.studio-tab-btn');
+  const tabPanels = {
+    wheel: document.getElementById('tabPanel-wheel'),
+    items: document.getElementById('tabPanel-items'),
+    presets: document.getElementById('tabPanel-presets'),
+    history: document.getElementById('tabPanel-history')
+  };
+
+  function switchMobileTab(targetTab) {
+    tabButtons.forEach((b) => {
+      const isMatch = b.getAttribute('data-tab') === targetTab;
+      if (isMatch) {
+        b.className = 'studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-bold transition-all btn-warm-primary';
+      } else {
+        b.className = 'studio-tab-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl text-[11px] font-semibold transition-all opacity-65 hover:opacity-100';
+      }
+    });
+
+    Object.keys(tabPanels).forEach((key) => {
+      if (key === targetTab) {
+        tabPanels[key].classList.remove('hidden');
+        tabPanels[key].classList.add('flex');
+      } else {
+        tabPanels[key].classList.add('hidden');
+        tabPanels[key].classList.remove('flex');
+      }
+    });
+
+    if (targetTab === 'wheel') {
+      requestAnimationFrame(resizeAndDrawWheel);
+    }
+  }
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      switchMobileTab(btn.getAttribute('data-tab'));
+    });
+  });
+
+  document.getElementById('goToItemsQuickBtn').addEventListener('click', () => {
+    switchMobileTab('items');
+  });
+
+  function applyThemeUI() {
+    const body = document.body;
+    const themeBtn = document.getElementById('themeToggleBtn');
+
+    if (appState.theme === 'light') {
+      body.classList.remove('dark-theme');
+      body.classList.add('light-theme');
+      document.documentElement.classList.remove('dark');
+      if (themeBtn) {
+        themeBtn.innerHTML = `<i data-lucide="moon" class="w-4 h-4 text-amber-700"></i>`;
+      }
+    } else {
+      body.classList.remove('light-theme');
+      body.classList.add('dark-theme');
+      document.documentElement.classList.add('dark');
+      if (themeBtn) {
+        themeBtn.innerHTML = `<i data-lucide="sun" class="w-4 h-4 text-amber-400"></i>`;
+      }
+    }
+    if (window.lucide) window.lucide.createIcons();
+    drawWheelFrame();
+  }
+
+  function applySoundUI() {
+    const soundBtn = document.getElementById('soundToggleBtn');
+    if (soundBtn) {
+      soundBtn.innerHTML = appState.soundEnabled
+        ? `<i data-lucide="volume-2" class="w-4 h-4 text-amber-400"></i>`
+        : `<i data-lucide="volume-x" class="w-4 h-4 text-stone-400"></i>`;
+    }
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  document.getElementById('themeToggleBtn').addEventListener('click', () => {
+    appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+    saveStateToStorage();
+    applyThemeUI();
+  });
+
+  document.getElementById('soundToggleBtn').addEventListener('click', () => {
+    appState.soundEnabled = !appState.soundEnabled;
+    saveStateToStorage();
+    applySoundUI();
+    if (appState.soundEnabled) playTickSound(0.7);
+  });
+
+  function updateCountersUI() {
+    const preset = getCurrentPreset();
+    const activeItems = getActiveItems();
+    const totalWeight = getTotalWeight(activeItems);
+
+    document.getElementById('activeItemsCountBadge').textContent = `${activeItems.length} mục`;
+    document.getElementById('totalSlicesCountBadge').textContent =
+      appState.displayMode === 'duplicate' ? `${totalWeight} ô quay` : `Tổng x${totalWeight}`;
+
+    document.getElementById('tabItemsCount').textContent = preset.items.length;
+    document.getElementById('tabPresetsCount').textContent = appState.presets.length;
+    document.getElementById('tabHistoryCount').textContent = appState.history.length;
+  }
+
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    const borderColors = {
+      success: 'border-emerald-500/40 text-emerald-300',
+      warning: 'border-amber-500/40 text-amber-300',
+      info: 'border-amber-500/30 text-stone-200'
+    };
+    toast.className = `glass-card px-3.5 py-2 rounded-2xl text-xs font-bold border shadow-lg transition-all duration-300 text-center ${
+      borderColors[type] || borderColors.info
+    }`;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 250);
+    }, 2000);
+  }
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function refreshAllUI() {
+    rebuildWheelSlices();
+    updateSpinDurationUI();
+    updateModeButtonsUI();
+    updateFontSizeBadgeUI();
+    updateCountersUI();
+    renderItemsList();
+    renderPresetsUI();
+    renderHistoryAndStats();
+    drawWheelFrame();
+  }
+
+  document.getElementById('spinBtn').addEventListener('click', startSpin);
+  canvas.addEventListener('click', () => {
+    if (!isSpinning) startSpin();
+  });
+
+  window.addEventListener('resize', resizeAndDrawWheel);
+
+  // ==========================================================================
+  // 14. KHỞI CHẠY ỨNG DỤNG
+  // ==========================================================================
+  loadStateFromStorage();
+  applyThemeUI();
+  applySoundUI();
+  refreshAllUI();
+  resizeAndDrawWheel();
+})();
+
+</script>
 </body>
 </html>
