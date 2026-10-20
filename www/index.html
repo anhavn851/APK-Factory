@@ -1403,6 +1403,7 @@
         /**
          * 1. Chuẩn Midea / Casper (R51/RG57) / Funiki / Nagakawa / Komeco (48-bit Inverted Byte MSB-first)
          * Khung 6 byte: [B0, ~B0, B1, ~B1, B2, ~B2] với B0 = 0xB2, truyền 2 lần
+         * Hỗ trợ đóng gói trực tiếp số nửa-giờ Hẹn giờ vào 6 bit Timer (B1[4..0] & B2[1..0]) để bật đèn đồng hồ trên dàn lạnh!
          */
         encodeMideaR51(roomState) {
           const tempGrayMap = {
@@ -1414,7 +1415,11 @@
           let b1 = 0xBF;
           let b2 = 0x00;
 
-          if (!roomState.power) {
+          const activeTimerMins = (roomState.timerOffMinutes > 0)
+            ? roomState.timerOffMinutes
+            : (roomState.timerOnMinutes > 0 ? roomState.timerOnMinutes : 0);
+
+          if (!roomState.power && activeTimerMins === 0) {
             // Mã tắt nguồn chuẩn Midea/Casper R51: B2 4D 7B 84 E0 1F
             b1 = 0x7B;
             b2 = 0xE0;
@@ -1423,11 +1428,24 @@
               'AUTO': 0xA0, 'QUIET': 0x80, 'BẬC 1': 0x80, 'BẬC 2': 0x40,
               'BẬC 3': 0x20, 'BẬC 4': 0x20, 'TURBO': 0x20
             };
-            b1 = (fanMap[roomState.fan] || 0xA0) | 0x1F;
-
+            const fanBits = fanMap[roomState.fan] || 0xA0;
             const modeMap = { 'cool': 0x00, 'dry': 0x04, 'auto': 0x08, 'heat': 0x0C, 'fan': 0x04 };
             const tempNibble = roomState.mode === 'fan' ? 0x0E : (tempGrayMap[tInt] ?? 0x0C);
-            b2 = (tempNibble << 4) | (modeMap[roomState.mode] ?? 0x00);
+            const modeBits = modeMap[roomState.mode] ?? 0x00;
+
+            if (activeTimerMins > 0) {
+              // Mã hóa số bước 30 phút (slots = halfHours - 1) vào 6 bit Timer của Midea/Casper R51
+              const halfHours = Math.max(1, Math.min(48, Math.round(activeTimerMins / 30)));
+              const slots = halfHours - 1;
+              const timerHigh5 = (slots >> 1) & 0x1F;
+              const timerLowBit = ((~slots) & 0x01) << 1;
+              b1 = fanBits | timerHigh5;
+              b2 = (tempNibble << 4) | modeBits | timerLowBit | (roomState.timerOffMinutes > 0 ? 0x01 : 0x00);
+            } else {
+              // Khi không hẹn giờ: B1[4..0] = 0x1F (11111) và B2[1..0] = 00
+              b1 = fanBits | 0x1F;
+              b2 = (tempNibble << 4) | modeBits;
+            }
           }
 
           const bytes = [b0, b0 ^ 0xFF, b1, b1 ^ 0xFF, b2, b2 ^ 0xFF];
@@ -1438,7 +1456,8 @@
 
         /**
          * 2. Chuẩn Gree / Casper (YBOF / YAP1F / YAN1F) 67-bit LSB-first
-         * 4 byte đầu + 3 bit '010' + khoảng nghỉ 19980us + 4 byte cuối (có Nibble Checksum ở Byte 7)
+         * Đóng gói chính xác Bit Hẹn Giờ (Byte 1 bit 7 = 0x80) và số giờ BCD (Byte 1 bits 4..6 & Byte 2 bits 0..3)
+         * để bật sáng biểu tượng chiếc đồng hồ (TIMER) ngay trên mặt dàn lạnh Casper / Gree!
          */
         encodeGreeYbof(roomState) {
           const modeMap = { 'auto': 0, 'cool': 1, 'dry': 2, 'fan': 3, 'heat': 4 };
@@ -1451,14 +1470,37 @@
 
           const b0 = mVal | pwrBit | fanBits | swingBit | sleepBit;
           const tInt = Math.min(30, Math.max(16, Math.floor(Number(roomState.temp) || 25))) - 16;
-          const halfBit = ((Number(roomState.temp) || 25) % 1 !== 0) ? (1 << 4) : 0;
-          const b1 = (tInt & 0x0F) | halfBit;
+
+          // Tính toán BCD Timer cho Gree / Casper YBOF (Byte 1 bits 4..7 & Byte 2 bits 0..3)
+          const activeTimerMins = (roomState.timerOffMinutes > 0)
+            ? roomState.timerOffMinutes
+            : (roomState.timerOnMinutes > 0 ? roomState.timerOnMinutes : 0);
+
+          let timerEnableBit = 0;
+          let timerHalfHrBit = 0;
+          let timerTensBits = 0;
+          let timerUnitsNibble = 0;
+
+          if (activeTimerMins > 0) {
+            const totalHours = Math.min(24, Math.max(0.5, activeTimerMins / 60));
+            const wholeHours = Math.floor(totalHours);
+            const hasHalf = (totalHours - wholeHours) >= 0.25 ? 1 : 0;
+            const tens = Math.floor(wholeHours / 10) & 0x03;
+            const units = (wholeHours % 10) & 0x0F;
+
+            timerEnableBit = 1 << 7; // Bit 7 của Byte 1: Bật biểu tượng đồng hồ hẹn giờ trên mặt dàn lạnh!
+            timerTensBits = tens << 5;
+            timerHalfHrBit = hasHalf << 4;
+            timerUnitsNibble = units;
+          }
+
+          const b1 = (tInt & 0x0F) | timerHalfHrBit | timerTensBits | timerEnableBit;
 
           const f = roomState.features || {};
           const turboBit = (f.turbo || roomState.fan === 'TURBO') ? (1 << 4) : 0;
           const ledBit = (f.led !== false) ? (1 << 5) : 0;
           const xfanBit = f.xfan ? (1 << 7) : 0;
-          const b2 = turboBit | ledBit | xfanBit;
+          const b2 = (timerUnitsNibble & 0x0F) | turboBit | ledBit | xfanBit;
           const b3 = 0x50;
           const b4 = (roomState.swingV === 'AUTO') ? 0x01 : 0x00;
           const b5 = f.ifeel ? 0x24 : 0x20;
@@ -1497,10 +1539,14 @@
 
         /**
          * 3. Chuẩn AUX / TCL / Casper / Funiki / Nagakawa 14-Byte (112-bit LSB-first)
-         * Header: [0x23, 0xCB, 0x26, 0x01, 0x00, ...] + Byte 13 Checksum = Sum(B[0..12]) & 0xFF
+         * Đóng gói cờ TimerOff (Byte 5 bit 1 = 0x02), TimerOn (Byte 5 bit 0 = 0x01) và số bước 10 phút vào Byte 9 & 10
          */
         encodeAuxTcl14(roomState) {
-          const pwr = roomState.power ? 0x24 : 0x20;
+          const pwrBit = roomState.power ? 0x04 : 0x00;
+          const tOffFlag = roomState.timerOffMinutes > 0 ? 0x02 : 0x00;
+          const tOnFlag = roomState.timerOnMinutes > 0 ? 0x01 : 0x00;
+          const b5 = 0x20 | pwrBit | tOffFlag | tOnFlag;
+
           const modeMap = { 'auto': 0x08, 'cool': 0x03, 'dry': 0x02, 'fan': 0x07, 'heat': 0x01 };
           const mByte = modeMap[roomState.mode] ?? 0x03;
           const tInt = (31 - Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)))) & 0x0F;
@@ -1508,13 +1554,22 @@
           const fanVal = fanIdx <= 0 ? 0x00 : fanIdx <= 2 ? 0x02 : fanIdx <= 4 ? 0x03 : 0x05;
           const swingV = roomState.swingV === 'AUTO' ? 0x38 : 0x00;
 
+          const b9OffSteps = roomState.timerOffMinutes > 0
+            ? Math.min(144, Math.round(roomState.timerOffMinutes / 10))
+            : 0x00;
+          const b10OnSteps = roomState.timerOnMinutes > 0
+            ? Math.min(144, Math.round(roomState.timerOnMinutes / 10))
+            : 0x00;
+
           const bytes = [
             0x23, 0xCB, 0x26, 0x01, 0x00,
-            pwr,
+            b5,
             mByte,
             tInt,
             swingV | fanVal,
-            0x00, 0x00, 0x00, 0x80
+            b9OffSteps,
+            b10OnSteps,
+            0x00, 0x80
           ];
           const chk = bytes.reduce((a, b) => (a + b) & 0xFF, 0);
           bytes.push(chk);
@@ -1525,6 +1580,7 @@
 
         /**
          * 4. Chuẩn Daikin (ARC433 3-Frame & ARC477 2-Frame LSB-first)
+         * Đóng gói chính xác số phút Timer ON / Timer OFF vào 3 byte B[10..12] (11-bit Little Endian)
          */
         encodeDaikin(roomState, isTwoFrame = false) {
           const sf1 = [0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00, 0xD7];
@@ -1548,6 +1604,16 @@
           const b8 = (fanMap[roomState.fan] || 0xA0) | swingV;
           const b9 = roomState.swingH === 'AUTO' ? 0x0F : 0x00;
 
+          // 11-bit Timer ON & 11-bit Timer OFF trong B[10..12]
+          const onVal = roomState.timerOnMinutes > 0 ? Math.min(1440, roomState.timerOnMinutes) : 0x000;
+          const offVal = roomState.timerOffMinutes > 0 ? Math.min(1440, roomState.timerOffMinutes) : 0x000;
+          let b10 = 0x00, b11 = 0x06, b12 = 0x60;
+          if (onVal > 0 || offVal > 0) {
+            b10 = onVal & 0xFF;
+            b11 = ((onVal >> 8) & 0x07) | ((offVal & 0x1F) << 3);
+            b12 = (offVal >> 5) & 0x3F;
+          }
+
           const f = roomState.features || {};
           const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00);
           const b16 = f.econo ? 0x84 : 0x80;
@@ -1555,7 +1621,7 @@
           const sf3 = [
             0x11, 0xDA, 0x27, 0x00, 0x00,
             b5, b6, 0x00, b8, b9,
-            0x00, 0x06, 0x60, b13, 0x00, 0xC1, b16, 0x00
+            b10, b11, b12, b13, 0x00, 0xC1, b16, 0x00
           ];
           const chk3 = sf3.reduce((a, b) => (a + b) & 0xFF, 0);
           sf3.push(chk3);
@@ -1577,7 +1643,9 @@
         encodePanasonic(roomState) {
           const sf1 = [0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06];
           const modeMap = { 'auto': 0x00, 'dry': 0x20, 'cool': 0x30, 'heat': 0x40, 'fan': 0x60 };
-          const b5 = (modeMap[roomState.mode] ?? 0x30) | 0x08 | (roomState.power ? 0x01 : 0x00);
+          const tOnBit = roomState.timerOnMinutes > 0 ? 0x04 : 0x00;
+          const tOffBit = roomState.timerOffMinutes > 0 ? 0x02 : 0x00;
+          const b5 = (modeMap[roomState.mode] ?? 0x30) | 0x08 | (roomState.power ? 0x01 : 0x00) | tOnBit | tOffBit;
           const b6 = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) * 2) & 0xFF;
 
           const fanMap = {
@@ -1590,10 +1658,19 @@
           const f = roomState.features || {};
           const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00);
 
+          let b10 = 0x00, b11 = 0x0E, b12 = 0xE0;
+          if (roomState.timerOnMinutes > 0 || roomState.timerOffMinutes > 0) {
+            const onMins = roomState.timerOnMinutes > 0 ? roomState.timerOnMinutes : 0x600;
+            const offMins = roomState.timerOffMinutes > 0 ? roomState.timerOffMinutes : 0x600;
+            b10 = onMins & 0xFF;
+            b11 = ((onMins >> 8) & 0x07) | 0x08 | ((offMins & 0x0F) << 4);
+            b12 = (offMins >> 4) & 0x7F;
+          }
+
           const sf2 = [
             0x02, 0x20, 0xE0, 0x04, 0x00,
             b5, b6, 0x80, b8, b9,
-            0x00, 0x0E, 0xE0, b13, 0x00, 0x80, 0x00, 0x06
+            b10, b11, b12, b13, 0x00, 0x80, 0x00, 0x06
           ];
           sf2.push(sf2.reduce((a, b) => (a + b) & 0xFF, 0));
 
@@ -1613,6 +1690,9 @@
           const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 16) & 0x0F;
           const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
           const b9 = (fanIdx <= 0 ? 0x00 : Math.min(5, fanIdx)) | (roomState.swingV === 'AUTO' ? 0x38 : 0x08);
+          const activeMins = roomState.timerOffMinutes > 0 ? roomState.timerOffMinutes : (roomState.timerOnMinutes || 0);
+          const timerByte = activeMins > 0 ? Math.min(144, Math.round(activeMins / 10)) : 0x00;
+          const timerModeFlag = roomState.timerOffMinutes > 0 ? 0x05 : (roomState.timerOnMinutes > 0 ? 0x03 : 0x00);
 
           const bytes = [
             0x23, 0xCB, 0x26, 0x01, 0x00,
@@ -1621,7 +1701,7 @@
             tVal,
             0x30,
             b9,
-            0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00
+            timerByte, timerByte, timerModeFlag, 0x00, 0x10, 0x00, 0x00
           ];
           bytes.push(bytes.reduce((a, b) => (a + b) & 0xFF, 0));
 
@@ -1631,12 +1711,26 @@
         },
 
         /**
-         * 7. Chuẩn LG (28-bit MSB-first 0x88 + 4-bit Nibble Checksum)
+         * 7. Chuẩn LG (28-bit MSB-first 0x88 + Gói lệnh Hẹn giờ 0x88A[mins][chk] riêng của LG)
          */
         encodeLG28(roomState, isLg2 = false) {
+          const buildLgPulses = (nibbles) => {
+            const hMark = isLg2 ? 3200 : 8500;
+            const hSpace = isLg2 ? 9800 : 4250;
+            const bMark = 520, oSpace = 1600, zSpace = 520;
+            const p = [hMark, hSpace];
+            for (let n = 0; n < 7; n++) {
+              const val = nibbles[n] & 0x0F;
+              for (let bit = 3; bit >= 0; bit--) {
+                p.push(bMark, ((val >> bit) & 1) ? oSpace : zSpace);
+              }
+            }
+            p.push(bMark, 10000);
+            return p;
+          };
+
           let nibbles;
           if (!roomState.power) {
-            // Mã tắt nguồn chuẩn LG 28-bit: 0x88C0051
             nibbles = [0x8, 0x8, 0xC, 0x0, 0x0, 0x5, 0x1];
           } else {
             const modeMap = { 'cool': 0x0, 'dry': 0x1, 'fan': 0x2, 'auto': 0x3, 'heat': 0x4 };
@@ -1652,18 +1746,19 @@
             nibbles = [0x8, 0x8, n2, n3, n4, n5, n6];
           }
 
-          const hMark = isLg2 ? 3200 : 8500;
-          const hSpace = isLg2 ? 9800 : 4250;
-          const bMark = 520, oSpace = 1600, zSpace = 520;
-          const pulses = [hMark, hSpace];
+          const subFrames = [buildLgPulses(nibbles)];
 
-          for (let n = 0; n < 7; n++) {
-            const val = nibbles[n] & 0x0F;
-            for (let bit = 3; bit >= 0; bit--) {
-              pulses.push(bMark, ((val >> bit) & 1) ? oSpace : zSpace);
-            }
+          // Nếu có hẹn giờ tắt trên LG -> Gửi kèm khung lệnh Hẹn giờ 0x88A[mins][chk] để bật đèn đồng hồ trên mặt máy LG
+          const activeMins = roomState.timerOffMinutes > 0 ? roomState.timerOffMinutes : (roomState.timerOnMinutes || 0);
+          if (activeMins > 0) {
+            const m = Math.min(1440, activeMins);
+            const tn2 = 0xA;
+            const tn3 = (m >> 8) & 0x0F;
+            const tn4 = (m >> 4) & 0x0F;
+            const tn5 = m & 0x0F;
+            const tn6 = (tn2 + tn3 + tn4 + tn5) & 0x0F;
+            subFrames.push(buildLgPulses([0x8, 0x8, tn2, tn3, tn4, tn5, tn6]));
           }
-          pulses.push(bMark, 10000);
 
           const bytes = [
             (nibbles[0] << 4) | nibbles[1],
@@ -1671,7 +1766,7 @@
             (nibbles[4] << 4) | nibbles[5],
             nibbles[6] << 4
           ];
-          return { bytes, subFrames: [pulses] };
+          return { bytes, subFrames };
         },
 
         /**
