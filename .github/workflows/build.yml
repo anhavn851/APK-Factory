@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Build Cordova APK
+      - name: Build Cordova & Native Bridge APK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           npm install -g cordova
@@ -31,13 +31,17 @@ jobs:
           cordova create build_app "$PACKAGE_ID" "$APP_NAME"
           rm -rf build_app/www/*
           cp -r www/* build_app/www/
+          if [ -d native ]; then cp -r native build_app/native; fi
           cd build_app
           node -e "
             const fs = require('fs');
             let xml = fs.readFileSync('config.xml', 'utf8');
-            let orient = 'portrait';
-            try { orient = JSON.parse(fs.readFileSync('www/app-config.json', 'utf8')).orientation || 'portrait'; } catch(e) {}
-            const extra = '<icon src=\"www/icon.png\" /><preference name=\"Orientation\" value=\"' + orient + '\" /><access origin=\"*\" /><allow-navigation href=\"*\" /><allow-intent href=\"http://*/*\" /><allow-intent href=\"https://*/*\" /><preference name=\"AndroidInsecureFileModeEnabled\" value=\"true\" />';
+            let cfg = {};
+            try { cfg = JSON.parse(fs.readFileSync('www/app-config.json', 'utf8')); } catch(e) {}
+            const orient = cfg.orientation || 'portrait';
+            const useKt = !!(cfg.hasCustomMainActivity && fs.existsSync('native/MainActivity.kt'));
+            let extra = '<icon src=\"www/icon.png\" /><preference name=\"Orientation\" value=\"' + orient + '\" /><access origin=\"*\" /><allow-navigation href=\"*\" /><allow-intent href=\"http://*/*\" /><allow-intent href=\"https://*/*\" /><preference name=\"AndroidInsecureFileModeEnabled\" value=\"true\" />';
+            if (useKt) { extra += '<preference name=\"GradlePluginKotlinEnabled\" value=\"true\" />'; }
             xml = xml.replace('</widget>', extra + '</widget>');
             fs.writeFileSync('config.xml', xml);
             if (fs.existsSync('www/index.html')) {
@@ -47,15 +51,66 @@ jobs:
             }
           "
           cordova platform add android@13.0.0
+          cp -r www/* platforms/android/app/src/main/assets/ || true
           node -e "
             const fs = require('fs');
+            const path = require('path');
+            let cfg = {};
+            try { cfg = JSON.parse(fs.readFileSync('www/app-config.json', 'utf8')); } catch(e) {}
+            const pkgId = cfg.packageId || 'com.apkfactory.webapp';
+            const hasKt = !!(cfg.hasCustomMainActivity && fs.existsSync('native/MainActivity.kt'));
+            const hasMf = !!(cfg.hasCustomManifest && fs.existsSync('native/AndroidManifest.xml'));
+            if (hasKt) {
+              let kt = fs.readFileSync('native/MainActivity.kt', 'utf8');
+              if (/^\s*package\s+[a-zA-Z0-9_.]+/m.test(kt)) {
+                kt = kt.replace(/^\s*package\s+[a-zA-Z0-9_.]+/m, 'package ' + pkgId);
+              } else {
+                kt = 'package ' + pkgId + '\n\n' + kt;
+              }
+              const javaPkgDir = path.join('platforms/android/app/src/main/java', ...pkgId.split('.'));
+              fs.mkdirSync(javaPkgDir, { recursive: true });
+              const oldJava = path.join(javaPkgDir, 'MainActivity.java');
+              if (fs.existsSync(oldJava)) fs.unlinkSync(oldJava);
+              fs.writeFileSync(path.join(javaPkgDir, 'MainActivity.kt'), kt, 'utf8');
+              const gradlePath = 'platforms/android/app/build.gradle';
+              if (fs.existsSync(gradlePath)) {
+                let bg = fs.readFileSync(gradlePath, 'utf8');
+                bg += '\n\ntasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { kotlinOptions { jvmTarget = "11" } }\n';
+                fs.writeFileSync(gradlePath, bg, 'utf8');
+              }
+            }
             const mfPath = 'platforms/android/app/src/main/AndroidManifest.xml';
             if (fs.existsSync(mfPath)) {
               let mf = fs.readFileSync(mfPath, 'utf8');
               if (!mf.includes('usesCleartextTraffic')) {
                 mf = mf.replace('<application', '<application android:usesCleartextTraffic=\"true\"');
-                fs.writeFileSync(mfPath, mf);
               }
+              if (hasKt) {
+                mf = mf.replace(/android:theme=\"@style\/Theme\.App\.SplashScreen\"/g, 'android:theme=\"@style/Theme.AppCompat.DayNight.NoActionBar\"');
+              }
+              if (hasMf) {
+                const userMf = fs.readFileSync('native/AndroidManifest.xml', 'utf8');
+                const tags = [];
+                const permRegex = /<uses-permission\b[^>]*?\/?>/gi;
+                const featRegex = /<uses-feature\b[^>]*?\/?>/gi;
+                let m;
+                while ((m = permRegex.exec(userMf)) !== null) {
+                  const t = m[0].endsWith('/>') ? m[0] : m[0].replace(/>$/, ' />');
+                  tags.push(t);
+                }
+                while ((m = featRegex.exec(userMf)) !== null) {
+                  const t = m[0].endsWith('/>') ? m[0] : m[0].replace(/>$/, ' />');
+                  tags.push(t);
+                }
+                const toInject = tags.filter(t => {
+                  const nameMatch = t.match(/android:name=\x22([^\x22]+)\x22/);
+                  return nameMatch && !mf.includes(nameMatch[1]);
+                });
+                if (toInject.length > 0) {
+                  mf = mf.replace('<application', toInject.join('\n    ') + '\n    <application');
+                }
+              }
+              fs.writeFileSync(mfPath, mf, 'utf8');
             }
           "
           cordova build android --debug
