@@ -4,19 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#070a10" />
-  <title>UltraAC IR Remote — Điều Khiển Điều Hòa Vạn Năng Siêu Tốc</title>
+  <title>UltraAC IR Remote Pro — Điều Khiển Điều Hòa Vạn Năng Siêu Tốc</title>
   <style>
     /* ==========================================================================
-       ULTRA-AC IR REMOTE — 100% OFFLINE ZERO-LATENCY CSS ENGINE
+       ULTRA-AC IR REMOTE PRO — 100% OFFLINE ZERO-LATENCY CSS ENGINE
        Modern Dark Mode + Glassmorphism Liquid Crystal Display (LCD)
        ========================================================================== */
     :root {
       --bg-deep: #070a10;
       --bg-shell: #0c111d;
-      --bg-card: rgba(22, 31, 48, 0.72);
-      --bg-card-active: rgba(30, 43, 66, 0.92);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-highlight: rgba(56, 189, 248, 0.35);
+      --bg-card: rgba(22, 31, 48, 0.76);
+      --bg-card-active: rgba(30, 43, 66, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-highlight: rgba(56, 189, 248, 0.38);
       --text-main: #f1f5f9;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
@@ -26,7 +26,7 @@
       --accent-fan: #34d399;
       --accent-auto: #2dd4bf;
       --lcd-glow: rgba(56, 189, 248, 0.16);
-      --lcd-border: rgba(56, 189, 248, 0.32);
+      --lcd-border: rgba(56, 189, 248, 0.34);
       --lcd-accent: #38bdf8;
       --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -57,7 +57,6 @@
       touch-action: manipulation;
     }
 
-    /* App Container: Fullscreen on Mobile, Centered Remote Shell on Desktop */
     .remote-app-shell {
       width: 100%;
       max-width: 430px;
@@ -78,17 +77,17 @@
         background: radial-gradient(circle at 50% 10%, #111827 0%, #05070b 100%);
       }
       .remote-app-shell {
-        height: min(96dvh, 900px);
+        height: min(96dvh, 910px);
         border-radius: 38px;
         border: 5px solid #1e293b;
         box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08);
       }
     }
 
-    /* Top IR Blaster Emitter Bar & Room Tabs */
+    /* Top Header & Saved Waves Bar */
     .top-bar {
       padding: max(8px, env(safe-area-inset-top)) 12px 6px;
-      background: rgba(12, 17, 29, 0.9);
+      background: rgba(12, 17, 29, 0.94);
       border-bottom: 1px solid var(--border-subtle);
       flex-shrink: 0;
       z-index: 20;
@@ -98,19 +97,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 7px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
 
     .brand-selector-pill {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: 999px;
       padding: 4px 10px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       color: var(--text-main);
     }
@@ -130,23 +129,22 @@
       color: #f1f5f9;
     }
 
-    /* Virtual IR LED Indicator */
     .ir-emitter-indicator {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.8);
-      padding: 4px 10px;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 4px 9px;
       border-radius: 999px;
       border: 1px solid var(--border-subtle);
     }
 
     .ir-led-bulb {
-      width: 9px;
-      height: 9px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #334155;
       transition: all 0.06s ease;
@@ -155,10 +153,10 @@
     .ir-led-bulb.transmitting {
       background: #ef4444;
       box-shadow: 0 0 12px #ef4444, 0 0 22px #f87171;
-      transform: scale(1.25);
+      transform: scale(1.3);
     }
 
-    /* Room Tabs Bar (Zero-Click Fast Room Switcher) */
+    /* Room Tabs & Saved Wave Presets Bar */
     .room-tabs-scroll {
       display: flex;
       align-items: center;
@@ -173,11 +171,11 @@
 
     .room-tab {
       flex-shrink: 0;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 11px;
+      font-size: 11.5px;
       font-weight: 700;
-      background: rgba(22, 31, 48, 0.55);
+      background: rgba(22, 31, 48, 0.58);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
       cursor: pointer;
@@ -206,15 +204,73 @@
       box-shadow: 0 0 6px #10b981;
     }
 
-    /* Main Scrollable Control Area */
+    /* Saved Wave Presets Strip */
+    .saved-waves-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 5px 10px;
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 13px;
+    }
+    .saved-waves-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .saved-wave-chip {
+      flex-shrink: 0;
+      padding: 4px 9px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      color: #a7f3d0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.12s ease;
+    }
+
+    .saved-wave-chip.active {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.32), rgba(5, 150, 105, 0.42));
+      border-color: #34d399;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    }
+
+    .saved-wave-chip:active {
+      transform: scale(0.95);
+    }
+
+    .save-wave-btn {
+      flex-shrink: 0;
+      padding: 4px 9px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Main Scrollable Body */
     .remote-main-body {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 10px 12px 12px;
+      padding: 8px 12px 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       scrollbar-width: none;
     }
     .remote-main-body::-webkit-scrollbar {
@@ -222,61 +278,64 @@
     }
 
     /* ==========================================================================
-       MODERN GLASSMORPHISM LCD DISPLAY
+       MODERN GLASSMORPHISM LCD DISPLAY (INTERACTIVE TOUCH ZONES)
        ========================================================================== */
     .lcd-screen {
       position: relative;
-      border-radius: 24px;
-      padding: 14px 16px;
+      border-radius: 22px;
+      padding: 12px 14px;
       background:
         radial-gradient(circle at 80% 15%, var(--lcd-glow) 0%, transparent 65%),
-        linear-gradient(165deg, rgba(19, 29, 46, 0.92) 0%, rgba(10, 16, 28, 0.96) 100%);
+        linear-gradient(165deg, rgba(19, 29, 46, 0.94) 0%, rgba(10, 16, 28, 0.98) 100%);
       border: 1.5px solid var(--lcd-border);
       box-shadow:
-        0 14px 32px -8px rgba(0, 0, 0, 0.65),
+        0 12px 28px -8px rgba(0, 0, 0, 0.65),
         inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       transition: border-color 0.25s ease, opacity 0.2s ease;
     }
 
     .lcd-screen.power-off {
-      border-color: rgba(148, 163, 184, 0.15);
-      background: linear-gradient(165deg, rgba(13, 18, 28, 0.88) 0%, rgba(8, 11, 18, 0.94) 100%);
+      border-color: rgba(148, 163, 184, 0.16);
+      background: linear-gradient(165deg, rgba(13, 18, 28, 0.9) 0%, rgba(8, 11, 18, 0.95) 100%);
     }
 
     .lcd-screen.power-off .lcd-active-content {
-      opacity: 0.28;
-      filter: grayscale(85%);
+      opacity: 0.32;
+      filter: grayscale(80%);
     }
 
     .lcd-top-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 11px;
+      gap: 4px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--text-muted);
-      padding-bottom: 8px;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-bottom: 7px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.09);
     }
 
     .lcd-mode-badges {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     .lcd-mode-pill {
-      padding: 3px 8px;
-      border-radius: 7px;
-      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 9.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-dim);
-      transition: all 0.15s ease;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .lcd-mode-pill:active {
+      transform: scale(0.92);
     }
 
     .lcd-mode-pill.active {
@@ -289,8 +348,8 @@
       display: grid;
       grid-template-columns: 1fr auto;
       align-items: center;
-      gap: 10px;
-      padding: 8px 0;
+      gap: 8px;
+      padding: 6px 0;
     }
 
     .lcd-temp-wrap {
@@ -300,7 +359,7 @@
     }
 
     .lcd-temp-number {
-      font-size: 56px;
+      font-size: 52px;
       font-weight: 900;
       letter-spacing: -0.04em;
       color: #ffffff;
@@ -309,18 +368,18 @@
     }
 
     .lcd-temp-decimal {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       color: var(--lcd-accent);
-      margin-top: 6px;
+      margin-top: 5px;
       margin-left: 2px;
     }
 
     .lcd-temp-unit {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--text-muted);
-      margin-top: 7px;
+      margin-top: 6px;
       margin-left: 2px;
     }
 
@@ -328,20 +387,27 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 5px;
-      font-size: 11px;
+      gap: 4px;
+      font-size: 10.5px;
       font-weight: 700;
     }
 
     .lcd-stat-chip {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: rgba(255, 255, 255, 0.05);
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.06);
       padding: 3.5px 8px;
       border-radius: 8px;
       color: #e2e8f0;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: transform 0.08s ease, border-color 0.12s ease;
+    }
+
+    .lcd-stat-chip:active {
+      transform: scale(0.95);
+      border-color: var(--lcd-accent);
     }
 
     .lcd-bottom-row {
@@ -350,9 +416,9 @@
       align-items: center;
       justify-content: space-between;
       gap: 6px;
-      padding-top: 8px;
-      border-top: 1px dashed rgba(255, 255, 255, 0.08);
-      font-size: 10.5px;
+      padding-top: 7px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.09);
+      font-size: 10px;
     }
 
     .lcd-active-flags {
@@ -366,9 +432,24 @@
       border-radius: 5px;
       font-size: 9.5px;
       font-weight: 800;
-      background: rgba(56, 189, 248, 0.14);
+      background: rgba(56, 189, 248, 0.15);
       color: var(--lcd-accent);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+    }
+
+    .lcd-clock-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2.5px 7px;
+      border-radius: 6px;
+      background: rgba(251, 191, 36, 0.18);
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      color: #fde68a;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 10px;
+      cursor: pointer;
     }
 
     /* ==========================================================================
@@ -377,24 +458,24 @@
     .macro-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
+      gap: 6px;
     }
 
     .macro-btn {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 8px 6px;
+      border-radius: 13px;
+      padding: 7px 5px;
       color: var(--text-main);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 2px;
       cursor: pointer;
-      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
+      transition: transform 0.08s ease, border-color 0.15s ease, background 0.15s ease;
     }
 
     .macro-btn:active {
@@ -403,36 +484,35 @@
 
     .macro-btn.active-macro {
       border-color: var(--lcd-accent);
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(56, 189, 248, 0.18);
     }
 
-    /* Core D-Pad & Power / Temp / Mode / Fan Grid */
     .primary-control-grid {
       display: grid;
-      grid-template-columns: 1fr 1.15fr 1fr;
-      gap: 8px;
+      grid-template-columns: 1fr 1.12fr 1fr;
+      gap: 7px;
       align-items: stretch;
     }
 
     .ctrl-col {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
     }
 
     .r-btn {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: 18px;
-      padding: 11px 8px;
+      border-radius: 16px;
+      padding: 9px 6px;
       color: var(--text-main);
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11.5px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
       transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
       position: relative;
@@ -445,27 +525,26 @@
     }
 
     .r-btn-power {
-      background: linear-gradient(145deg, rgba(239, 68, 68, 0.22), rgba(153, 27, 27, 0.28));
-      border-color: rgba(248, 113, 113, 0.38);
+      background: linear-gradient(145deg, rgba(239, 68, 68, 0.24), rgba(153, 27, 27, 0.3));
+      border-color: rgba(248, 113, 113, 0.42);
       color: #fecaca;
     }
 
     .r-btn-power.power-on {
-      background: linear-gradient(145deg, rgba(16, 185, 129, 0.24), rgba(5, 150, 105, 0.32));
-      border-color: rgba(52, 211, 153, 0.48);
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.34));
+      border-color: rgba(52, 211, 153, 0.5);
       color: #a7f3d0;
     }
 
-    /* Center Temperature Rocker */
     .temp-rocker {
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.92) 100%);
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.88) 0%, rgba(15, 23, 42, 0.94) 100%);
       border: 1.5px solid var(--lcd-border);
-      border-radius: 24px;
+      border-radius: 22px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      padding: 6px;
+      padding: 5px;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
@@ -473,8 +552,8 @@
       width: 100%;
       flex: 1;
       border: none;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
       color: #ffffff;
       font-size: 24px;
       font-weight: 900;
@@ -486,17 +565,17 @@
     }
 
     .temp-step-btn:active {
-      background: rgba(56, 189, 248, 0.22);
+      background: rgba(56, 189, 248, 0.25);
       transform: scale(0.95);
     }
 
     .temp-rocker-label {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: var(--text-muted);
-      padding: 5px 0;
+      padding: 4px 0;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -505,18 +584,18 @@
 
     /* Dynamic Brand Feature Drawer */
     .brand-drawer-card {
-      background: rgba(15, 23, 42, 0.68);
+      background: rgba(15, 23, 42, 0.72);
       border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 10px;
+      border-radius: 18px;
+      padding: 9px 10px;
     }
 
     .drawer-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 11px;
+      margin-bottom: 7px;
+      font-size: 10.5px;
       font-weight: 800;
       color: var(--text-muted);
     }
@@ -530,10 +609,10 @@
     .feature-chip-btn {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 8px 6px;
+      border-radius: 11px;
+      padding: 7px 5px;
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       text-align: center;
       cursor: pointer;
@@ -544,32 +623,36 @@
       gap: 2px;
     }
 
-    .feature-chip-btn.active {
-      background: rgba(56, 189, 248, 0.18);
-      border-color: var(--lcd-accent);
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.14);
+    .feature-chip-btn:active {
+      transform: scale(0.94);
     }
 
-    /* Tool Action Row (Dual Timer, Blind Mode, Auto-Scanner) */
+    .feature-chip-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--lcd-accent);
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.16);
+    }
+
+    /* Advanced Tools Row */
     .advanced-tools-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 7px;
+      gap: 6px;
     }
 
     .tool-pill-btn {
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 9px 6px;
+      background: rgba(30, 41, 59, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 12px;
+      padding: 8px 6px;
       color: #e2e8f0;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
     }
 
@@ -577,13 +660,11 @@
       transform: scale(0.96);
     }
 
-    /* ==========================================================================
-       BOTTOM IR OSCILLOSCOPE & PACKET DEBUG BAR
-       ========================================================================== */
+    /* Bottom IR Oscilloscope & Packet Debug Bar */
     .ir-debug-footer {
       background: #05080f;
       border-top: 1px solid rgba(255, 255, 255, 0.09);
-      padding: 7px 12px max(8px, env(safe-area-inset-bottom));
+      padding: 6px 12px max(7px, env(safe-area-inset-bottom));
       flex-shrink: 0;
       z-index: 20;
     }
@@ -593,37 +674,35 @@
       align-items: center;
       justify-content: space-between;
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--text-muted);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .debug-hex-string {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 9.5px;
       color: #34d399;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     #irWaveformCanvas {
       width: 100%;
-      height: 28px;
+      height: 24px;
       background: rgba(15, 23, 42, 0.75);
       border-radius: 6px;
       border: 1px solid rgba(56, 189, 248, 0.18);
       display: block;
     }
 
-    /* ==========================================================================
-       MODALS (DUAL-MODE TIMER, AUTO-SCANNER, RAW IR)
-       ========================================================================== */
+    /* Modals */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(3, 6, 12, 0.84);
+      background: rgba(3, 6, 12, 0.85);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       z-index: 60;
@@ -639,17 +718,17 @@
     .modal-sheet {
       width: 100%;
       max-width: 430px;
-      max-height: 88dvh;
+      max-height: 90dvh;
       background: #0f1626;
-      border-top: 1px solid rgba(255, 255, 255, 0.14);
-      border-top-left-radius: 28px;
-      border-top-right-radius: 28px;
-      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
+      padding: 15px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 11px;
       overflow-y: auto;
-      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.75);
+      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.78);
     }
 
     .modal-header {
@@ -666,16 +745,16 @@
       gap: 6px;
       background: #080c15;
       padding: 4px;
-      border-radius: 14px;
+      border-radius: 13px;
     }
 
     .seg-tab-btn {
-      padding: 8px;
-      border-radius: 10px;
+      padding: 7px;
+      border-radius: 9px;
       border: none;
       background: transparent;
       color: var(--text-muted);
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 800;
       cursor: pointer;
     }
@@ -686,39 +765,59 @@
     }
 
     .form-card {
-      background: rgba(22, 31, 48, 0.7);
+      background: rgba(22, 31, 48, 0.74);
       border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 12px;
+      border-radius: 15px;
+      padding: 11px;
     }
 
     .primary-action-btn {
       width: 100%;
-      padding: 12px;
-      border-radius: 14px;
+      padding: 11px;
+      border-radius: 13px;
       border: none;
       background: linear-gradient(135deg, #0284c7, #2563eb);
       color: #ffffff;
       font-weight: 800;
-      font-size: 13px;
+      font-size: 12.5px;
       cursor: pointer;
+    }
+
+    .primary-action-btn:active {
+      transform: scale(0.98);
     }
 
     .danger-action-btn {
       width: 100%;
       padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(248, 113, 113, 0.35);
-      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(248, 113, 113, 0.38);
+      background: rgba(239, 68, 68, 0.14);
       color: #fca5a5;
       font-weight: 700;
       font-size: 12px;
       cursor: pointer;
     }
 
-    /* ==========================================================================
-       BLIND GESTURE MODE (OLED PURE BLACK OVERLAY)
-       ========================================================================== */
+    .wave-option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #090d16;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .wave-option-row.selected {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: var(--lcd-accent);
+    }
+
+    /* Blind Gesture Mode (OLED Pure Black) */
     #blindGestureOverlay {
       position: fixed;
       inset: 0;
@@ -729,7 +828,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 36px 24px;
-      color: rgba(255, 255, 255, 0.22);
+      color: rgba(255, 255, 255, 0.24);
       touch-action: none;
     }
 
@@ -745,7 +844,7 @@
     .blind-big-temp {
       font-size: 84px;
       font-weight: 900;
-      color: rgba(255, 255, 255, 0.26);
+      color: rgba(255, 255, 255, 0.28);
       letter-spacing: -0.04em;
       line-height: 1;
     }
@@ -753,31 +852,58 @@
     .blind-feedback-text {
       font-size: 15px;
       font-weight: 700;
-      color: rgba(56, 189, 248, 0.45);
+      color: rgba(56, 189, 248, 0.5);
       margin-top: 10px;
       min-height: 22px;
+    }
+
+    /* Toast Notification */
+    #appToast {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid #38bdf8;
+      color: #f8fafc;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 800;
+      z-index: 120;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    #appToast.show {
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
 <body>
 
+  <!-- Toast Thông báo nhanh -->
+  <div id="appToast">✅ Đã phát tín hiệu hồng ngoại</div>
+
   <!-- ================= MAIN REMOTE SHELL ================= -->
   <div class="remote-app-shell">
 
-    <!-- 1. TOP BAR: BRAND SELECTOR, VIRTUAL IR LED & ROOM TABS -->
+    <!-- 1. TOP BAR: BRAND SELECTOR, SIGNAL BOOST, BEEP & ROOM TABS -->
     <header class="top-bar">
       <div class="header-status-row">
         <!-- Brand Selector -->
         <div class="brand-selector-pill">
           <span>Hãng:</span>
           <select id="brandSelect" aria-label="Chọn hãng điều hòa">
+            <option value="Casper">Casper</option>
             <option value="Daikin">Daikin</option>
             <option value="Panasonic">Panasonic</option>
-            <option value="Mitsubishi">Mitsubishi</option>
-            <option value="Casper">Casper</option>
             <option value="Gree">Gree</option>
             <option value="Midea">Midea</option>
             <option value="Funiki">Funiki</option>
+            <option value="Mitsubishi">Mitsubishi</option>
             <option value="LG">LG</option>
             <option value="Samsung">Samsung</option>
             <option value="Toshiba">Toshiba</option>
@@ -786,9 +912,12 @@
           </select>
         </div>
 
-        <!-- IR Blaster Emitter LED & Beep Toggle -->
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <button id="beepToggleBtn" type="button" title="Bật/Tắt tiếng Bíp điều hòa" class="ir-emitter-indicator" style="cursor: pointer;">
+        <!-- Signal Boost, Beep & IR Status -->
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <button id="boostToggleBtn" type="button" title="Tăng cường sóng hồng ngoại (Phát kép chống trượt)" class="ir-emitter-indicator" style="cursor: pointer; border-color: rgba(52, 211, 153, 0.4); color: #6ee7b7;">
+            <span id="boostIconText">⚡ Sóng x2</span>
+          </button>
+          <button id="beepToggleBtn" type="button" title="Bật/Tắt tiếng Bíp trên điện thoại" class="ir-emitter-indicator" style="cursor: pointer;">
             <span id="beepIconText">🔊 Bíp</span>
           </button>
           <div class="ir-emitter-indicator" title="Trạng thái mắt phát hồng ngoại IR 38kHz">
@@ -798,7 +927,7 @@
         </div>
       </div>
 
-      <!-- Room Tabs (1-Tap or Swipe on LCD) -->
+      <!-- Room Tabs -->
       <div id="roomTabsContainer" class="room-tabs-scroll">
         <!-- Dynamically populated Room Tabs -->
       </div>
@@ -807,24 +936,35 @@
     <!-- 2. MAIN REMOTE BODY -->
     <main class="remote-main-body">
 
-      <!-- HARDWARE IR DIAGNOSTIC & PROTOCOL QUICK SWITCH BAR -->
-      <div id="hwDiagnosticBanner" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 11px; border-radius: 12px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.28); font-size: 11px;">
-        <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
-          <span id="hwStatusDot" style="width: 8px; height: 8px; border-radius: 999px; background: #fbbf24; flex-shrink: 0;"></span>
+      <!-- SAVED WAVES BAR (BỘ NHỚ LƯU SÓNG ĐIỀU KHIỂN 1-CHẠM) -->
+      <div class="saved-waves-bar">
+        <button id="openSaveWaveModalBtn" type="button" class="save-wave-btn" title="Lưu loại sóng đang dùng thành tên riêng để bấm 1 chạm">
+          <span>💾</span>
+          <span>Lưu sóng</span>
+        </button>
+        <div id="savedWavesListContainer" style="display: flex; align-items: center; gap: 5px;">
+          <!-- Dynamically populated Saved Wave Chips -->
+        </div>
+      </div>
+
+      <!-- HARDWARE IR DIAGNOSTIC & WAVE SELECTOR BAR -->
+      <div id="hwDiagnosticBanner" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 10px; border-radius: 12px; background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(56, 189, 248, 0.28); font-size: 10.5px;">
+        <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+          <span id="hwStatusDot" style="width: 7px; height: 7px; border-radius: 999px; background: #fbbf24; flex-shrink: 0;"></span>
           <span id="hwStatusMessage" style="font-weight: 700; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             Đang kiểm tra mắt hồng ngoại...
           </span>
         </div>
-        <button id="quickCycleProtocolBtn" type="button" style="flex-shrink: 0; padding: 4px 8px; border-radius: 8px; background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; font-size: 10.5px; font-weight: 800; cursor: pointer;">
-          Đổi mã: <span id="quickProtocolBadge">REV-A (Đa tần)</span>
+        <button id="quickCycleProtocolBtn" type="button" style="flex-shrink: 0; padding: 4px 8px; border-radius: 8px; background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 10px; font-weight: 800; cursor: pointer;">
+          Sóng: <span id="quickProtocolBadge">Gree YBOF</span>
         </button>
       </div>
 
-      <!-- MODERN GLASSMORPHISM LCD DISPLAY -->
-      <section id="lcdScreen" class="lcd-screen" title="Vuốt ngang trên màn hình LCD để chuyển phòng nhanh">
+      <!-- MODERN GLASSMORPHISM LCD DISPLAY (CHẠM TRỰC TIẾP ĐỂ ĐỔI CHẾ ĐỘ / QUẠT / GIÓ) -->
+      <section id="lcdScreen" class="lcd-screen">
         <div class="lcd-top-row">
-          <span id="lcdRoomAndBrandText">PHÒNG NGỦ • DAIKIN (REV-A)</span>
-          <div class="lcd-mode-badges">
+          <span id="lcdRoomAndBrandText" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 155px;">PHÒNG NGỦ • CASPER</span>
+          <div class="lcd-mode-badges" title="Chạm trực tiếp vào chế độ để chuyển ngay">
             <span data-mode-pill="auto" class="lcd-mode-pill">AUTO</span>
             <span data-mode-pill="cool" class="lcd-mode-pill active">COOL</span>
             <span data-mode-pill="dry" class="lcd-mode-pill">DRY</span>
@@ -842,17 +982,17 @@
               <span class="lcd-temp-unit">°C</span>
             </div>
 
-            <!-- Right Telemetry Chips (Fan, Swing V/H, Step) -->
+            <!-- Right Telemetry Chips (Interactive: Tap to cycle!) -->
             <div class="lcd-telemetry-col">
-              <div class="lcd-stat-chip">
+              <div id="lcdFanChipBtn" class="lcd-stat-chip" title="Chạm để đổi tốc độ quạt">
                 <span>🌀 Quạt:</span>
                 <strong id="lcdFanText" style="color: var(--lcd-accent);">AUTO</strong>
               </div>
-              <div class="lcd-stat-chip">
+              <div id="lcdSwingVChipBtn" class="lcd-stat-chip" title="Chạm để đổi đảo gió dọc">
                 <span>↕️ Gió dọc:</span>
                 <strong id="lcdSwingVText">AUTO</strong>
               </div>
-              <div class="lcd-stat-chip">
+              <div id="lcdSwingHChipBtn" class="lcd-stat-chip" title="Chạm để đổi đảo gió ngang">
                 <span>↔️ Gió ngang:</span>
                 <strong id="lcdSwingHText">AUTO</strong>
               </div>
@@ -861,9 +1001,12 @@
 
           <div class="lcd-bottom-row">
             <div id="lcdActiveFlagsContainer" class="lcd-active-flags">
-              <!-- Active brand features & timer badges -->
+              <!-- Active brand features & wave lock tag -->
             </div>
-            <span id="lcdTimerCountdownText" style="font-family: var(--font-mono); font-weight: 800; color: #fbbf24;"></span>
+            <div id="lcdTimerBadgeBtn" class="lcd-clock-indicator" style="display: none;" title="Đang bật hẹn giờ (Chạm để mở cài đặt hẹn giờ)">
+              <span>🕒</span>
+              <span id="lcdTimerCountdownText"></span>
+            </div>
           </div>
         </div>
       </section>
@@ -871,21 +1014,18 @@
       <!-- 1-TAP MACROS (3 KỊCH BẢN 1-CHẠM) -->
       <section class="macro-row">
         <button type="button" id="macroTurboCoolBtn" class="macro-btn">
-          <span style="font-size: 15px;">❄️</span>
-          <span>Làm lạnh cấp tốc</span>
-          <span style="font-size: 9.5px; color: var(--text-muted);">18°C • Max • Swing</span>
+          <span style="font-size: 14px;">❄️ Làm lạnh nhanh</span>
+          <span style="font-size: 9px; color: var(--text-muted);">18°C • Turbo • Đảo gió</span>
         </button>
 
         <button type="button" id="macroFocusStudyBtn" class="macro-btn">
-          <span style="font-size: 15px;">📚</span>
-          <span>Học tập / Tập trung</span>
-          <span style="font-size: 9.5px; color: var(--text-muted);">26°C • Êm • Tắt LED</span>
+          <span style="font-size: 14px;">🌙 Ngủ êm dịu</span>
+          <span style="font-size: 9px; color: var(--text-muted);">26°C • Quiet • Tắt đèn</span>
         </button>
 
         <button type="button" id="macroAntiMoldBtn" class="macro-btn">
-          <span style="font-size: 15px;">🛡️</span>
-          <span>Sấy khô chống mốc</span>
-          <span style="font-size: 9.5px; color: var(--text-muted);">Fan • Tắt sau 15p</span>
+          <span style="font-size: 14px;">🛡️ Sấy dàn lạnh</span>
+          <span style="font-size: 9px; color: var(--text-muted);">Quạt Fan • Tắt sau 30p</span>
         </button>
       </section>
 
@@ -894,17 +1034,17 @@
         <!-- Left Column: Power, Mode, Swing V -->
         <div class="ctrl-col">
           <button type="button" id="powerBtn" class="r-btn r-btn-power power-on">
-            <span style="font-size: 16px;">⏻</span>
+            <span style="font-size: 15px;">⏻</span>
             <span id="powerBtnLabel">NGUỒN: BẬT</span>
           </button>
 
           <button type="button" id="modeCycleBtn" class="r-btn">
-            <span style="font-size: 15px;">🎛️</span>
+            <span style="font-size: 14px;">🎛️</span>
             <span>CHẾ ĐỘ (MODE)</span>
           </button>
 
           <button type="button" id="swingVCycleBtn" class="r-btn">
-            <span style="font-size: 15px;">↕️</span>
+            <span style="font-size: 14px;">↕️</span>
             <span>ĐẢO GIÓ DỌC</span>
           </button>
         </div>
@@ -916,58 +1056,58 @@
           </button>
           <div id="tempStepModeToggle" class="temp-rocker-label" title="Bấm để đổi bước nhảy 0.5°C hoặc 1.0°C">
             <span>NHIỆT ĐỘ</span>
-            <span id="tempStepBadge" style="color: var(--lcd-accent);">(±0.5°C)</span>
+            <span id="tempStepBadge" style="color: var(--lcd-accent);">(±1.0°C)</span>
           </div>
           <button type="button" id="tempDownBtn" class="temp-step-btn" aria-label="Giảm nhiệt độ">
             －
           </button>
         </div>
 
-        <!-- Right Column: Fan Speed, Swing H, Quiet/Turbo Quick -->
+        <!-- Right Column: Fan Speed, Swing H, Hardware Timer -->
         <div class="ctrl-col">
           <button type="button" id="fanCycleBtn" class="r-btn">
-            <span style="font-size: 15px;">🌀</span>
+            <span style="font-size: 14px;">🌀</span>
             <span>TỐC ĐỘ QUẠT</span>
           </button>
 
           <button type="button" id="swingHCycleBtn" class="r-btn">
-            <span style="font-size: 15px;">↔️</span>
+            <span style="font-size: 14px;">↔️</span>
             <span>ĐẢO GIÓ NGANG</span>
           </button>
 
-          <button type="button" id="openTimerModalBtn" class="r-btn" style="border-color: rgba(251, 191, 36, 0.35);">
-            <span style="font-size: 15px;">⏱️</span>
-            <span style="color: #fde68a;">HẸN GIỜ KÉP</span>
+          <button type="button" id="openTimerModalBtn" class="r-btn" style="border-color: rgba(251, 191, 36, 0.45); background: rgba(251, 191, 36, 0.1);">
+            <span style="font-size: 14px;">🕒</span>
+            <span style="color: #fde68a;">HẸN GIỜ (TIMER)</span>
           </button>
         </div>
       </section>
 
-      <!-- DYNAMIC BRAND FEATURE DRAWER (BIẾN ĐỔI THEO HÃNG) -->
+      <!-- DYNAMIC BRAND FEATURE DRAWER (CÁC NÚT CHỨC NĂNG BẮN MÃ THẬT 100%) -->
       <section class="brand-drawer-card">
         <div class="drawer-header">
-          <span id="brandDrawerTitle">TÍNH NĂNG CHUYÊN BIỆT: DAIKIN</span>
-          <span id="protocolVariantBadge" style="color: var(--lcd-accent); font-family: var(--font-mono);">PROTO: REV-A</span>
+          <span id="brandDrawerTitle">TÍNH NĂNG CHUYÊN BIỆT: CASPER</span>
+          <span id="protocolVariantBadge" style="color: #34d399; font-family: var(--font-mono); cursor: pointer;" title="Bấm để chọn hoặc lưu sóng">SÓNG: GREE-YBOF</span>
         </div>
         <div id="brandFeaturesGrid" class="brand-features-grid">
-          <!-- Dynamically populated based on selected brand group -->
+          <!-- Dynamically populated based on selected brand -->
         </div>
       </section>
 
-      <!-- KILLER FEATURES BAR: BLIND MODE & AUTO-SCANNER / RAW IR -->
+      <!-- ADVANCED TOOLS ROW: CHỌN & DÒ SÓNG, LƯU SÓNG, ĐIỀU KHIỂN MÙ -->
       <section class="advanced-tools-row">
+        <button type="button" id="openScannerModalBtn" class="tool-pill-btn" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+          <span>📡</span>
+          <span>Chọn / Dò Sóng</span>
+        </button>
+
+        <button type="button" id="openSavedWavesManagerBtn" class="tool-pill-btn" style="border-color: rgba(52, 211, 153, 0.4); color: #6ee7b7;">
+          <span>📌</span>
+          <span>Kho Sóng Đã Lưu</span>
+        </button>
+
         <button type="button" id="openBlindModeBtn" class="tool-pill-btn">
           <span>🌑</span>
           <span>Điều khiển mù</span>
-        </button>
-
-        <button type="button" id="openScannerModalBtn" class="tool-pill-btn">
-          <span>📡</span>
-          <span>Dò mã tự động</span>
-        </button>
-
-        <button type="button" id="openRawIrModalBtn" class="tool-pill-btn">
-          <span>⚡</span>
-          <span>Nạp Raw / Hex</span>
         </button>
       </section>
 
@@ -976,67 +1116,88 @@
     <!-- 3. BOTTOM IR OSCILLOSCOPE & PACKET HEX DEBUGGER -->
     <footer class="ir-debug-footer">
       <div class="debug-meta-row">
-        <span id="debugBridgeModeText">Bridge: Web Simulator (Oscilloscope)</span>
-        <span id="debugPulseStatsText">38.0 kHz • 0 pulses • 0.0 ms</span>
+        <span id="debugBridgeModeText">Bridge: Đang kiểm tra...</span>
+        <span id="debugPulseStatsText">38.0 kHz • 0 xung • 0.0 ms</span>
       </div>
       <div id="debugHexPacketText" class="debug-hex-string">
         HEX: [Sẵn sàng phát gói tin trạng thái IR]
       </div>
-      <canvas id="irWaveformCanvas" width="380" height="28"></canvas>
+      <canvas id="irWaveformCanvas" width="380" height="24"></canvas>
     </footer>
 
   </div>
 
-  <!-- ================= MODAL 1: HẸN GIỜ KÉP (DUAL-MODE SMART TIMER) ================= -->
+  <!-- ================= MODAL 1: HẸN GIỜ CHUẨN ĐỒNG HỒ DÀN LẠNH (🕒 TIMER) ================= -->
   <div id="timerModal" class="modal-backdrop">
     <div class="modal-sheet">
       <div class="modal-header">
-        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #fde68a;">
-          ⏱️ Hệ Thống Hẹn Giờ Kép (Dual-Mode Timer)
+        <h3 style="margin: 0; font-size: 14.5px; font-weight: 800; color: #fde68a;">
+          🕒 Hẹn Giờ Bo Mạch Điều Hòa (Hiện Đồng Hồ Trên Máy)
         </h3>
         <button type="button" id="closeTimerModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
       </div>
 
-      <!-- 2 Mode Selector -->
       <div class="seg-tabs">
         <button type="button" id="tabBtnHwTimer" class="seg-tab-btn active">
-          1. Hẹn giờ Bo mạch (IR Packet)
+          1. Hẹn Giờ Đồng Hồ Máy (IR)
         </button>
         <button type="button" id="tabBtnSleepCurve" class="seg-tab-btn">
-          2. Đường cong Giấc ngủ
+          2. Kịch Bản Giấc Ngủ Đêm
         </button>
       </div>
 
-      <!-- Panel 1: Hardware IR Packet Timer -->
+      <!-- Panel 1: Hardware IR Packet Timer + Guaranteed Phone Auto-Off Backup -->
       <div id="panelHwTimer" style="display: flex; flex-direction: column; gap: 10px;">
         <div class="form-card">
-          <p style="margin: 0 0 8px; font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
-            Đóng gói trực tiếp bit <code>timer_on</code> / <code>timer_off</code> kèm số phút vào gói tin IR và bắn lên bo mạch điều hòa (điều hòa tự đếm ngược độc lập).
-          </p>
+          <div style="font-size: 11px; color: #a7f3d0; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px 10px; border-radius: 10px; margin-bottom: 10px; line-height: 1.45;">
+            💡 <b>Cơ chế Kép Chống Trượt 100%:</b><br/>
+            1️⃣ Gửi trực tiếp mã <b>Timer Bit + Số giờ</b> chuẩn hãng lên mặt dàn lạnh để <b>hiện biểu tượng đồng hồ (🕒) cạnh số nhiệt độ</b>.<br/>
+            2️⃣ Nếu điều hòa nhà bạn thuộc dòng cần mã riêng cho đồng hồ (như Casper/TCL/Midea), hãy bấm nút <b>"Chế độ phát Hẹn Giờ"</b> bên dưới để gửi đồng thời cả 3 định dạng đồng hồ OEM!
+          </div>
+
+          <!-- Quick Preset Off-Timer Chips -->
+          <label style="display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; color: #fde68a;">
+            ⚡ Chọn nhanh Hẹn Tắt (Timer OFF):
+          </label>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+            <button type="button" data-quick-off-mins="30" class="tool-pill-btn quick-timer-chip">0.5 giờ</button>
+            <button type="button" data-quick-off-mins="60" class="tool-pill-btn quick-timer-chip">1.0 giờ</button>
+            <button type="button" data-quick-off-mins="120" class="tool-pill-btn quick-timer-chip">2.0 giờ</button>
+            <button type="button" data-quick-off-mins="180" class="tool-pill-btn quick-timer-chip">3.0 giờ</button>
+            <button type="button" data-quick-off-mins="240" class="tool-pill-btn quick-timer-chip">4.0 giờ</button>
+            <button type="button" data-quick-off-mins="300" class="tool-pill-btn quick-timer-chip">5.0 giờ</button>
+            <button type="button" data-quick-off-mins="360" class="tool-pill-btn quick-timer-chip">6.0 giờ</button>
+            <button type="button" data-quick-off-mins="480" class="tool-pill-btn quick-timer-chip">8.0 giờ</button>
+          </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #34d399;">
-                Hẹn Bật (Timer ON)
-              </label>
-              <select id="hwTimerOnSelect" style="width: 100%; padding: 8px; border-radius: 10px; background: #090d16; color: white; border: 1px solid var(--border-subtle); font-weight: 700;">
-                <!-- Populated 0.0h to 24.0h step 0.5h -->
-              </select>
-            </div>
-
-            <div>
               <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #fb923c;">
-                Hẹn Tắt (Timer OFF)
+                🕒 Hẹn Tắt (Timer OFF)
               </label>
               <select id="hwTimerOffSelect" style="width: 100%; padding: 8px; border-radius: 10px; background: #090d16; color: white; border: 1px solid var(--border-subtle); font-weight: 700;">
                 <!-- Populated 0.0h to 24.0h step 0.5h -->
               </select>
             </div>
+
+            <div>
+              <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: #34d399;">
+                🕒 Hẹn Bật (Timer ON)
+              </label>
+              <select id="hwTimerOnSelect" style="width: 100%; padding: 8px; border-radius: 10px; background: #090d16; color: white; border: 1px solid var(--border-subtle); font-weight: 700;">
+                <!-- Populated 0.0h to 24.0h step 0.5h -->
+              </select>
+            </div>
           </div>
 
+          <label style="display: flex; align-items: center; gap: 7px; font-size: 11px; color: #e2e8f0; margin-bottom: 10px; cursor: pointer;">
+            <input type="checkbox" id="timerMultiFormatCheck" checked />
+            <span><b>Bắn Đa Khung Đồng Hồ (Gree + Midea48 + TCL112)</b> giúp chắc chắn hiện biểu tượng đồng hồ 🕒 trên mặt điều hòa</span>
+          </label>
+
           <div style="display: flex; gap: 8px;">
-            <button type="button" id="activateHwTimerBtn" class="primary-action-btn">
-              Kích hoạt & Bắn Gói Tin Hẹn Giờ
+            <button type="button" id="activateHwTimerBtn" class="primary-action-btn" style="background: linear-gradient(135deg, #d97706, #ea580c);">
+              🕒 Bắn Mã Hẹn Giờ Lên Điều Hòa
             </button>
             <button type="button" id="cancelHwTimerBtn" class="danger-action-btn" style="width: auto; white-space: nowrap; padding: 0 14px;">
               Hủy Hẹn Giờ
@@ -1045,7 +1206,7 @@
         </div>
       </div>
 
-      <!-- Panel 2: Smart Sleep Curve / Scheduled Macro -->
+      <!-- Panel 2: Smart Sleep Curve -->
       <div id="panelSleepCurve" style="display: none; flex-direction: column; gap: 10px;">
         <div class="form-card">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
@@ -1073,62 +1234,134 @@
     </div>
   </div>
 
-  <!-- ================= MODAL 2: TRÌNH DÒ MÃ TỰ ĐỘNG (AUTO-SCANNER) ================= -->
+  <!-- ================= MODAL 2: CHỌN SÓNG CỐ ĐỊNH & DÒ MÃ TỰ ĐỘNG ================= -->
   <div id="scannerModal" class="modal-backdrop">
     <div class="modal-sheet">
       <div class="modal-header">
-        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--lcd-accent);">
-          📡 Trình Dò Mã Hồng Ngoại Tự Động (Auto-Scanner)
+        <h3 style="margin: 0; font-size: 14.5px; font-weight: 800; color: var(--lcd-accent);">
+          📡 Chọn Sóng Hồng Ngoại Chuẩn & Dò Tự Động
         </h3>
         <button type="button" id="closeScannerModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
       </div>
 
-      <div class="form-card" style="text-align: center;">
-        <p style="margin: 0 0 10px; font-size: 12px; color: var(--text-muted);">
-          Hướng mắt hồng ngoại về phía điều hòa. Cứ mỗi <b>1.5 giây</b> ứng dụng sẽ tự động phát một biến thể giao thức (<code id="scannerCurrentBrandText">Daikin</code>).
-        </p>
-
-        <div style="padding: 14px; border-radius: 16px; background: #070a10; border: 1px solid var(--lcd-border); margin-bottom: 12px;">
-          <div style="font-size: 11px; color: var(--text-muted);">Đang thử nghiệm biến thể:</div>
-          <div id="scannerVariantDisplay" style="font-size: 20px; font-weight: 900; color: var(--lcd-accent); margin: 4px 0;">
-            Model Protocol REV-A (Standard)
-          </div>
-          <div id="scannerProgressText" style="font-family: var(--font-mono); font-size: 11px; color: #34d399;">
-            Biến thể 1 / 5 • Chu kỳ 1.5s
-          </div>
+      <div class="form-card">
+        <div style="font-size: 11px; color: #fde68a; margin-bottom: 8px; line-height: 1.4;">
+          🎯 <b>Mẹo bắt sóng nhạy 100%:</b> Hãy bấm thử từng loại sóng bên dưới. Khi thấy điều hòa kêu <b>"Bíp"</b> chuẩn nhất, hãy bấm <b>"💾 Lưu thành Sóng của tôi"</b> để khóa cố định loại sóng đó (không bị nhiễu đa tần)!
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div id="waveListSelectorContainer" style="display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; margin-bottom: 10px;">
+          <!-- Dynamically populated Single-Wave protocols -->
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
           <button type="button" id="startStopAutoScanBtn" class="primary-action-btn">
-            ▶️ Bắt đầu Tự động Dò (1.5s / mã)
+            ▶️ Tự Động Dò (2.0s/mã)
           </button>
-          <button type="button" id="lockScannedProtocolBtn" class="primary-action-btn" style="background: linear-gradient(135deg, #059669, #10b981);">
-            ✅ Đã nghe tiếng Bíp — Khóa mã này!
+          <button type="button" id="saveScannedWaveBtn" class="primary-action-btn" style="background: linear-gradient(135deg, #059669, #10b981);">
+            💾 Lưu Sóng Đang Chọn!
+          </button>
+        </div>
+
+        <div id="scannerProgressText" style="text-align: center; font-family: var(--font-mono); font-size: 10.5px; color: #34d399;">
+          Chạm vào bất kỳ dòng sóng nào ở trên để bắn thử ngay lập tức
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: LƯU SÓNG ĐIỀU KHIỂN & KHO SÓNG ĐÃ LƯU ================= -->
+  <div id="saveWaveModal" class="modal-backdrop">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 14.5px; font-weight: 800; color: #34d399;">
+          📌 Lưu Sóng Điều Khiển & Quản Lý Kho Sóng
+        </h3>
+        <button type="button" id="closeSaveWaveModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Form lưu sóng hiện tại -->
+      <div class="form-card">
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
+          Đang khóa cấu hình sóng: <b id="saveModalCurrentWaveInfo" style="color: #38bdf8;">Casper • WAVE-GREE (Gree YBOF 67-bit)</b>
+        </div>
+
+        <label style="display: block; font-size: 11px; font-weight: 700; color: #e2e8f0; margin-bottom: 5px;">
+          Đặt tên cho sóng điều khiển này (để lần sau bấm 1 chạm là nhận ngay):
+        </label>
+        <input
+          type="text"
+          id="customWaveNameInput"
+          placeholder="VD: Điều hòa Phòng Ngủ nhà mình..."
+          style="width: 100%; padding: 10px 12px; border-radius: 11px; background: #070a10; color: #ffffff; border: 1px solid rgba(56, 189, 248, 0.4); font-size: 13px; font-weight: 700; margin-bottom: 8px;"
+        />
+
+        <!-- Gợi ý tên nhanh -->
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;">
+          <button type="button" data-suggest-name="❄️ Điều hòa Phòng Ngủ" class="saved-wave-chip suggest-name-btn">❄️ Điều hòa Phòng Ngủ</button>
+          <button type="button" data-suggest-name="🛋️ Điều hòa Phòng Khách" class="saved-wave-chip suggest-name-btn">🛋️ Điều hòa Phòng Khách</button>
+          <button type="button" data-suggest-name="⚡ Sóng Chuẩn Nhà Mình" class="saved-wave-chip suggest-name-btn">⚡ Sóng Chuẩn Nhà Mình</button>
+        </div>
+
+        <button type="button" id="confirmSaveWaveBtn" class="primary-action-btn" style="background: linear-gradient(135deg, #059669, #10b981);">
+          ✅ Lưu Sóng Này Vào Bộ Nhớ 1-Chạm
+        </button>
+      </div>
+
+      <!-- Danh sách các sóng đã lưu -->
+      <div class="form-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 800; color: #e2e8f0;">📂 Danh sách Sóng đã lưu của bạn:</span>
+          <button type="button" id="openRawIrFromSaveModalBtn" style="background: transparent; border: none; color: #38bdf8; font-size: 10.5px; font-weight: 700; cursor: pointer;">
+            + Nạp mã Raw/Hex riêng
+          </button>
+        </div>
+        <div id="savedWavesManagerList" style="display: flex; flex-direction: column; gap: 7px; max-height: 200px; overflow-y: auto;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Thêm / Đổi tên phòng không dùng window.prompt -->
+      <div class="form-card">
+        <div style="font-size: 11.5px; font-weight: 800; color: #fde68a; margin-bottom: 6px;">
+          🏠 Thêm Phòng Mới Hoặc Đổi Tên Phòng Hiện Tại:
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <input
+            type="text"
+            id="customRoomNameInput"
+            placeholder="Nhập tên phòng (VD: Phòng làm việc)"
+            style="flex: 1; padding: 8px 10px; border-radius: 10px; background: #070a10; color: #ffffff; border: 1px solid var(--border-subtle); font-size: 12px;"
+          />
+          <button type="button" id="renameCurrentRoomBtn" class="tool-pill-btn" style="padding: 0 10px; white-space: nowrap;">
+            Đổi tên
+          </button>
+          <button type="button" id="addNewRoomModalBtn" class="primary-action-btn" style="width: auto; padding: 0 12px; white-space: nowrap;">
+            ＋ Thêm phòng
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ================= MODAL 3: NẠP MÃ RAW IR / PRONTO HEX ================= -->
+  <!-- ================= MODAL 4: NẠP MÃ RAW IR / PRONTO HEX ================= -->
   <div id="rawIrModal" class="modal-backdrop">
     <div class="modal-sheet">
       <div class="modal-header">
-        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #34d399;">
-          ⚡ Nạp Mã Raw Micro-giây / Pronto Hex (Nội địa Nhật)
+        <h3 style="margin: 0; font-size: 14.5px; font-weight: 800; color: #34d399;">
+          ⚡ Nạp Mã Raw Micro-giây / Pronto Hex
         </h3>
         <button type="button" id="closeRawIrModalBtn" style="background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
       </div>
 
       <div class="form-card">
         <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-          Dán chuỗi xung micro-giây (VD: <code>3450, 1720, 430, 1290...</code>) hoặc mã <b>Pronto Hex</b> (<code>0000 006D ...</code>):
+          Dán chuỗi xung micro-giây (VD: <code>9000, 4500, 620, 1600...</code>) hoặc mã <b>Pronto Hex</b> (<code>0000 006D ...</code>):
         </label>
         <textarea
           id="rawIrInputTextarea"
-          rows="5"
+          rows="4"
           style="width: 100%; border-radius: 12px; background: #070a10; color: #34d399; border: 1px solid var(--border-subtle); padding: 10px; font-family: var(--font-mono); font-size: 11px;"
-          placeholder="3450, 1720, 430, 430, 430, 1290, 430, 430..."
+          placeholder="9000, 4500, 620, 540, 620, 1600..."
         ></textarea>
 
         <div style="display: flex; gap: 8px; margin-top: 10px;">
@@ -1170,202 +1403,291 @@
     (function () {
       'use strict';
 
-      const STORAGE_KEY = 'ultra_ac_ir_state_v1';
+      const STORAGE_KEY = 'ultra_ac_ir_state_v2';
       const CARRIER_FREQ_HZ = 38000;
 
+      function showToast(msg) {
+        const t = document.getElementById('appToast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(showToast._tid);
+        showToast._tid = setTimeout(() => t.classList.remove('show'), 1850);
+      }
+
+      function reverseByteBits(b) {
+        let rev = 0;
+        let val = b & 0xFF;
+        for (let i = 0; i < 8; i++) {
+          rev = (rev << 1) | (val & 1);
+          val >>= 1;
+        }
+        return rev & 0xFF;
+      }
+
       // ========================================================================
-      // 1. CẤU HÌNH ĐẶC TẢ 12 HÃNG ĐIỀU HÒA & KHAY TÍNH NĂNG ĐỘNG
+      // 1. DANH SÁCH 15 LOẠI SÓNG HỒNG NGOẠI ĐƠN TẦN CHUẨN (KHÔNG XUNG ĐỘT)
       // ========================================================================
+      const IR_WAVE_CATALOG = [
+        {
+          id: 'WAVE-GREE',
+          shortBadge: 'Gree YBOF (Đời 1)',
+          name: 'Sóng Gree / Casper YBOF (67-bit Chuẩn 1 - Có đồng hồ Timer)',
+          desc: 'Phổ biến nhất cho Casper (YAP1F/YAN1F), Gree, Funiki, Nagakawa, Tosot',
+          brands: ['Casper', 'Gree', 'Funiki', 'Nagakawa']
+        },
+        {
+          id: 'WAVE-TCL112',
+          shortBadge: 'Casper/TCL 112-bit',
+          name: 'Sóng Casper / TCL / Funiki 14-Byte (112-bit - Có đồng hồ Timer)',
+          desc: 'Chuẩn bo mạch TCL112AC dùng trên Casper Inverter (GC/KC/HC), Funiki, TCL',
+          brands: ['Casper', 'Funiki', 'Nagakawa']
+        },
+        {
+          id: 'WAVE-MIDEA48',
+          shortBadge: 'Midea/Casper 48-bit',
+          name: 'Sóng Midea / Casper RG57 (48-bit 0xA1 - Có đồng hồ Timer)',
+          desc: 'Chuẩn Midea 48-bit có CRC & thanh ghi Timer 30 phút cho Midea, Casper, Comfee',
+          brands: ['Midea', 'Casper', 'Funiki', 'Nagakawa']
+        },
+        {
+          id: 'WAVE-COOLIX',
+          shortBadge: 'Coolix R51 (0xB2)',
+          name: 'Sóng Midea / Casper R51 (Coolix 0xB2 + Lệnh Đảo gió/LED riêng)',
+          desc: 'Dành cho điều khiển R51M/E đời đầu của Midea, Casper, Beko, Komeco',
+          brands: ['Midea', 'Casper', 'Funiki']
+        },
+        {
+          id: 'WAVE-AUX13',
+          shortBadge: 'AUX/Electra 13B',
+          name: 'Sóng AUX / Nagakawa / Funiki (104-bit 0xC3)',
+          desc: 'Chuẩn bo mạch AUX YKR-T / Electra 13-Byte',
+          brands: ['Nagakawa', 'Funiki', 'Casper', 'Midea']
+        },
+        {
+          id: 'WAVE-DAIKIN3',
+          shortBadge: 'Daikin 3-Khung',
+          name: 'Sóng Daikin ARC433 (Chuẩn 3 Khung 216-bit - Có đồng hồ Timer)',
+          desc: 'Dành cho điều hòa Daikin tiêu chuẩn & Inverter đời phổ biến tại VN',
+          brands: ['Daikin']
+        },
+        {
+          id: 'WAVE-DAIKIN2',
+          shortBadge: 'Daikin 2-Khung',
+          name: 'Sóng Daikin ARC477 (Inverter Đời Mới 2 Khung - Có đồng hồ Timer)',
+          desc: 'Dành cho điều hòa Daikin Inverter đời mới (FTKA / FTKC / FTKZ)',
+          brands: ['Daikin']
+        },
+        {
+          id: 'WAVE-PANA',
+          shortBadge: 'Panasonic 216-bit',
+          name: 'Sóng Panasonic Kaseikyo (27-Byte Chuẩn CS/CU - Có đồng hồ Timer)',
+          desc: 'Dành cho mọi dòng Panasonic Inverter & Tiêu chuẩn tại Việt Nam',
+          brands: ['Panasonic']
+        },
+        {
+          id: 'WAVE-MITSU',
+          shortBadge: 'Mitsubishi 18B',
+          name: 'Sóng Mitsubishi Electric (144-bit Phát Lặp Kép - Có đồng hồ Timer)',
+          desc: 'Dành cho Mitsubishi Electric & Mitsubishi Heavy',
+          brands: ['Mitsubishi']
+        },
+        {
+          id: 'WAVE-LG1',
+          shortBadge: 'LG 28-bit (0x88)',
+          name: 'Sóng LG Chuẩn 28-bit (Header 8500us + Lệnh Timer 0x88A)',
+          desc: 'Dành cho điều hòa LG DualCool / Inverter phổ biến',
+          brands: ['LG']
+        },
+        {
+          id: 'WAVE-LG2',
+          shortBadge: 'LG2 Inverter Mới',
+          name: 'Sóng LG Đời Mới (Header 3200us/9800us + Lệnh Timer 0x88A)',
+          desc: 'Dành cho điều hòa LG Inverter đời mới AKB749556 / AKB752154',
+          brands: ['LG']
+        },
+        {
+          id: 'WAVE-SAMSUNG',
+          shortBadge: 'Samsung 14B',
+          name: 'Sóng Samsung WindFree / Digital Inverter (112-bit)',
+          desc: 'Dành cho điều hòa Samsung 14-Byte / 21-Byte',
+          brands: ['Samsung']
+        },
+        {
+          id: 'WAVE-TOSHIBA',
+          shortBadge: 'Toshiba 72-bit',
+          name: 'Sóng Toshiba Chuẩn 9-Byte (72-bit MSB-first)',
+          desc: 'Dành cho điều hòa Toshiba Inverter & Nội địa',
+          brands: ['Toshiba']
+        },
+        {
+          id: 'WAVE-SHARP',
+          shortBadge: 'Sharp 104-bit',
+          name: 'Sóng Sharp J-Tech Inverter / Plasmacluster (13-Byte)',
+          desc: 'Dành cho điều hòa Sharp chuẩn 104-bit',
+          brands: ['Sharp']
+        },
+        {
+          id: 'WAVE-MULTI',
+          shortBadge: 'Đa Tần (Dò nhanh)',
+          name: 'Sóng Đa Tần Tổng Hợp (Phát tuần tự cách nhịp chống nhiễu)',
+          desc: 'Chỉ dùng khi chưa rõ đời máy; khuyên dùng Sóng Đơn ở trên khi đã biết mã!',
+          brands: ['Casper', 'Daikin', 'Panasonic', 'Gree', 'Midea', 'Funiki', 'Mitsubishi', 'LG', 'Samsung', 'Toshiba', 'Sharp', 'Nagakawa']
+        }
+      ];
+
+      function getDefaultWaveForBrand(brand) {
+        const map = {
+          Casper: 'WAVE-GREE',
+          Gree: 'WAVE-GREE',
+          Midea: 'WAVE-MIDEA48',
+          Funiki: 'WAVE-TCL112',
+          Nagakawa: 'WAVE-TCL112',
+          Daikin: 'WAVE-DAIKIN3',
+          Panasonic: 'WAVE-PANA',
+          Mitsubishi: 'WAVE-MITSU',
+          LG: 'WAVE-LG1',
+          Samsung: 'WAVE-SAMSUNG',
+          Toshiba: 'WAVE-TOSHIBA',
+          Sharp: 'WAVE-SHARP'
+        };
+        return map[brand] || 'WAVE-GREE';
+      }
+
       const BRAND_PROFILES = {
-        Daikin: {
-          group: 'group_jp_premium',
-          halfDegree: true,
-          headerMark: 3450, headerSpace: 1720,
-          bitMark: 430, zeroSpace: 430, oneSpace: 1290,
-          vendorCode: [0x11, 0xDA],
+        Casper: {
+          halfDegree: false,
           features: [
-            { key: 'powerful', label: 'Powerful', sub: 'Cực mạnh', bit: 0 },
-            { key: 'econo', label: 'Econo', sub: 'Tiết kiệm', bit: 1 },
-            { key: 'quiet', label: 'Quiet', sub: 'Siêu tĩnh', bit: 2 },
-            { key: 'sensor', label: 'Sensor', sub: 'Mắt thần', bit: 3 },
-            { key: 'moldProof', label: 'Nanoe-G / Mold', sub: 'Lọc khí & Mốc', bit: 4 },
-            { key: 'led', label: 'Đèn dàn lạnh', sub: 'Bật/Tắt LED', bit: 5 }
+            { key: 'turbo', label: 'Turbo', sub: 'Làm lạnh 30s' },
+            { key: 'ifeel', label: 'iFeel', sub: 'Cảm biến nhiệt' },
+            { key: 'xfan', label: 'iClean / X-Fan', sub: 'Tự làm sạch' },
+            { key: 'led', label: 'Đèn LED', sub: 'Bật/Tắt đèn máy' },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm êm' },
+            { key: 'eco', label: 'Eco', sub: 'Tiết kiệm điện' }
+          ]
+        },
+        Daikin: {
+          halfDegree: true,
+          features: [
+            { key: 'powerful', label: 'Powerful', sub: 'Cực mạnh' },
+            { key: 'econo', label: 'Econo', sub: 'Tiết kiệm' },
+            { key: 'quiet', label: 'Quiet', sub: 'Siêu tĩnh' },
+            { key: 'sensor', label: 'Sensor', sub: 'Mắt thần' },
+            { key: 'moldProof', label: 'Mold Proof', sub: 'Chống ẩm mốc' },
+            { key: 'led', label: 'Đèn LED', sub: 'Đèn dàn lạnh' }
           ]
         },
         Panasonic: {
-          group: 'group_jp_premium',
           halfDegree: true,
-          headerMark: 3500, headerSpace: 1750,
-          bitMark: 435, zeroSpace: 435, oneSpace: 1300,
-          vendorCode: [0x02, 0x20],
           features: [
-            { key: 'powerful', label: 'Powerful', sub: 'Làm lạnh nhanh', bit: 0 },
-            { key: 'econo', label: 'Econavi', sub: 'Tiết kiệm điện', bit: 1 },
-            { key: 'quiet', label: 'Quiet', sub: 'Siêu êm', bit: 2 },
-            { key: 'sensor', label: 'Sensor', sub: 'Mắt thần', bit: 3 },
-            { key: 'moldProof', label: 'Nanoe-G', sub: 'Khử khuẩn', bit: 4 },
-            { key: 'led', label: 'Đèn dàn lạnh', sub: 'Bật/Tắt LED', bit: 5 }
-          ]
-        },
-        Mitsubishi: {
-          group: 'group_jp_premium',
-          halfDegree: true,
-          headerMark: 3400, headerSpace: 1700,
-          bitMark: 420, zeroSpace: 420, oneSpace: 1260,
-          vendorCode: [0x23, 0xCB],
-          features: [
-            { key: 'powerful', label: 'Powerful', sub: 'Công suất cao', bit: 0 },
-            { key: 'econo', label: 'Econo Cool', sub: 'Tiết kiệm', bit: 1 },
-            { key: 'quiet', label: 'Quiet', sub: 'Êm dịu', bit: 2 },
-            { key: 'sensor', label: '3D i-See', sub: 'Mắt thần 3D', bit: 3 },
-            { key: 'moldProof', label: 'Mold Proof', sub: 'Chống nấm mốc', bit: 4 },
-            { key: 'led', label: 'Đèn dàn lạnh', sub: 'Bật/Tắt LED', bit: 5 }
-          ]
-        },
-        Casper: {
-          group: 'group_smart_value',
-          halfDegree: true,
-          headerMark: 9000, headerSpace: 4500,
-          bitMark: 620, zeroSpace: 540, oneSpace: 1640,
-          vendorCode: [0xCA, 0x50],
-          features: [
-            { key: 'turbo', label: 'Turbo', sub: 'Làm lạnh 30s', bit: 0 },
-            { key: 'ifeel', label: 'iFeel', sub: 'Cảm biến nhiệt', bit: 1 },
-            { key: 'xfan', label: 'iClean / X-Fan', sub: 'Tự làm sạch', bit: 2 },
-            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
-            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
-            { key: 'eco', label: 'Eco', sub: 'Tiết kiệm', bit: 5 }
+            { key: 'powerful', label: 'Powerful', sub: 'Làm lạnh nhanh' },
+            { key: 'econo', label: 'Econavi', sub: 'Tiết kiệm điện' },
+            { key: 'quiet', label: 'Quiet', sub: 'Siêu êm' },
+            { key: 'sensor', label: 'Sensor', sub: 'Mắt thần' },
+            { key: 'moldProof', label: 'Nanoe-G', sub: 'Lọc khí Ion' },
+            { key: 'led', label: 'Đèn LED', sub: 'Đèn dàn lạnh' }
           ]
         },
         Gree: {
-          group: 'group_smart_value',
           halfDegree: false,
-          headerMark: 9000, headerSpace: 4500,
-          bitMark: 620, zeroSpace: 540, oneSpace: 1640,
-          vendorCode: [0x47, 0x52],
           features: [
-            { key: 'turbo', label: 'Turbo', sub: 'Tăng tốc', bit: 0 },
-            { key: 'ifeel', label: 'iFeel', sub: 'Theo Remote', bit: 1 },
-            { key: 'xfan', label: 'X-Fan', sub: 'Sấy dàn lạnh', bit: 2 },
-            { key: 'led', label: 'LED Display', sub: 'Đèn màn hình', bit: 3 },
-            { key: 'sleep', label: 'Sleep', sub: 'Ngủ ngon', bit: 4 },
-            { key: 'eco', label: 'Cold Plasma', sub: 'Lọc khí', bit: 5 }
+            { key: 'turbo', label: 'Turbo', sub: 'Tăng tốc' },
+            { key: 'ifeel', label: 'iFeel', sub: 'Theo Remote' },
+            { key: 'xfan', label: 'X-Fan', sub: 'Sấy dàn lạnh' },
+            { key: 'led', label: 'Đèn LED', sub: 'Bật/Tắt đèn máy' },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ ngon' },
+            { key: 'eco', label: 'Cold Plasma', sub: 'Khử khuẩn' }
           ]
         },
         Midea: {
-          group: 'group_smart_value',
           halfDegree: false,
-          headerMark: 4400, headerSpace: 4400,
-          bitMark: 540, zeroSpace: 540, oneSpace: 1620,
-          vendorCode: [0xB2, 0x4D],
           features: [
-            { key: 'turbo', label: 'Turbo', sub: 'Cực nhanh', bit: 0 },
-            { key: 'ifeel', label: 'Follow Me', sub: 'iFeel Sensor', bit: 1 },
-            { key: 'xfan', label: 'Self-Clean', sub: 'Tự làm sạch', bit: 2 },
-            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
-            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
-            { key: 'eco', label: 'Gear Eco', sub: 'Tiết kiệm', bit: 5 }
+            { key: 'turbo', label: 'Turbo', sub: 'Cực nhanh' },
+            { key: 'ifeel', label: 'Follow Me', sub: 'iFeel Sensor' },
+            { key: 'xfan', label: 'Self-Clean', sub: 'Tự làm sạch' },
+            { key: 'led', label: 'Đèn LED', sub: 'Bật/Tắt đèn máy' },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm' },
+            { key: 'eco', label: 'Gear Eco', sub: 'Tiết kiệm' }
           ]
         },
         Funiki: {
-          group: 'group_smart_value',
           halfDegree: false,
-          headerMark: 9000, headerSpace: 4500,
-          bitMark: 600, zeroSpace: 550, oneSpace: 1650,
-          vendorCode: [0xF0, 0x4E],
           features: [
-            { key: 'turbo', label: 'Turbo', sub: 'Làm lạnh nhanh', bit: 0 },
-            { key: 'ifeel', label: 'iFeel', sub: 'Cảm biến nhiệt', bit: 1 },
-            { key: 'xfan', label: 'Self-Clean', sub: 'Sấy dàn lạnh', bit: 2 },
-            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
-            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
-            { key: 'eco', label: 'Nano Silver', sub: 'Kháng khuẩn', bit: 5 }
+            { key: 'turbo', label: 'Turbo', sub: 'Làm lạnh nhanh' },
+            { key: 'ifeel', label: 'iFeel', sub: 'Cảm biến nhiệt' },
+            { key: 'xfan', label: 'Self-Clean', sub: 'Sấy dàn lạnh' },
+            { key: 'led', label: 'Đèn LED', sub: 'Bật/Tắt đèn máy' },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm' },
+            { key: 'eco', label: 'Nano Silver', sub: 'Kháng khuẩn' }
           ]
         },
         Nagakawa: {
-          group: 'group_smart_value',
           halfDegree: false,
-          headerMark: 9000, headerSpace: 4500,
-          bitMark: 600, zeroSpace: 550, oneSpace: 1650,
-          vendorCode: [0x9A, 0x6A],
           features: [
-            { key: 'turbo', label: 'Turbo', sub: 'Siêu tốc', bit: 0 },
-            { key: 'ifeel', label: 'iFeel', sub: 'Theo Remote', bit: 1 },
-            { key: 'xfan', label: 'Auto Clean', sub: 'Tự làm sạch', bit: 2 },
-            { key: 'led', label: 'LED Display', sub: 'Đèn dàn lạnh', bit: 3 },
-            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm', bit: 4 },
-            { key: 'eco', label: 'Eco', sub: 'Tiết kiệm', bit: 5 }
+            { key: 'turbo', label: 'Turbo', sub: 'Siêu tốc' },
+            { key: 'ifeel', label: 'iFeel', sub: 'Theo Remote' },
+            { key: 'xfan', label: 'Auto Clean', sub: 'Tự làm sạch' },
+            { key: 'led', label: 'Đèn LED', sub: 'Bật/Tắt đèn máy' },
+            { key: 'sleep', label: 'Sleep', sub: 'Ngủ đêm' },
+            { key: 'eco', label: 'Eco', sub: 'Tiết kiệm' }
+          ]
+        },
+        Mitsubishi: {
+          halfDegree: true,
+          features: [
+            { key: 'powerful', label: 'Powerful', sub: 'Công suất cao' },
+            { key: 'econo', label: 'Econo Cool', sub: 'Tiết kiệm' },
+            { key: 'quiet', label: 'Quiet', sub: 'Êm dịu' },
+            { key: 'sensor', label: '3D i-See', sub: 'Mắt thần 3D' },
+            { key: 'moldProof', label: 'Mold Proof', sub: 'Chống nấm mốc' },
+            { key: 'led', label: 'Đèn LED', sub: 'Đèn dàn lạnh' }
           ]
         },
         LG: {
-          group: 'group_kr_tech',
           halfDegree: false,
-          headerMark: 8400, headerSpace: 4200,
-          bitMark: 520, zeroSpace: 520, oneSpace: 1580,
-          vendorCode: [0x88, 0x00],
           features: [
-            { key: 'jetCool', label: 'Jet Cool', sub: 'Lạnh tức thì', bit: 0 },
-            { key: 'energySaving', label: 'Energy Ctrl', sub: '40% / 60% / 80%', bit: 1, multiLevel: true },
-            { key: 'comfortAir', label: 'Comfort Air', sub: 'Gió dễ chịu', bit: 2 },
-            { key: 'ionizer', label: 'Plasmaster', sub: 'Ion lọc khí', bit: 3 },
-            { key: 'quiet', label: 'Silent', sub: 'Giảm ồn', bit: 4 },
-            { key: 'led', label: 'Light Off', sub: 'Đèn dàn lạnh', bit: 5 }
+            { key: 'jetCool', label: 'Jet Cool', sub: 'Lạnh tức thì' },
+            { key: 'energySaving', label: 'Energy Ctrl', sub: '40% / 60% / 80%', multiLevel: true },
+            { key: 'comfortAir', label: 'Comfort Air', sub: 'Gió dễ chịu' },
+            { key: 'ionizer', label: 'Plasmaster', sub: 'Ion lọc khí' },
+            { key: 'quiet', label: 'Silent', sub: 'Giảm ồn' },
+            { key: 'led', label: 'Đèn LED', sub: 'Bật/Tắt đèn máy' }
           ]
         },
         Samsung: {
-          group: 'group_kr_tech',
           halfDegree: false,
-          headerMark: 3000, headerSpace: 9000,
-          bitMark: 500, zeroSpace: 500, oneSpace: 1500,
-          vendorCode: [0xB2, 0xF9],
           features: [
-            { key: 'jetCool', label: 'Fast Cool', sub: 'Làm lạnh nhanh', bit: 0 },
-            { key: 'energySaving', label: 'Energy Saving', sub: '40% / 60% / 80%', bit: 1, multiLevel: true },
-            { key: 'comfortAir', label: 'WindFree', sub: 'Gió buốt 0%', bit: 2 },
-            { key: 'ionizer', label: 'Ionizer', sub: 'Lọc bụi mịn', bit: 3 },
-            { key: 'quiet', label: 'Quiet', sub: 'Siêu êm', bit: 4 },
-            { key: 'led', label: 'Beep / Light', sub: 'Đèn màn hình', bit: 5 }
+            { key: 'jetCool', label: 'Fast Cool', sub: 'Làm lạnh nhanh' },
+            { key: 'energySaving', label: 'Energy Saving', sub: '40% / 60% / 80%', multiLevel: true },
+            { key: 'comfortAir', label: 'WindFree', sub: 'Gió dịu êm' },
+            { key: 'ionizer', label: 'Ionizer', sub: 'Lọc bụi mịn' },
+            { key: 'quiet', label: 'Quiet', sub: 'Siêu êm' },
+            { key: 'led', label: 'Đèn LED', sub: 'Đèn màn hình' }
           ]
         },
         Toshiba: {
-          group: 'group_kr_tech',
-          halfDegree: true,
-          headerMark: 4400, headerSpace: 4300,
-          bitMark: 540, zeroSpace: 540, oneSpace: 1620,
-          vendorCode: [0xF2, 0x0D],
+          halfDegree: false,
           features: [
-            { key: 'jetCool', label: 'Hi-Power', sub: 'Công suất lớn', bit: 0 },
-            { key: 'energySaving', label: 'Power Sel', sub: '50% / 75% / 100%', bit: 1, multiLevel: true },
-            { key: 'comfortAir', label: 'Comfort Air', sub: 'Luồng gió êm', bit: 2 },
-            { key: 'ionizer', label: 'Pure Ion', sub: 'Lọc khí Plasma', bit: 3 },
-            { key: 'quiet', label: 'Quiet', sub: 'Tĩnh lặng', bit: 4 },
-            { key: 'led', label: 'LED', sub: 'Đèn dàn lạnh', bit: 5 }
+            { key: 'jetCool', label: 'Hi-Power', sub: 'Công suất lớn' },
+            { key: 'energySaving', label: 'Power Sel', sub: '50% / 75% / 100%', multiLevel: true },
+            { key: 'comfortAir', label: 'Comfort Air', sub: 'Luồng gió êm' },
+            { key: 'ionizer', label: 'Pure Ion', sub: 'Lọc khí Plasma' },
+            { key: 'quiet', label: 'Quiet', sub: 'Tĩnh lặng' },
+            { key: 'led', label: 'Đèn LED', sub: 'Đèn dàn lạnh' }
           ]
         },
         Sharp: {
-          group: 'group_kr_tech',
-          halfDegree: true,
-          headerMark: 3800, headerSpace: 1900,
-          bitMark: 460, zeroSpace: 460, oneSpace: 1380,
-          vendorCode: [0xAA, 0x5A],
+          halfDegree: false,
           features: [
-            { key: 'jetCool', label: 'Super Jet', sub: 'Giảm 5°C/5p', bit: 0 },
-            { key: 'energySaving', label: 'J-Tech Eco', sub: '40% / 60% / 80%', bit: 1, multiLevel: true },
-            { key: 'comfortAir', label: 'Coanda Air', sub: 'Gió trần nhà', bit: 2 },
-            { key: 'ionizer', label: 'Plasmacluster', sub: 'Diệt khuẩn Ion', bit: 3 },
-            { key: 'quiet', label: 'Baby Sleep', sub: 'Êm dịu', bit: 4 },
-            { key: 'led', label: 'LED', sub: 'Đèn dàn lạnh', bit: 5 }
+            { key: 'jetCool', label: 'Super Jet', sub: 'Lạnh cực nhanh' },
+            { key: 'energySaving', label: 'J-Tech Eco', sub: '40% / 60% / 80%', multiLevel: true },
+            { key: 'comfortAir', label: 'Coanda Air', sub: 'Gió trần nhà' },
+            { key: 'ionizer', label: 'Plasmacluster', sub: 'Diệt khuẩn Ion' },
+            { key: 'quiet', label: 'Baby Sleep', sub: 'Êm dịu' },
+            { key: 'led', label: 'Đèn LED', sub: 'Đèn dàn lạnh' }
           ]
         }
       };
-
-      const PROTOCOL_VARIANTS = [
-        { id: 'REV-A', name: 'REV-A • Đa Tần Tự Động (Bắn gộp các đời mã chính của hãng)', badge: 'REV-A (Đa tần)' },
-        { id: 'REV-B', name: 'REV-B • Chuẩn OEM Đời 1 (Gree YBOF / Daikin ARC433 / LG 0x88)', badge: 'REV-B (Đời 1)' },
-        { id: 'REV-C', name: 'REV-C • Chuẩn OEM Đời 2 (Midea R51 / Daikin ARC477 / LG2 Inv)', badge: 'REV-C (Đời 2)' },
-        { id: 'REV-D', name: 'REV-D • Chuẩn OEM Đời 3 (AUX-TCL 14B / Pana KDK / Toshiba)', badge: 'REV-D (Đời 3)' },
-        { id: 'REV-E', name: 'REV-E • Chuẩn OEM Đời 4 (Inverter Mở Rộng / Nội Địa)', badge: 'REV-E (Đời 4)' }
-      ];
 
       const MODES = ['auto', 'cool', 'dry', 'fan', 'heat'];
       const FAN_SPEEDS = ['AUTO', 'QUIET', 'BẬC 1', 'BẬC 2', 'BẬC 3', 'BẬC 4', 'TURBO'];
@@ -1374,11 +1696,10 @@
 
       // ========================================================================
       // 2. MODULE ĐỘC LẬP: IR PROTOCOL ENGINE (CHUẨN PHẦN CỨNG IRremoteESP8266)
+      //    Mỗi hàm trả về 1 khung xung liền mạch (Atomic Contiguous Pulse Array)
+      //    để Android ConsumerIrManager phát chính xác tuyệt đối tới từng micro-giây!
       // ========================================================================
       const IRProtocolEngine = {
-        /**
-         * Chuyển mảng byte sang mảng xung [Mark, Space...] theo chuẩn LSB-first hoặc MSB-first
-         */
         bytesToPulses(bytes, timing, msbFirst = false) {
           const pulses = [timing.hMark, timing.hSpace];
           for (let i = 0; i < bytes.length; i++) {
@@ -1400,64 +1721,20 @@
           return pulses;
         },
 
-        /**
-         * 1. Chuẩn Midea / Casper (R51/RG57) / Funiki / Nagakawa / Komeco (48-bit Inverted Byte MSB-first)
-         * Khung 6 byte: [B0, ~B0, B1, ~B1, B2, ~B2] với B0 = 0xB2, truyền 2 lần
-         * Hỗ trợ đóng gói trực tiếp số nửa-giờ Hẹn giờ vào 6 bit Timer (B1[4..0] & B2[1..0]) để bật đèn đồng hồ trên dàn lạnh!
-         */
-        encodeMideaR51(roomState) {
-          const tempGrayMap = {
-            16: 0x0, 17: 0x0, 18: 0x1, 19: 0x3, 20: 0x2, 21: 0x6, 22: 0x7, 23: 0x5,
-            24: 0x4, 25: 0xC, 26: 0xD, 27: 0x9, 28: 0x8, 29: 0xA, 30: 0xB
-          };
-          const tInt = Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)));
-          let b0 = 0xB2;
-          let b1 = 0xBF;
-          let b2 = 0x00;
-
-          const activeTimerMins = (roomState.timerOffMinutes > 0)
-            ? roomState.timerOffMinutes
-            : (roomState.timerOnMinutes > 0 ? roomState.timerOnMinutes : 0);
-
-          if (!roomState.power && activeTimerMins === 0) {
-            // Mã tắt nguồn chuẩn Midea/Casper R51: B2 4D 7B 84 E0 1F
-            b1 = 0x7B;
-            b2 = 0xE0;
-          } else {
-            const fanMap = {
-              'AUTO': 0xA0, 'QUIET': 0x80, 'BẬC 1': 0x80, 'BẬC 2': 0x40,
-              'BẬC 3': 0x20, 'BẬC 4': 0x20, 'TURBO': 0x20
-            };
-            const fanBits = fanMap[roomState.fan] || 0xA0;
-            const modeMap = { 'cool': 0x00, 'dry': 0x04, 'auto': 0x08, 'heat': 0x0C, 'fan': 0x04 };
-            const tempNibble = roomState.mode === 'fan' ? 0x0E : (tempGrayMap[tInt] ?? 0x0C);
-            const modeBits = modeMap[roomState.mode] ?? 0x00;
-
-            if (activeTimerMins > 0) {
-              // Mã hóa số bước 30 phút (slots = halfHours - 1) vào 6 bit Timer của Midea/Casper R51
-              const halfHours = Math.max(1, Math.min(48, Math.round(activeTimerMins / 30)));
-              const slots = halfHours - 1;
-              const timerHigh5 = (slots >> 1) & 0x1F;
-              const timerLowBit = ((~slots) & 0x01) << 1;
-              b1 = fanBits | timerHigh5;
-              b2 = (tempNibble << 4) | modeBits | timerLowBit | (roomState.timerOffMinutes > 0 ? 0x01 : 0x00);
-            } else {
-              // Khi không hẹn giờ: B1[4..0] = 0x1F (11111) và B2[1..0] = 00
-              b1 = fanBits | 0x1F;
-              b2 = (tempNibble << 4) | modeBits;
+        joinSubFramesIntoAtomicBurst(subFrames) {
+          const combined = [];
+          for (let f = 0; f < subFrames.length; f++) {
+            const arr = subFrames[f];
+            for (let i = 0; i < arr.length; i++) {
+              combined.push(arr[i]);
             }
           }
-
-          const bytes = [b0, b0 ^ 0xFF, b1, b1 ^ 0xFF, b2, b2 ^ 0xFF];
-          const timing = { hMark: 4400, hSpace: 4400, bMark: 560, oSpace: 1680, zSpace: 560, gapUs: 5200 };
-          const singleFrame = this.bytesToPulses(bytes, timing, true);
-          return { bytes, subFrames: [singleFrame, singleFrame] };
+          return combined;
         },
 
         /**
-         * 2. Chuẩn Gree / Casper (YBOF / YAP1F / YAN1F) 67-bit LSB-first
-         * Đóng gói chính xác Bit Hẹn Giờ (Byte 1 bit 7 = 0x80) và số giờ BCD (Byte 1 bits 4..6 & Byte 2 bits 0..3)
-         * để bật sáng biểu tượng chiếc đồng hồ (TIMER) ngay trên mặt dàn lạnh Casper / Gree!
+         * 1. Sóng Gree / Casper YBOF / YAP1F / YAN1F (67-bit LSB-first)
+         * Bật sáng biểu tượng đồng hồ (🕒 TIMER) trên mặt dàn lạnh qua Byte 1 bit 7 (0x80) + BCD Hours
          */
         encodeGreeYbof(roomState) {
           const modeMap = { 'auto': 0, 'cool': 1, 'dry': 2, 'fan': 3, 'heat': 4 };
@@ -1466,12 +1743,12 @@
           const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
           const fanBits = (fanIdx <= 0 ? 0 : fanIdx <= 2 ? 1 : fanIdx <= 4 ? 2 : 3) << 4;
           const swingBit = (roomState.swingV === 'AUTO') ? (1 << 6) : 0;
-          const sleepBit = (roomState.features && roomState.features.sleep) ? (1 << 7) : 0;
+          const f = roomState.features || {};
+          const sleepBit = (f.sleep || f.quiet) ? (1 << 7) : 0;
 
           const b0 = mVal | pwrBit | fanBits | swingBit | sleepBit;
           const tInt = Math.min(30, Math.max(16, Math.floor(Number(roomState.temp) || 25))) - 16;
 
-          // Tính toán BCD Timer cho Gree / Casper YBOF (Byte 1 bits 4..7 & Byte 2 bits 0..3)
           const activeTimerMins = (roomState.timerOffMinutes > 0)
             ? roomState.timerOffMinutes
             : (roomState.timerOnMinutes > 0 ? roomState.timerOnMinutes : 0);
@@ -1488,7 +1765,7 @@
             const tens = Math.floor(wholeHours / 10) & 0x03;
             const units = (wholeHours % 10) & 0x0F;
 
-            timerEnableBit = 1 << 7; // Bit 7 của Byte 1: Bật biểu tượng đồng hồ hẹn giờ trên mặt dàn lạnh!
+            timerEnableBit = 1 << 7; // Bit 7 Byte 1: Bật đèn đồng hồ 🕒 trên dàn lạnh Gree / Casper!
             timerTensBits = tens << 5;
             timerHalfHrBit = hasHalf << 4;
             timerUnitsNibble = units;
@@ -1496,22 +1773,26 @@
 
           const b1 = (tInt & 0x0F) | timerHalfHrBit | timerTensBits | timerEnableBit;
 
-          const f = roomState.features || {};
-          const turboBit = (f.turbo || roomState.fan === 'TURBO') ? (1 << 4) : 0;
+          const turboBit = (f.turbo || f.powerful || roomState.fan === 'TURBO') ? (1 << 4) : 0;
           const ledBit = (f.led !== false) ? (1 << 5) : 0;
-          const xfanBit = f.xfan ? (1 << 7) : 0;
-          const b2 = (timerUnitsNibble & 0x0F) | turboBit | ledBit | xfanBit;
+          const modelABit = 1 << 6; // ModelA (YAW1F/YAP1F)
+          const xfanBit = (f.xfan || f.moldProof) ? (1 << 7) : 0;
+          const b2 = (timerUnitsNibble & 0x0F) | turboBit | ledBit | modelABit | xfanBit;
           const b3 = 0x50;
-          const b4 = (roomState.swingV === 'AUTO') ? 0x01 : 0x00;
-          const b5 = f.ifeel ? 0x24 : 0x20;
-          const b6 = 0x00;
 
-          // Nibble Checksum chuẩn Gree YBOF
+          const swingVMap = { 'AUTO': 0x01, 'CAO': 0x02, 'GIỮA': 0x04, 'THẤP': 0x06, 'CỐ ĐỊNH': 0x00 };
+          const swingHMap = { 'AUTO': 0x10, 'TRÁI': 0x20, 'GIỮA': 0x30, 'PHẢI': 0x40, 'GÓC RỘNG': 0x10 };
+          const b4 = (swingVMap[roomState.swingV] ?? 0x01) | (swingHMap[roomState.swingH] ?? 0x00);
+          const b5 = f.ifeel ? 0x24 : 0x20; // 0x20 = Hiển thị nhiệt độ cài đặt trên mặt dàn lạnh
+          const b6 = (f.eco || f.econo) ? 0x04 : 0x00;
+
+          // Checksum chuẩn IRGreeAC::calcChecksum (Tổng nibble thấp B0..B3 + nibble cao B4..B6 + 10) & 0x0F
           const chk = (
             (b0 & 0x0F) +
             (b1 & 0x0F) +
             (b2 & 0x0F) +
             (b3 & 0x0F) +
+            ((b4 >> 4) & 0x0F) +
             ((b5 >> 4) & 0x0F) +
             ((b6 >> 4) & 0x0F) +
             10
@@ -1526,7 +1807,7 @@
               pulses.push(bMark, ((bytes[i] >> bit) & 1) ? oSpace : zSpace);
             }
           }
-          // 3 bit nối '0, 1, 0' + khoảng nghỉ 19980us
+          // 3 connector bits '0, 1, 0' + 19980us space
           pulses.push(bMark, zSpace, bMark, oSpace, bMark, zSpace, bMark, 19980);
           for (let i = 4; i < 8; i++) {
             for (let bit = 0; bit < 8; bit++) {
@@ -1534,53 +1815,235 @@
             }
           }
           pulses.push(bMark, 10000);
-          return { bytes, subFrames: [pulses] };
+          return { bytes, atomicPulses: pulses };
         },
 
         /**
-         * 3. Chuẩn AUX / TCL / Casper / Funiki / Nagakawa 14-Byte (112-bit LSB-first)
-         * Đóng gói cờ TimerOff (Byte 5 bit 1 = 0x02), TimerOn (Byte 5 bit 0 = 0x01) và số bước 10 phút vào Byte 9 & 10
+         * 2. Sóng Casper / TCL / Funiki / Nagakawa 14-Byte (TCL112AC - 112-bit LSB-first)
+         * Chuẩn union Tcl112Protocol trong ir_Tcl.h:
+         * - Byte 5: Power(0x04) | OffTimerEnabled(0x08) | OnTimerEnabled(0x10) | Quiet(0x20) | Light(0x40) | Econo(0x80)
+         * - Byte 8: Fan(0..2) | SwingV(3..5) | TimerIndicator(0x40 - Bật biểu tượng đồng hồ 🕒!)
+         * - Byte 9: ((OffTimerMins / 20) & 0x3F) << 1
+         * - Byte 10: ((OnTimerMins / 20) & 0x3F) << 1
          */
-        encodeAuxTcl14(roomState) {
+        encodeTcl112(roomState) {
+          const f = roomState.features || {};
           const pwrBit = roomState.power ? 0x04 : 0x00;
-          const tOffFlag = roomState.timerOffMinutes > 0 ? 0x02 : 0x00;
-          const tOnFlag = roomState.timerOnMinutes > 0 ? 0x01 : 0x00;
-          const b5 = 0x20 | pwrBit | tOffFlag | tOnFlag;
+          const offTimerEnabledBit = roomState.timerOffMinutes > 0 ? 0x08 : 0x00;
+          const onTimerEnabledBit = roomState.timerOnMinutes > 0 ? 0x10 : 0x00;
+          const quietBit = (f.quiet || roomState.fan === 'QUIET') ? 0x20 : 0x00;
+          const lightBit = (f.led !== false) ? 0x40 : 0x00;
+          const econoBit = (f.eco || f.econo) ? 0x80 : 0x00;
+          const b5 = pwrBit | offTimerEnabledBit | onTimerEnabledBit | quietBit | lightBit | econoBit;
 
-          const modeMap = { 'auto': 0x08, 'cool': 0x03, 'dry': 0x02, 'fan': 0x07, 'heat': 0x01 };
-          const mByte = modeMap[roomState.mode] ?? 0x03;
-          const tInt = (31 - Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)))) & 0x0F;
+          const modeMap = { 'heat': 0x01, 'dry': 0x02, 'cool': 0x03, 'fan': 0x07, 'auto': 0x08 };
+          const healthBit = (f.xfan || f.moldProof || f.ionizer) ? 0x10 : 0x00;
+          const turboBit = (f.turbo || f.powerful || roomState.fan === 'TURBO') ? 0x20 : 0x00;
+          const b6 = (modeMap[roomState.mode] ?? 0x03) | healthBit | turboBit;
+
+          const tempVal = Number(roomState.temp) || 25;
+          const tInt = (31 - Math.min(30, Math.max(16, Math.floor(tempVal)))) & 0x0F;
+
           const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
-          const fanVal = fanIdx <= 0 ? 0x00 : fanIdx <= 2 ? 0x02 : fanIdx <= 4 ? 0x03 : 0x05;
-          const swingV = roomState.swingV === 'AUTO' ? 0x38 : 0x00;
+          const fanVal = fanIdx <= 0 ? 0x00 : fanIdx === 1 ? 0x01 : fanIdx === 2 ? 0x02 : fanIdx <= 4 ? 0x03 : 0x05;
+          const swingV = roomState.swingV === 'AUTO' ? (0x07 << 3) : (0x00 << 3);
+          const timerIndicatorBit = (roomState.timerOffMinutes > 0 || roomState.timerOnMinutes > 0) ? 0x40 : 0x00;
+          const b8 = fanVal | swingV | timerIndicatorBit;
 
-          const b9OffSteps = roomState.timerOffMinutes > 0
-            ? Math.min(144, Math.round(roomState.timerOffMinutes / 10))
-            : 0x00;
-          const b10OnSteps = roomState.timerOnMinutes > 0
-            ? Math.min(144, Math.round(roomState.timerOnMinutes / 10))
-            : 0x00;
+          const offSteps20m = roomState.timerOffMinutes > 0
+            ? Math.min(36, Math.max(1, Math.round(roomState.timerOffMinutes / 20)))
+            : 0;
+          const onSteps20m = roomState.timerOnMinutes > 0
+            ? Math.min(36, Math.max(1, Math.round(roomState.timerOnMinutes / 20)))
+            : 0;
+          const b9 = (offSteps20m & 0x3F) << 1;
+          const b10 = (onSteps20m & 0x3F) << 1;
+
+          const swingHBit = roomState.swingH === 'AUTO' ? 0x08 : 0x00;
+          const halfDegBit = (tempVal % 1 !== 0) ? 0x20 : 0x00;
+          const b12 = swingHBit | halfDegBit | 0x80;
 
           const bytes = [
             0x23, 0xCB, 0x26, 0x01, 0x00,
-            b5,
-            mByte,
-            tInt,
-            swingV | fanVal,
-            b9OffSteps,
-            b10OnSteps,
-            0x00, 0x80
+            b5, b6, tInt, b8,
+            b9, b10, 0x00, b12
           ];
           const chk = bytes.reduce((a, b) => (a + b) & 0xFF, 0);
           bytes.push(chk);
 
-          const timing = { hMark: 3100, hSpace: 1650, bMark: 400, oSpace: 1200, zSpace: 400, gapUs: 10000 };
-          return { bytes, subFrames: [this.bytesToPulses(bytes, timing, false)] };
+          const timing = { hMark: 3100, hSpace: 1650, bMark: 400, oSpace: 1180, zSpace: 400, gapUs: 10000 };
+          return { bytes, atomicPulses: this.bytesToPulses(bytes, timing, false) };
         },
 
         /**
-         * 4. Chuẩn Daikin (ARC433 3-Frame & ARC477 2-Frame LSB-first)
-         * Đóng gói chính xác số phút Timer ON / Timer OFF vào 3 byte B[10..12] (11-bit Little Endian)
+         * 3. Sóng Midea / Casper RG57 / Comfee 48-bit (IRMideaAC 0xA1 / 0xA2 MSB-first)
+         * Chuẩn union MideaProtocol trong ir_Midea.h:
+         * - Byte 5 (transmitted 1st): 0xA1 (Command) hoặc 0xA2 (khi có Timer)
+         * - Byte 4: Mode(0..2) | Fan(3..4) | Sleep(6) | Power(7)
+         * - Byte 3: Temp(0..4 = tempC - 17)
+         * - Byte 2: bit0=1 | OffTimer(1..6 = halfHours - 1, hoặc 0x3F khi tắt) | BeepDisable(7)
+         * - Byte 1: OnTimer(1..6 = halfHours - 1, hoặc 0xFF khi tắt)
+         * - Byte 0: Checksum = reverseBits((sum ^ 0xFF), 8)
+         * Truyền 6 byte chính + gap 5000us + 6 byte đảo bit (~B) trong 1 xung liền mạch!
+         */
+        encodeMidea48(roomState) {
+          const f = roomState.features || {};
+          const hasTimer = (roomState.timerOffMinutes > 0 || roomState.timerOnMinutes > 0);
+          const b5 = 0xA1; // Header 0b10100 + Type 0b001
+
+          const modeMap = { 'cool': 0, 'dry': 1, 'auto': 2, 'heat': 3, 'fan': 4 };
+          const mBits = modeMap[roomState.mode] ?? 0;
+          const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
+          const fBits = (fanIdx <= 0 ? 0 : fanIdx <= 2 ? 1 : fanIdx <= 4 ? 2 : 3) << 3;
+          const sleepBit = (f.sleep || f.quiet) ? (1 << 6) : 0;
+          const pwrBit = roomState.power ? (1 << 7) : 0;
+          const b4 = mBits | fBits | sleepBit | pwrBit;
+
+          const clampedTemp = Math.min(30, Math.max(17, Math.round(Number(roomState.temp) || 25)));
+          const b3 = (clampedTemp - 17) & 0x1F;
+
+          // Byte 2: OffTimer (6 bits: halfHours - 1; 0x3F = Off)
+          let offTimerField = 0x3F;
+          if (roomState.timerOffMinutes > 0) {
+            const halfHrs = Math.min(48, Math.max(1, Math.round(roomState.timerOffMinutes / 30)));
+            offTimerField = (halfHrs - 1) & 0x3F;
+          }
+          const b2 = 0x01 | (offTimerField << 1);
+
+          // Byte 1: OnTimer (6 bits: halfHours - 1; 0x7F = Off, bit 7 = disableSensor)
+          let b1 = 0xFF;
+          if (roomState.timerOnMinutes > 0) {
+            const halfHrs = Math.min(48, Math.max(1, Math.round(roomState.timerOnMinutes / 30)));
+            const onField = (halfHrs - 1) & 0x3F;
+            b1 = (onField << 1); // bit 7 = 0, bit 0 = 0
+          }
+
+          const first5 = [b5, b4, b3, b2, b1];
+          let sum = 0;
+          for (let i = 0; i < 5; i++) {
+            sum = (sum - reverseByteBits(first5[i])) & 0xFF;
+          }
+          const b0 = reverseByteBits((sum ^ 0xFF) & 0xFF);
+
+          const bytes = [b5, b4, b3, b2, b1, b0];
+          const invBytes = bytes.map(b => (~b) & 0xFF);
+
+          const timing1 = { hMark: 4400, hSpace: 4400, bMark: 550, oSpace: 1650, zSpace: 550, gapUs: 5000 };
+          const timing2 = { hMark: 4400, hSpace: 4400, bMark: 550, oSpace: 1650, zSpace: 550, gapUs: 10000 };
+          const p1 = this.bytesToPulses(bytes, timing1, true);
+          const p2 = this.bytesToPulses(invBytes, timing2, true);
+
+          return {
+            bytes,
+            atomicPulses: this.joinSubFramesIntoAtomicBurst([p1, p2]),
+            hasTimer
+          };
+        },
+
+        /**
+         * 4. Sóng Coolix / Midea R51 / Casper R51 (24-bit inverted to 48-bit: [B0, ~B0, B1, ~B1, B2, ~B2])
+         * Hỗ trợ phát mã chuyên biệt khi bấm Đảo gió (Swing), Turbo, Đèn LED, Tự làm sạch (Clean)
+         * Và khi đặt Hẹn Giờ (Timer) -> tự động ghép khung Midea 48-bit (0xA1) để bật đồng hồ 🕒 trên dàn lạnh!
+         */
+        encodeCoolixR51(roomState, lastAction = '') {
+          let b0 = 0xB2, b1 = 0xBF, b2 = 0x00;
+
+          if (lastAction === 'toggle_swing_v' || lastAction === 'toggle_swing_h') {
+            // Mã Đảo gió chuẩn Coolix R51: B2 4D 6B 94 E0 1F
+            b0 = 0xB2; b1 = 0x6B; b2 = 0xE0;
+          } else if (lastAction === 'toggle_led') {
+            // Mã Bật/Tắt đèn LED dàn lạnh chuẩn Coolix/Midea R51: B5 4A F5 0A B5 4A
+            b0 = 0xB5; b1 = 0xF5; b2 = 0xB5;
+          } else if (lastAction === 'toggle_turbo') {
+            // Mã Turbo chuẩn Coolix/Midea R51: B5 4A F5 0A A2 5D
+            b0 = 0xB5; b1 = 0xF5; b2 = 0xA2;
+          } else if (lastAction === 'toggle_xfan') {
+            // Mã Tự làm sạch (Self-Clean) chuẩn Coolix R51: B5 4A F5 0A AA 55
+            b0 = 0xB5; b1 = 0xF5; b2 = 0xAA;
+          } else if (!roomState.power && roomState.timerOnMinutes === 0) {
+            // Mã Tắt nguồn chuẩn Coolix R51: B2 4D 7B 84 E0 1F
+            b0 = 0xB2; b1 = 0x7B; b2 = 0xE0;
+          } else {
+            const tempGrayMap = {
+              16: 0x0, 17: 0x0, 18: 0x1, 19: 0x3, 20: 0x2, 21: 0x6, 22: 0x7, 23: 0x5,
+              24: 0x4, 25: 0xC, 26: 0xD, 27: 0x9, 28: 0x8, 29: 0xA, 30: 0xB
+            };
+            const tInt = Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)));
+            const fanMap = {
+              'AUTO': 0xB0, 'QUIET': 0x90, 'BẬC 1': 0x90, 'BẬC 2': 0x50,
+              'BẬC 3': 0x30, 'BẬC 4': 0x30, 'TURBO': 0x30
+            };
+            const fanBits = fanMap[roomState.fan] || 0xB0;
+            const modeMap = { 'cool': 0x00, 'dry': 0x04, 'auto': 0x08, 'heat': 0x0C, 'fan': 0x04 };
+            const tempNibble = roomState.mode === 'fan' ? 0x0E : (tempGrayMap[tInt] ?? 0x0C);
+            const modeBits = modeMap[roomState.mode] ?? 0x00;
+
+            b0 = 0xB2;
+            b1 = fanBits | 0x1F;
+            b2 = (tempNibble << 4) | modeBits;
+          }
+
+          const bytes = [b0, (~b0) & 0xFF, b1, (~b1) & 0xFF, b2, (~b2) & 0xFF];
+          const timing1 = { hMark: 4400, hSpace: 4400, bMark: 550, oSpace: 1650, zSpace: 550, gapUs: 5220 };
+          const timing2 = { hMark: 4400, hSpace: 4400, bMark: 550, oSpace: 1650, zSpace: 550, gapUs: 10000 };
+          const f1 = this.bytesToPulses(bytes, timing1, true);
+          const f2 = this.bytesToPulses(bytes, timing2, true);
+
+          // Nếu người dùng kích hoạt Hẹn Giờ trên máy Coolix/R51 -> Gửi khung Midea48 chứa thanh ghi Timer!
+          if (lastAction === 'activate_timer' || roomState.timerOffMinutes > 0 || roomState.timerOnMinutes > 0) {
+            const mideaTimer = this.encodeMidea48(roomState);
+            return {
+              bytes: mideaTimer.bytes,
+              atomicPulses: mideaTimer.atomicPulses
+            };
+          }
+
+          return {
+            bytes,
+            atomicPulses: this.joinSubFramesIntoAtomicBurst([f1, f2])
+          };
+        },
+
+        /**
+         * 5. Sóng AUX / Electra / Nagakawa / Funiki 13-Byte (104-bit LSB-first, Header 0xC3)
+         */
+        encodeAux13(roomState) {
+          const f = roomState.features || {};
+          const tInt = ((Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 16) & 0x0F) << 3;
+          const swingV = roomState.swingV === 'AUTO' ? 0x00 : 0x07;
+          const b1 = tInt | swingV;
+          const swingH = roomState.swingH === 'AUTO' ? 0x00 : 0xE0;
+          const b2 = swingH;
+
+          const fanIdx = FAN_SPEEDS.indexOf(roomState.fan);
+          const fanBits = (fanIdx <= 0 ? 0x05 : fanIdx <= 2 ? 0x03 : fanIdx <= 4 ? 0x02 : 0x01) << 5;
+          const b4 = fanBits;
+          const turboBit = (f.turbo || roomState.fan === 'TURBO') ? 0x40 : 0x00;
+          const b5 = turboBit;
+
+          const modeMap = { 'auto': 0x00, 'cool': 0x01, 'dry': 0x02, 'heat': 0x04, 'fan': 0x06 };
+          const b6 = ((modeMap[roomState.mode] ?? 0x01) << 5) | (f.sleep ? 0x04 : 0x00);
+
+          const activeMins = roomState.timerOffMinutes > 0 ? roomState.timerOffMinutes : (roomState.timerOnMinutes || 0);
+          const timerHours = activeMins > 0 ? Math.min(24, Math.max(1, Math.round(activeMins / 60))) : 0;
+          const b7 = timerHours & 0x1F;
+
+          const pwrBit = roomState.power ? 0x20 : 0x00;
+          const timerBit = activeMins > 0 ? 0x08 : 0x00;
+          const ecoBit = f.eco ? 0x80 : 0x00;
+          const b9 = pwrBit | timerBit | ecoBit;
+          const b11 = (f.led !== false) ? 0x05 : 0x00;
+
+          const bytes = [0xC3, b1, b2, 0x00, b4, b5, b6, b7, 0x00, b9, 0x00, b11];
+          const chk = bytes.reduce((a, b) => (a + b) & 0xFF, 0);
+          bytes.push(chk);
+
+          const timing = { hMark: 9000, hSpace: 4500, bMark: 560, oSpace: 1680, zSpace: 560, gapUs: 10000 };
+          return { bytes, atomicPulses: this.bytesToPulses(bytes, timing, false) };
+        },
+
+        /**
+         * 6. Sóng Daikin (ARC433 3-Frame & ARC477 2-Frame LSB-first, nối liền mạch với gap 29000us)
          */
         encodeDaikin(roomState, isTwoFrame = false) {
           const sf1 = [0x11, 0xDA, 0x27, 0x00, 0xC5, 0x00, 0x00, 0xD7];
@@ -1593,8 +2056,8 @@
           const tOffBit = roomState.timerOffMinutes > 0 ? 0x02 : 0x00;
           const b5 = mBits | 0x08 | pwrBit | tOnBit | tOffBit;
 
-          const clampedTemp = Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25)));
-          const b6 = (clampedTemp * 2) & 0xFF;
+          const clampedTemp = Math.min(30, Math.max(16, Number(roomState.temp) || 25));
+          const b6 = Math.round(clampedTemp * 2) & 0xFF;
 
           const fanMap = {
             'AUTO': 0xA0, 'QUIET': 0xB0, 'BẬC 1': 0x30, 'BẬC 2': 0x40,
@@ -1604,41 +2067,37 @@
           const b8 = (fanMap[roomState.fan] || 0xA0) | swingV;
           const b9 = roomState.swingH === 'AUTO' ? 0x0F : 0x00;
 
-          // 11-bit Timer ON & 11-bit Timer OFF trong B[10..12]
-          const onVal = roomState.timerOnMinutes > 0 ? Math.min(1440, roomState.timerOnMinutes) : 0x000;
-          const offVal = roomState.timerOffMinutes > 0 ? Math.min(1440, roomState.timerOffMinutes) : 0x000;
-          let b10 = 0x00, b11 = 0x06, b12 = 0x60;
-          if (onVal > 0 || offVal > 0) {
-            b10 = onVal & 0xFF;
-            b11 = ((onVal >> 8) & 0x07) | ((offVal & 0x1F) << 3);
-            b12 = (offVal >> 5) & 0x3F;
-          }
+          const onVal = roomState.timerOnMinutes > 0 ? Math.min(1440, roomState.timerOnMinutes) : 0x600;
+          const offVal = roomState.timerOffMinutes > 0 ? Math.min(1440, roomState.timerOffMinutes) : 0x600;
+          const b10 = onVal & 0xFF;
+          const b11 = ((onVal >> 8) & 0x07) | ((offVal & 0x1F) << 3);
+          const b12 = (offVal >> 5) & 0x3F;
 
           const f = roomState.features || {};
           const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00);
-          const b16 = f.econo ? 0x84 : 0x80;
+          const b16 = (f.econo ? 0x04 : 0x00) | (f.sensor ? 0x02 : 0x00) | (f.moldProof ? 0x10 : 0x00) | 0x80;
 
           const sf3 = [
             0x11, 0xDA, 0x27, 0x00, 0x00,
             b5, b6, 0x00, b8, b9,
             b10, b11, b12, b13, 0x00, 0xC1, b16, 0x00
           ];
-          const chk3 = sf3.reduce((a, b) => (a + b) & 0xFF, 0);
-          sf3.push(chk3);
+          sf3.push(sf3.reduce((a, b) => (a + b) & 0xFF, 0));
 
-          const timing = { hMark: 3450, hSpace: 1720, bMark: 430, oSpace: 1300, zSpace: 430, gapUs: 10000 };
-          const p1 = this.bytesToPulses(sf1, timing, false);
-          const p2 = this.bytesToPulses(sf2, timing, false);
-          const p3 = this.bytesToPulses(sf3, timing, false);
+          const timingGap29ms = { hMark: 3450, hSpace: 1720, bMark: 430, oSpace: 1300, zSpace: 430, gapUs: 29000 };
+          const timingEnd = { hMark: 3450, hSpace: 1720, bMark: 430, oSpace: 1300, zSpace: 430, gapUs: 10000 };
+          const p1 = this.bytesToPulses(sf1, timingGap29ms, false);
+          const p2 = this.bytesToPulses(sf2, timingGap29ms, false);
+          const p3 = this.bytesToPulses(sf3, timingEnd, false);
 
           return {
             bytes: sf3,
-            subFrames: isTwoFrame ? [p2, p3] : [p1, p2, p3]
+            atomicPulses: this.joinSubFramesIntoAtomicBurst(isTwoFrame ? [p2, p3] : [p1, p2, p3])
           };
         },
 
         /**
-         * 5. Chuẩn Panasonic CS/CU (2-Frame: 8 Byte + 19 Byte Kaseikyo LSB-first)
+         * 7. Sóng Panasonic CS/CU (2-Frame 8B + 19B nối liền mạch với gap 10000us)
          */
         encodePanasonic(roomState) {
           const sf1 = [0x02, 0x20, 0xE0, 0x04, 0x00, 0x00, 0x00, 0x06];
@@ -1656,7 +2115,7 @@
           const b8 = (fanMap[roomState.fan] || 0xA0) | swingV;
           const b9 = roomState.swingH === 'AUTO' ? 0x0D : 0x06;
           const f = roomState.features || {};
-          const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00);
+          const b13 = (f.powerful ? 0x01 : 0x00) | (f.quiet ? 0x20 : 0x00) | (f.moldProof ? 0x40 : 0x00);
 
           let b10 = 0x00, b11 = 0x0E, b12 = 0xE0;
           if (roomState.timerOnMinutes > 0 || roomState.timerOffMinutes > 0) {
@@ -1675,16 +2134,19 @@
           sf2.push(sf2.reduce((a, b) => (a + b) & 0xFF, 0));
 
           const timing = { hMark: 3500, hSpace: 1750, bMark: 435, oSpace: 1300, zSpace: 435, gapUs: 10000 };
+          const p1 = this.bytesToPulses(sf1, timing, false);
+          const p2 = this.bytesToPulses(sf2, timing, false);
           return {
             bytes: sf2,
-            subFrames: [this.bytesToPulses(sf1, timing, false), this.bytesToPulses(sf2, timing, false)]
+            atomicPulses: this.joinSubFramesIntoAtomicBurst([p1, p2])
           };
         },
 
         /**
-         * 6. Chuẩn Mitsubishi Electric (18-Byte LSB-first, phát lặp 2 lần)
+         * 8. Sóng Mitsubishi Electric (18-Byte LSB-first, phát lặp 2 lần cách nhau 14500us)
          */
         encodeMitsubishi(roomState) {
+          const f = roomState.features || {};
           const pwr = roomState.power ? 0x20 : 0x00;
           const modeMap = { 'heat': 0x08, 'dry': 0x10, 'cool': 0x18, 'auto': 0x20, 'fan': 0x38 };
           const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 16) & 0x0F;
@@ -1693,6 +2155,7 @@
           const activeMins = roomState.timerOffMinutes > 0 ? roomState.timerOffMinutes : (roomState.timerOnMinutes || 0);
           const timerByte = activeMins > 0 ? Math.min(144, Math.round(activeMins / 10)) : 0x00;
           const timerModeFlag = roomState.timerOffMinutes > 0 ? 0x05 : (roomState.timerOnMinutes > 0 ? 0x03 : 0x00);
+          const b14 = (f.econo ? 0x20 : 0x00) | (f.powerful ? 0x10 : 0x00);
 
           const bytes = [
             0x23, 0xCB, 0x26, 0x01, 0x00,
@@ -1701,20 +2164,22 @@
             tVal,
             0x30,
             b9,
-            timerByte, timerByte, timerModeFlag, 0x00, 0x10, 0x00, 0x00
+            timerByte, timerByte, timerModeFlag, 0x00, b14, 0x00, 0x00
           ];
           bytes.push(bytes.reduce((a, b) => (a + b) & 0xFF, 0));
 
-          const timing = { hMark: 3400, hSpace: 1750, bMark: 450, oSpace: 1300, zSpace: 420, gapUs: 10000 };
-          const frame = this.bytesToPulses(bytes, timing, false);
-          return { bytes, subFrames: [frame, frame] };
+          const timing1 = { hMark: 3400, hSpace: 1750, bMark: 450, oSpace: 1300, zSpace: 420, gapUs: 14500 };
+          const timing2 = { hMark: 3400, hSpace: 1750, bMark: 450, oSpace: 1300, zSpace: 420, gapUs: 10000 };
+          const f1 = this.bytesToPulses(bytes, timing1, false);
+          const f2 = this.bytesToPulses(bytes, timing2, false);
+          return { bytes, atomicPulses: this.joinSubFramesIntoAtomicBurst([f1, f2]) };
         },
 
         /**
-         * 7. Chuẩn LG (28-bit MSB-first 0x88 + Gói lệnh Hẹn giờ 0x88A[mins][chk] riêng của LG)
+         * 9. Sóng LG 28-bit (0x88 MSB-first + Khung lệnh Hẹn Giờ 0x88A / JetCool / Đèn LED / Đảo gió)
          */
-        encodeLG28(roomState, isLg2 = false) {
-          const buildLgPulses = (nibbles) => {
+        encodeLG28(roomState, isLg2 = false, lastAction = '') {
+          const buildLgPulses = (nibbles, gapUs = 10000) => {
             const hMark = isLg2 ? 3200 : 8500;
             const hSpace = isLg2 ? 9800 : 4250;
             const bMark = 520, oSpace = 1600, zSpace = 520;
@@ -1725,16 +2190,23 @@
                 p.push(bMark, ((val >> bit) & 1) ? oSpace : zSpace);
               }
             }
-            p.push(bMark, 10000);
+            p.push(bMark, gapUs);
             return p;
           };
 
           let nibbles;
-          if (!roomState.power) {
+          if (lastAction === 'toggle_led') {
+            // Mã bật/tắt đèn LED dàn lạnh LG: 0x88C00A6
+            nibbles = [0x8, 0x8, 0xC, 0x0, 0x0, 0xA, 0x6];
+          } else if (lastAction === 'toggle_swing_v') {
+            // Mã đảo gió dọc LG: 0x8813149
+            const swOn = roomState.swingV === 'AUTO';
+            nibbles = swOn ? [0x8, 0x8, 0x1, 0x3, 0x1, 0x4, 0x9] : [0x8, 0x8, 0x1, 0x3, 0x1, 0x5, 0xA];
+          } else if (!roomState.power && roomState.timerOnMinutes === 0) {
             nibbles = [0x8, 0x8, 0xC, 0x0, 0x0, 0x5, 0x1];
           } else {
             const modeMap = { 'cool': 0x0, 'dry': 0x1, 'fan': 0x2, 'auto': 0x3, 'heat': 0x4 };
-            const n2 = 0x0 | (modeMap[roomState.mode] ?? 0x0);
+            const n2 = modeMap[roomState.mode] ?? 0x0;
             const n3 = (roomState.features && roomState.features.jetCool) ? 0x1 : 0x0;
             const n4 = (Math.min(30, Math.max(18, Math.round(Number(roomState.temp) || 25))) - 15) & 0x0F;
             const fanMap = {
@@ -1746,18 +2218,19 @@
             nibbles = [0x8, 0x8, n2, n3, n4, n5, n6];
           }
 
-          const subFrames = [buildLgPulses(nibbles)];
-
-          // Nếu có hẹn giờ tắt trên LG -> Gửi kèm khung lệnh Hẹn giờ 0x88A[mins][chk] để bật đèn đồng hồ trên mặt máy LG
           const activeMins = roomState.timerOffMinutes > 0 ? roomState.timerOffMinutes : (roomState.timerOnMinutes || 0);
+          const parts = [];
           if (activeMins > 0) {
+            parts.push(buildLgPulses(nibbles, 12000));
             const m = Math.min(1440, activeMins);
             const tn2 = 0xA;
             const tn3 = (m >> 8) & 0x0F;
             const tn4 = (m >> 4) & 0x0F;
             const tn5 = m & 0x0F;
             const tn6 = (tn2 + tn3 + tn4 + tn5) & 0x0F;
-            subFrames.push(buildLgPulses([0x8, 0x8, tn2, tn3, tn4, tn5, tn6]));
+            parts.push(buildLgPulses([0x8, 0x8, tn2, tn3, tn4, tn5, tn6], 10000));
+          } else {
+            parts.push(buildLgPulses(nibbles, 10000));
           }
 
           const bytes = [
@@ -1766,11 +2239,11 @@
             (nibbles[4] << 4) | nibbles[5],
             nibbles[6] << 4
           ];
-          return { bytes, subFrames };
+          return { bytes, atomicPulses: this.joinSubFramesIntoAtomicBurst(parts) };
         },
 
         /**
-         * 8. Chuẩn Toshiba (9-Byte MSB-first + XOR Checksum)
+         * 10. Sóng Toshiba (9-Byte MSB-first, phát lặp 2 khung cách 7400us)
          */
         encodeToshiba(roomState) {
           const tVal = (Math.min(30, Math.max(17, Math.round(Number(roomState.temp) || 25))) - 17) << 4;
@@ -1778,36 +2251,47 @@
           const mVal = roomState.power ? (modeMap[roomState.mode] ?? 0x01) : 0x07;
           const fanIdx = Math.max(0, FAN_SPEEDS.indexOf(roomState.fan));
           const b6 = ((fanIdx & 0x07) << 5) | mVal;
-          const bytes = [0xF2, 0x0D, 0x03, 0xFC, 0x01, tVal, b6, 0x00];
+          const f = roomState.features || {};
+          const b7 = f.jetCool ? 0x01 : (f.energySaving ? 0x03 : 0x00);
+          const bytes = [0xF2, 0x0D, 0x03, 0xFC, 0x01, tVal, b6, b7];
           bytes.push(bytes[4] ^ bytes[5] ^ bytes[6] ^ bytes[7]);
 
-          const timing = { hMark: 4400, hSpace: 4300, bMark: 540, oSpace: 1620, zSpace: 540, gapUs: 7400 };
-          const frame = this.bytesToPulses(bytes, timing, true);
-          return { bytes, subFrames: [frame, frame] };
+          const timing1 = { hMark: 4400, hSpace: 4300, bMark: 540, oSpace: 1620, zSpace: 540, gapUs: 7400 };
+          const timing2 = { hMark: 4400, hSpace: 4300, bMark: 540, oSpace: 1620, zSpace: 540, gapUs: 10000 };
+          return {
+            bytes,
+            atomicPulses: this.joinSubFramesIntoAtomicBurst([
+              this.bytesToPulses(bytes, timing1, true),
+              this.bytesToPulses(bytes, timing2, true)
+            ])
+          };
         },
 
         /**
-         * 9. Chuẩn Samsung (14-Byte / 21-Byte LSB-first)
+         * 11. Sóng Samsung (14-Byte LSB-first)
          */
         encodeSamsung(roomState) {
+          const f = roomState.features || {};
           const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 16) << 4;
           const modeMap = { 'auto': 0x00, 'cool': 0x01, 'dry': 0x02, 'fan': 0x03, 'heat': 0x04 };
           const b11 = tVal | (modeMap[roomState.mode] ?? 0x01);
-          const b12 = roomState.power ? 0xF0 : 0xC0;
+          const b12 = (roomState.power ? 0xF0 : 0xC0) | (f.jetCool ? 0x01 : 0x00) | (f.quiet ? 0x02 : 0x00);
           const bytes = [0x02, 0x92, 0x0F, 0x00, 0x00, 0x00, 0xF0, 0x01, 0xD2, 0x0F, 0x00, b11, b12, 0xF0];
           const timing = { hMark: 3000, hSpace: 9000, bMark: 500, oSpace: 1500, zSpace: 500, gapUs: 10000 };
-          return { bytes, subFrames: [this.bytesToPulses(bytes, timing, false)] };
+          return { bytes, atomicPulses: this.bytesToPulses(bytes, timing, false) };
         },
 
         /**
-         * 10. Chuẩn Sharp (13-Byte LSB-first + XOR Nibble Checksum)
+         * 12. Sóng Sharp (13-Byte LSB-first)
          */
         encodeSharp(roomState) {
+          const f = roomState.features || {};
           const tVal = (Math.min(30, Math.max(16, Math.round(Number(roomState.temp) || 25))) - 15) & 0x0F;
           const pwr = roomState.power ? 0x31 : 0x21;
           const modeMap = { 'auto': 0x00, 'heat': 0x01, 'cool': 0x02, 'dry': 0x03, 'fan': 0x02 };
           const b6 = 0x20 | (modeMap[roomState.mode] ?? 0x02);
-          const bytes = [0xAA, 0x5A, 0xCF, 0x10, tVal, pwr, b6, 0x00, 0x08, 0x80, 0x00, 0xF0, 0x01];
+          const b10 = (f.jetCool ? 0x01 : 0x00) | (f.ionizer ? 0x04 : 0x00);
+          const bytes = [0xAA, 0x5A, 0xCF, 0x10, tVal, pwr, b6, 0x00, 0x08, 0x80, b10, 0xF0, 0x01];
           let xorNib = 0;
           for (let i = 0; i < 12; i++) {
             xorNib ^= (bytes[i] & 0x0F) ^ ((bytes[i] >> 4) & 0x0F);
@@ -1815,71 +2299,87 @@
           xorNib ^= (bytes[12] & 0x0F);
           bytes[12] = ((xorNib & 0x0F) << 4) | 0x01;
           const timing = { hMark: 3800, hSpace: 1900, bMark: 420, oSpace: 1400, zSpace: 420, gapUs: 10000 };
-          return { bytes, subFrames: [this.bytesToPulses(bytes, timing, false)] };
+          return { bytes, atomicPulses: this.bytesToPulses(bytes, timing, false) };
         },
 
         /**
-         * Hàm chính: Đóng gói gói tin hồng ngoại theo đúng Hãng & Biến thể REV-A..REV-E
-         * Khi ở REV-A (Đa tần tự động), tự động ghép nối các bộ mã OEM phổ biến nhất của hãng đó tại Việt Nam!
+         * Mã hóa theo đúng loại Sóng (Wave ID) được chọn!
+         * Khi dùng Sóng Đơn (WAVE-GREE, WAVE-TCL112, WAVE-MIDEA48...), chỉ phát ĐÚNG 1 giao thức duy nhất
+         * giúp mắt nhận điều hòa bắt sóng nhạy 100% ngay lập tức mà không bao giờ bị nghẽn!
          */
-        encodeStateToPulses(roomState) {
-          const brand = roomState.brand || 'Daikin';
-          const rev = roomState.protocolVariant || 'REV-A';
-          let encodedList = [];
+        encodeByWaveId(roomState, waveId, lastAction = '') {
+          switch (waveId) {
+            case 'WAVE-GREE':
+              return [this.encodeGreeYbof(roomState)];
+            case 'WAVE-TCL112':
+              return [this.encodeTcl112(roomState)];
+            case 'WAVE-MIDEA48':
+              return [this.encodeMidea48(roomState)];
+            case 'WAVE-COOLIX':
+              return [this.encodeCoolixR51(roomState, lastAction)];
+            case 'WAVE-AUX13':
+              return [this.encodeAux13(roomState)];
+            case 'WAVE-DAIKIN3':
+              return [this.encodeDaikin(roomState, false)];
+            case 'WAVE-DAIKIN2':
+              return [this.encodeDaikin(roomState, true)];
+            case 'WAVE-PANA':
+              return [this.encodePanasonic(roomState)];
+            case 'WAVE-MITSU':
+              return [this.encodeMitsubishi(roomState)];
+            case 'WAVE-LG1':
+              return [this.encodeLG28(roomState, false, lastAction)];
+            case 'WAVE-LG2':
+              return [this.encodeLG28(roomState, true, lastAction)];
+            case 'WAVE-SAMSUNG':
+              return [this.encodeSamsung(roomState)];
+            case 'WAVE-TOSHIBA':
+              return [this.encodeToshiba(roomState)];
+            case 'WAVE-SHARP':
+              return [this.encodeSharp(roomState)];
+            case 'WAVE-MULTI':
+            default: {
+              const b = roomState.brand || 'Casper';
+              if (['Casper', 'Gree', 'Midea', 'Funiki', 'Nagakawa'].includes(b)) {
+                return [
+                  this.encodeGreeYbof(roomState),
+                  this.encodeTcl112(roomState),
+                  this.encodeMidea48(roomState)
+                ];
+              }
+              if (b === 'Daikin') return [this.encodeDaikin(roomState, false), this.encodeDaikin(roomState, true)];
+              if (b === 'Panasonic') return [this.encodePanasonic(roomState)];
+              if (b === 'Mitsubishi') return [this.encodeMitsubishi(roomState)];
+              if (b === 'LG') return [this.encodeLG28(roomState, false, lastAction), this.encodeLG28(roomState, true, lastAction)];
+              if (b === 'Samsung') return [this.encodeSamsung(roomState)];
+              if (b === 'Toshiba') return [this.encodeToshiba(roomState)];
+              if (b === 'Sharp') return [this.encodeSharp(roomState)];
+              return [this.encodeGreeYbof(roomState), this.encodeTcl112(roomState)];
+            }
+          }
+        },
 
-          if (['Casper', 'Gree', 'Midea', 'Funiki', 'Nagakawa'].includes(brand)) {
-            if (rev === 'REV-B') {
-              encodedList = [this.encodeGreeYbof(roomState)];
-            } else if (rev === 'REV-C') {
-              encodedList = [this.encodeMideaR51(roomState)];
-            } else if (rev === 'REV-D') {
-              encodedList = [this.encodeAuxTcl14(roomState)];
-            } else if (rev === 'REV-E') {
-              encodedList = [this.encodeMitsubishi(roomState)];
-            } else {
-              // REV-A (Mặc định): Bắn liên hoàn cả 3 bo mạch OEM của Casper/Funiki/Midea/Gree/Nagakawa (Midea R51 + Gree YBOF + AUX 14B)
-              encodedList = [
-                this.encodeMideaR51(roomState),
-                this.encodeGreeYbof(roomState),
-                this.encodeAuxTcl14(roomState)
-              ];
-            }
-          } else if (brand === 'Daikin') {
-            if (rev === 'REV-B') {
-              encodedList = [this.encodeDaikin(roomState, false)];
-            } else if (rev === 'REV-C') {
-              encodedList = [this.encodeDaikin(roomState, true)];
-            } else {
-              encodedList = [this.encodeDaikin(roomState, false), this.encodeDaikin(roomState, true)];
-            }
-          } else if (brand === 'Panasonic') {
-            encodedList = [this.encodePanasonic(roomState)];
-          } else if (brand === 'Mitsubishi') {
-            encodedList = [this.encodeMitsubishi(roomState), this.encodeAuxTcl14(roomState)];
-          } else if (brand === 'LG') {
-            if (rev === 'REV-B') {
-              encodedList = [this.encodeLG28(roomState, false)];
-            } else if (rev === 'REV-C') {
-              encodedList = [this.encodeLG28(roomState, true)];
-            } else {
-              encodedList = [this.encodeLG28(roomState, false), this.encodeLG28(roomState, true), this.encodeMideaR51(roomState)];
-            }
-          } else if (brand === 'Toshiba') {
-            encodedList = [this.encodeToshiba(roomState), this.encodeMideaR51(roomState)];
-          } else if (brand === 'Samsung') {
-            encodedList = [this.encodeSamsung(roomState), this.encodeMideaR51(roomState)];
-          } else if (brand === 'Sharp') {
-            encodedList = [this.encodeSharp(roomState)];
+        encodeStateToPulses(roomState, lastAction = '', forceMultiTimer = false) {
+          const waveId = roomState.protocolVariant || getDefaultWaveForBrand(roomState.brand);
+          let packets;
+
+          // Nếu đang bấm nút "Bắn Mã Hẹn Giờ" và bật chế độ Đa Khung Đồng Hồ cho các hãng OEM (Casper/Gree/Midea/Funiki/Nagakawa)
+          if (
+            forceMultiTimer &&
+            ['Casper', 'Gree', 'Midea', 'Funiki', 'Nagakawa'].includes(roomState.brand) &&
+            ['WAVE-GREE', 'WAVE-TCL112', 'WAVE-MIDEA48', 'WAVE-COOLIX', 'WAVE-MULTI'].includes(waveId)
+          ) {
+            const primary = this.encodeByWaveId(roomState, waveId === 'WAVE-MULTI' ? 'WAVE-GREE' : waveId, 'activate_timer')[0];
+            const greePkt = this.encodeGreeYbof(roomState);
+            const tclPkt = this.encodeTcl112(roomState);
+            const mideaPkt = this.encodeMidea48(roomState);
+            packets = [primary, greePkt, tclPkt, mideaPkt];
           } else {
-            encodedList = [this.encodeMideaR51(roomState), this.encodeGreeYbof(roomState)];
+            packets = this.encodeByWaveId(roomState, waveId, lastAction);
           }
 
-          const allSubFrames = [];
-          encodedList.forEach(item => {
-            item.subFrames.forEach(sf => allSubFrames.push(sf));
-          });
-
-          const primaryBytes = encodedList[0].bytes;
+          const atomicBursts = packets.map(p => p.atomicPulses);
+          const primaryBytes = packets[0].bytes;
           const hexFormatted = primaryBytes
             .map(b => (b & 0xFF).toString(16).toUpperCase().padStart(2, '0'))
             .join(' ');
@@ -1887,17 +2387,13 @@
           return {
             frequency: CARRIER_FREQ_HZ,
             bytes: primaryBytes,
-            checksum: primaryBytes[primaryBytes.length - 1],
-            hexString: `${brand.toUpperCase()} [${rev}] (${allSubFrames.length} khung): ${hexFormatted}`,
-            pulses: allSubFrames[0],
-            subFrames: allSubFrames
+            waveId,
+            hexString: `${roomState.brand.toUpperCase()} [${waveId}]: ${hexFormatted}`,
+            pulses: atomicBursts[0],
+            atomicBursts
           };
         },
 
-        /**
-         * Giải mã chuỗi Raw IR (micro-giây phân cách bởi dấu phẩy/khoảng trắng)
-         * hoặc chuỗi Pronto Hex (0000 006D ...) sang mảng số nguyên micro-giây
-         */
         parseCustomRawOrPronto(rawText) {
           const trimmed = (rawText || '').trim();
           if (!trimmed) return null;
@@ -1913,7 +2409,7 @@
             return {
               frequency: carrierHz,
               pulses,
-              subFrames: [pulses],
+              atomicBursts: [pulses],
               hexString: 'PRONTO HEX CUSTOM PACKET'
             };
           }
@@ -1924,24 +2420,23 @@
             .filter(n => !isNaN(n) && n >= 50 && n <= 100000);
 
           if (nums.length < 4) return null;
-          if (nums.length % 2 !== 0) {
-            nums.push(10000);
-          }
+          if (nums.length % 2 !== 0) nums.push(10000);
 
           return {
             frequency: CARRIER_FREQ_HZ,
             pulses: nums,
-            subFrames: [nums],
+            atomicBursts: [nums],
             hexString: `RAW TIMINGS (${nums.length} PULSES)`
           };
         }
       };
 
       // ========================================================================
-      // 3. CẦU NỐI PHẦN CỨNG ANDROID (IRBRIDGE) & OSCILLOSCOPE DEBUGGER
+      // 3. CẦU NỐI PHẦN CỨNG ANDROID (IRBRIDGE) — CHỐNG NGHẼN & KHÔNG XUNG ĐỘT
       // ========================================================================
       let audioCtx = null;
-      let burstTimeouts = [];
+      let scheduledTxTimeouts = [];
+      let hardwareBusyUntilMs = 0;
 
       function updateHardwareDiagnosticBanner() {
         const dotEl = document.getElementById('hwStatusDot');
@@ -1962,24 +2457,21 @@
         if (hasBridge && hasEmitter) {
           dotEl.style.background = '#34d399';
           dotEl.style.boxShadow = '0 0 8px #34d399';
-          msgEl.textContent = '🟢 Đã kết nối Mắt Hồng Ngoại phần cứng (Sẵn sàng điều khiển)';
+          msgEl.textContent = '🟢 Mắt Hồng Ngoại Sẵn Sàng (Truyền nguyên khung chống trượt)';
           msgEl.style.color = '#6ee7b7';
           if (badgeEl) badgeEl.textContent = 'IR SẴN SÀNG';
         } else if (hasBridge && !hasEmitter) {
           dotEl.style.background = '#f43f5e';
           dotEl.style.boxShadow = '0 0 8px #f43f5e';
-          msgEl.textContent = '🔴 Điện thoại này không có cổng Hồng ngoại (IR Blaster)';
+          msgEl.textContent = '🔴 Điện thoại không có mắt Hồng ngoại (IR Blaster)';
           msgEl.style.color = '#fda4af';
           if (badgeEl) badgeEl.textContent = 'KHÔNG CÓ IR';
         } else {
           dotEl.style.background = '#fbbf24';
           dotEl.style.boxShadow = '0 0 8px #fbbf24';
-          const isAndroidWv = /;\s*wv\)|Version\/\d+\.\d+.*Chrome/i.test(navigator.userAgent || '');
-          msgEl.textContent = isAndroidWv
-            ? '⚠️ Bản APK này chưa có cầu nối IR (Hãy F5 APK Factory Studio & Tạo APK lại!)'
-            : '⚠️ Chế độ Web (Hãy đóng gói APK bằng APK Factory Studio mới)';
+          msgEl.textContent = '⚠️ Chế độ Xem thử Web (Đóng gói APK để phát tia IR thật)';
           msgEl.style.color = '#fde68a';
-          if (badgeEl) badgeEl.textContent = 'CHƯA CÓ BRIDGE';
+          if (badgeEl) badgeEl.textContent = 'SIMULATOR';
         }
       }
       setTimeout(updateHardwareDiagnosticBanner, 250);
@@ -2007,9 +2499,9 @@
             osc.stop(startTime + duration);
           };
 
-          beepOnce(now, 0.065);
+          beepOnce(now, 0.06);
           if (isDouble) {
-            beepOnce(now + 0.095, 0.085);
+            beepOnce(now + 0.09, 0.08);
           }
         } catch (err) {}
       }
@@ -2028,11 +2520,17 @@
         const led = document.getElementById('irBlasterLed');
         if (led) {
           led.classList.add('transmitting');
-          setTimeout(() => led.classList.remove('transmitting'), 220);
+          setTimeout(() => led.classList.remove('transmitting'), 240);
         }
       }
 
       const IRBridge = {
+        /**
+         * Phát gói tin hồng ngoại với hàng đợi thời gian thực (Anti-Collision Timing):
+         * - Tính chính xác thời lượng phát vật lý (ms) của từng khung xung (thường 110ms - 190ms).
+         * - Đợi khung trước phát xong 100% + 65ms nghỉ giải phóng bộ thu AGC của điều hòa rồi mới phát khung tiếp theo!
+         * - Nếu bật "⚡ Sóng x2 (signalBoost)" trên sóng đơn, tự động phát bồi thêm 1 nhịp xác nhận sau 240ms.
+         */
         transmitPacket(packet, vibratePattern = 30, doubleBeep = false) {
           if (!packet || !Array.isArray(packet.pulses)) return;
 
@@ -2040,34 +2538,50 @@
           playAcPiezoBeep(doubleBeep);
 
           const freq = packet.frequency || CARRIER_FREQ_HZ;
-          const frames = Array.isArray(packet.subFrames) && packet.subFrames.length > 0
-            ? packet.subFrames
+          let bursts = Array.isArray(packet.atomicBursts) && packet.atomicBursts.length > 0
+            ? packet.atomicBursts.slice()
             : [packet.pulses];
-          let usedNativeHardware = false;
 
-          // Hủy các khung truyền cũ nếu người dùng bấm liên tục
-          burstTimeouts.forEach(t => clearTimeout(t));
-          burstTimeouts = [];
+          // Nếu đang dùng Sóng Đơn cố định và bật chế độ "⚡ Sóng x2" -> phát bồi 2 lần cách nhau an toàn
+          if (appState.signalBoost && bursts.length === 1) {
+            bursts.push(bursts[0]);
+          }
 
-          // Truyền từng khung (sub-frame) cách nhau 95ms để không bao giờ tràn bộ đệm phần cứng IR trên Xiaomi/Redmi/Android
-          if (window.AndroidIR && typeof window.AndroidIR.transmit === 'function') {
-            usedNativeHardware = true;
-            frames.forEach((framePulses, idx) => {
-              const tId = setTimeout(() => {
+          // Hủy các lịch phát chờ chưa tới lượt nếu người dùng bấm nút mới
+          scheduledTxTimeouts.forEach(t => clearTimeout(t));
+          scheduledTxTimeouts = [];
+
+          const hasNativeIr = Boolean(window.AndroidIR && typeof window.AndroidIR.transmit === 'function');
+
+          if (hasNativeIr) {
+            const now = Date.now();
+            // Nếu phần cứng đang bận phát dở khung trước, chờ nó phát xong hẳn rồi mới phát khung mới
+            let cumulativeDelayMs = Math.max(0, hardwareBusyUntilMs - now);
+
+            bursts.forEach((pulseArray) => {
+              const frameDurationMs = Math.ceil(pulseArray.reduce((a, b) => a + b, 0) / 1000);
+              const fireDelay = cumulativeDelayMs;
+
+              const tid = setTimeout(() => {
                 try {
-                  window.AndroidIR.transmit(freq, JSON.stringify(framePulses));
+                  window.AndroidIR.transmit(freq, JSON.stringify(pulseArray));
                 } catch (err) {
                   console.error('AndroidIR transmit error:', err);
                 }
-              }, idx * 95);
-              burstTimeouts.push(tId);
+              }, fireDelay);
+
+              scheduledTxTimeouts.push(tid);
+              // Khoảng cách an toàn giữa 2 gói độc lập = Thời lượng thực của gói + 70ms nghỉ mắt thu
+              cumulativeDelayMs += frameDurationMs + 70;
             });
+
+            hardwareBusyUntilMs = now + cumulativeDelayMs - 20;
           }
 
-          this.renderDebugOscilloscope(packet, usedNativeHardware);
+          this.renderDebugOscilloscope(packet, hasNativeIr, bursts.length);
         },
 
-        renderDebugOscilloscope(packet, isNative) {
+        renderDebugOscilloscope(packet, isNative, burstCount) {
           const bridgeEl = document.getElementById('debugBridgeModeText');
           const statsEl = document.getElementById('debugPulseStatsText');
           const hexEl = document.getElementById('debugHexPacketText');
@@ -2077,8 +2591,8 @@
           const totalMs = (totalUs / 1000).toFixed(1);
 
           bridgeEl.textContent = isNative
-            ? '🟢 IR Hardware: Android ConsumerIrManager'
-            : '🔵 IR Simulator: Oscilloscope Active';
+            ? `🟢 Phần cứng IR (${burstCount > 1 ? 'Phát ' + burstCount + ' nhịp chuẩn' : '1 nhịp chuẩn'})`
+            : '🔵 Mô phỏng Sóng IR (Web)';
           statsEl.textContent = `${(packet.frequency / 1000).toFixed(1)} kHz • ${packet.pulses.length} xung • ${totalMs} ms`;
           hexEl.textContent = `HEX: [${packet.hexString}]`;
 
@@ -2088,7 +2602,6 @@
           const h = canvas.height;
           ctx.clearRect(0, 0, w, h);
 
-          // Vẽ lưới nền Oscilloscope
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
           ctx.lineWidth = 1;
           ctx.beginPath();
@@ -2096,7 +2609,6 @@
           ctx.lineTo(w, h / 2);
           ctx.stroke();
 
-          // Vẽ dạng sóng xung vuông (Mark = Cao, Space = Thấp)
           const previewPulses = packet.pulses.slice(0, 64);
           const sliceUs = previewPulses.reduce((a, b) => a + b, 0) || 1;
 
@@ -2105,16 +2617,14 @@
           ctx.beginPath();
 
           let currentX = 2;
-          const highY = 5;
-          const lowY = h - 5;
-
+          const highY = 4;
+          const lowY = h - 4;
           ctx.moveTo(currentX, lowY);
 
           for (let i = 0; i < previewPulses.length; i++) {
             const isMark = (i % 2 === 0);
             const segWidth = Math.max(1.5, (previewPulses[i] / sliceUs) * (w - 4));
             const targetY = isMark ? highY : lowY;
-
             ctx.lineTo(currentX, targetY);
             ctx.lineTo(currentX + segWidth, targetY);
             currentX += segWidth;
@@ -2126,24 +2636,24 @@
       };
 
       // ========================================================================
-      // 4. QUẢN LÝ TRẠNG THÁI PHÒNG (ZERO-CLICK PERSISTENCE)
+      // 4. QUẢN LÝ TRẠNG THÁI PHÒNG & BỘ NHỚ LƯU SÓNG ĐIỀU KHIỂN (SAVED WAVES)
       // ========================================================================
       function createDefaultRooms() {
         return [
           {
             id: 'room_bedroom',
             name: '🛏️ Phòng ngủ',
-            brand: 'Daikin',
-            protocolVariant: 'REV-A',
+            brand: 'Casper',
+            protocolVariant: 'WAVE-GREE',
             power: true,
             mode: 'cool',
             temp: 25.0,
-            tempStep: 0.5,
+            tempStep: 1.0,
             fan: 'AUTO',
             swingV: 'AUTO',
             swingH: 'AUTO',
             energySavingLevel: 0,
-            features: { powerful: false, econo: true, quiet: true, sensor: false, moldProof: false, led: true },
+            features: { turbo: false, ifeel: false, xfan: false, led: true, sleep: false, eco: false },
             timerOnMinutes: 0,
             timerOffMinutes: 0,
             timerDeadlineMs: 0
@@ -2151,17 +2661,17 @@
           {
             id: 'room_living',
             name: '🛋️ Phòng khách',
-            brand: 'Casper',
-            protocolVariant: 'REV-A',
+            brand: 'Daikin',
+            protocolVariant: 'WAVE-DAIKIN3',
             power: true,
             mode: 'cool',
             temp: 24.0,
             tempStep: 0.5,
             fan: 'BẬC 3',
             swingV: 'AUTO',
-            swingH: 'GÓC RỘNG',
+            swingH: 'AUTO',
             energySavingLevel: 0,
-            features: { turbo: false, ifeel: true, xfan: true, led: true, sleep: false, eco: false },
+            features: { powerful: false, econo: true, quiet: false, sensor: false, moldProof: false, led: true },
             timerOnMinutes: 0,
             timerOffMinutes: 0,
             timerDeadlineMs: 0
@@ -2169,17 +2679,17 @@
           {
             id: 'room_study',
             name: '📚 Phòng học',
-            brand: 'LG',
-            protocolVariant: 'REV-A',
+            brand: 'Panasonic',
+            protocolVariant: 'WAVE-PANA',
             power: true,
             mode: 'cool',
             temp: 26.0,
-            tempStep: 1.0,
+            tempStep: 0.5,
             fan: 'QUIET',
-            swingV: 'CAO',
+            swingV: 'AUTO',
             swingH: 'GIỮA',
-            energySavingLevel: 2, // 60%
-            features: { jetCool: false, energySaving: true, comfortAir: true, ionizer: true, quiet: true, led: false },
+            energySavingLevel: 0,
+            features: { powerful: false, econo: true, quiet: true, sensor: false, moldProof: true, led: true },
             timerOnMinutes: 0,
             timerOffMinutes: 0,
             timerDeadlineMs: 0
@@ -2187,10 +2697,35 @@
         ];
       }
 
+      function createDefaultSavedWaves() {
+        return [
+          {
+            id: 'sw_casper_gree',
+            name: '❄️ Casper Chuẩn (Gree YBOF)',
+            brand: 'Casper',
+            protocolVariant: 'WAVE-GREE',
+            tempStep: 1.0,
+            customRaw: null
+          },
+          {
+            id: 'sw_casper_tcl',
+            name: '⚡ Casper Đời Mới (TCL 112)',
+            brand: 'Casper',
+            protocolVariant: 'WAVE-TCL112',
+            tempStep: 1.0,
+            customRaw: null
+          }
+        ];
+      }
+
       let appState = {
         activeRoomId: 'room_bedroom',
+        activeSavedWaveId: 'sw_casper_gree',
         beepEnabled: true,
+        signalBoost: true, // Mặc định bật Phát kép x2 giúp bắt sóng cực nhạy
+        multiFormatTimer: true,
         rooms: createDefaultRooms(),
+        savedWaves: createDefaultSavedWaves(),
         sleepCurve: {
           active: false,
           wakeLockEnabled: true,
@@ -2208,9 +2743,21 @@
           if (!raw) return;
           const parsed = JSON.parse(raw);
           if (parsed && Array.isArray(parsed.rooms) && parsed.rooms.length > 0) {
-            appState.rooms = parsed.rooms;
-            appState.activeRoomId = parsed.activeRoomId || parsed.rooms[0].id;
+            appState.rooms = parsed.rooms.map(r => {
+              // Nâng cấp mã REV-A..E cũ sang mã Sóng Đơn chuẩn mới
+              if (!r.protocolVariant || r.protocolVariant.startsWith('REV-')) {
+                r.protocolVariant = getDefaultWaveForBrand(r.brand);
+              }
+              return r;
+            });
+            appState.activeRoomId = parsed.activeRoomId || appState.rooms[0].id;
             appState.beepEnabled = parsed.beepEnabled !== false;
+            appState.signalBoost = parsed.signalBoost !== false;
+            appState.multiFormatTimer = parsed.multiFormatTimer !== false;
+            if (Array.isArray(parsed.savedWaves) && parsed.savedWaves.length > 0) {
+              appState.savedWaves = parsed.savedWaves;
+            }
+            appState.activeSavedWaveId = parsed.activeSavedWaveId || '';
             if (parsed.sleepCurve) {
               appState.sleepCurve = parsed.sleepCurve;
             }
@@ -2233,25 +2780,29 @@
         return r;
       }
 
-      function transmitCurrentRoomState(vibratePattern = 30, doubleBeep = false) {
+      function getWaveMeta(waveId) {
+        return IR_WAVE_CATALOG.find(w => w.id === waveId) || IR_WAVE_CATALOG[0];
+      }
+
+      function transmitCurrentRoomState(vibratePattern = 30, doubleBeep = false, lastAction = '', forceMultiTimer = false) {
         const room = getActiveRoom();
         saveState();
         renderAllUI();
-        const packet = IRProtocolEngine.encodeStateToPulses(room);
+        const packet = IRProtocolEngine.encodeStateToPulses(room, lastAction, forceMultiTimer);
         IRBridge.transmitPacket(packet, vibratePattern, doubleBeep);
       }
 
       // ========================================================================
-      // 5. RENDER GIAO DIỆN TRUNG TÂM, LCD & KHAY TÍNH NĂNG THEO HÃNG
+      // 5. RENDER GIAO DIỆN TRUNG TÂM, THANH SÓNG ĐÃ LƯU, LCD & KHAY TÍNH NĂNG
       // ========================================================================
       function applyModeAccentColors(mode, isPowerOn) {
         const root = document.documentElement;
         const palettes = {
-          cool: { accent: '#38bdf8', glow: 'rgba(56, 189, 248, 0.18)', border: 'rgba(56, 189, 248, 0.36)' },
-          heat: { accent: '#fb923c', glow: 'rgba(251, 146, 60, 0.18)', border: 'rgba(251, 146, 60, 0.36)' },
-          dry:  { accent: '#a78bfa', glow: 'rgba(167, 139, 250, 0.18)', border: 'rgba(167, 139, 250, 0.36)' },
-          fan:  { accent: '#34d399', glow: 'rgba(52, 211, 153, 0.18)', border: 'rgba(52, 211, 153, 0.36)' },
-          auto: { accent: '#2dd4bf', glow: 'rgba(45, 212, 191, 0.18)', border: 'rgba(45, 212, 191, 0.36)' }
+          cool: { accent: '#38bdf8', glow: 'rgba(56, 189, 248, 0.18)', border: 'rgba(56, 189, 248, 0.38)' },
+          heat: { accent: '#fb923c', glow: 'rgba(251, 146, 60, 0.18)', border: 'rgba(251, 146, 60, 0.38)' },
+          dry:  { accent: '#a78bfa', glow: 'rgba(167, 139, 250, 0.18)', border: 'rgba(167, 139, 250, 0.38)' },
+          fan:  { accent: '#34d399', glow: 'rgba(52, 211, 153, 0.18)', border: 'rgba(52, 211, 153, 0.38)' },
+          auto: { accent: '#2dd4bf', glow: 'rgba(45, 212, 191, 0.18)', border: 'rgba(45, 212, 191, 0.38)' }
         };
         const pal = palettes[mode] || palettes.cool;
         root.style.setProperty('--lcd-accent', pal.accent);
@@ -2270,7 +2821,7 @@
           btn.innerHTML = `
             <span class="room-power-dot ${rm.power ? 'on' : ''}"></span>
             <span>${rm.name}</span>
-            <span style="font-size: 10px; opacity: 0.7;">${rm.temp.toFixed(1)}°</span>
+            <span style="font-size: 10px; opacity: 0.72;">${Number(rm.temp).toFixed(1)}°</span>
           `;
           btn.addEventListener('click', () => {
             appState.activeRoomId = rm.id;
@@ -2281,30 +2832,66 @@
           container.appendChild(btn);
         });
 
-        // Nút thêm phòng mới nhanh
+        // Nút mở Modal thêm/đổi tên phòng (Hoạt động 100% trên APK, không dùng window.prompt)
         const addBtn = document.createElement('button');
         addBtn.type = 'button';
         addBtn.className = 'room-tab';
         addBtn.textContent = '＋ Phòng';
         addBtn.addEventListener('click', () => {
-          const name = window.prompt('Nhập tên phòng mới (VD: Phòng làm việc):', '🏢 Phòng làm việc');
-          if (!name || !name.trim()) return;
-          const newRoom = {
-            ...JSON.parse(JSON.stringify(getActiveRoom())),
-            id: 'room_' + Date.now(),
-            name: name.trim()
-          };
-          appState.rooms.push(newRoom);
-          appState.activeRoomId = newRoom.id;
-          saveState();
-          renderAllUI();
+          openSaveWaveModal(true);
         });
         container.appendChild(addBtn);
+      }
+
+      function renderSavedWavesStrip() {
+        const container = document.getElementById('savedWavesListContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const room = getActiveRoom();
+
+        if (!appState.savedWaves || appState.savedWaves.length === 0) {
+          const emptySpan = document.createElement('span');
+          emptySpan.style.cssText = 'font-size: 10.5px; color: var(--text-muted);';
+          emptySpan.textContent = 'Chưa có sóng lưu — Bấm "💾 Lưu sóng" để tạo nút 1 chạm';
+          container.appendChild(emptySpan);
+          return;
+        }
+
+        appState.savedWaves.forEach((sw) => {
+          const isCurrent = (room.brand === sw.brand && room.protocolVariant === sw.protocolVariant);
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = `saved-wave-chip ${isCurrent ? 'active' : ''}`;
+          chip.innerHTML = `
+            <span>${isCurrent ? '✅' : '📌'}</span>
+            <span>${sw.name}</span>
+          `;
+          chip.addEventListener('click', () => {
+            if (sw.customRaw) {
+              const parsed = IRProtocolEngine.parseCustomRawOrPronto(sw.customRaw);
+              if (parsed) {
+                IRBridge.transmitPacket(parsed, [40, 30, 60], true);
+                showToast(`🔥 Đã phát sóng đã lưu: ${sw.name}`);
+              }
+              return;
+            }
+            room.brand = sw.brand;
+            room.protocolVariant = sw.protocolVariant;
+            if (sw.tempStep) room.tempStep = sw.tempStep;
+            appState.activeSavedWaveId = sw.id;
+            room.power = true;
+            transmitCurrentRoomState([35, 30, 50], true, 'apply_saved_wave');
+            showToast(`✅ Đã nạp & phát sóng: ${sw.name}`);
+          });
+          container.appendChild(chip);
+        });
       }
 
       function renderLcdAndPrimaryControls() {
         const room = getActiveRoom();
         const lcd = document.getElementById('lcdScreen');
+        const waveMeta = getWaveMeta(room.protocolVariant);
 
         applyModeAccentColors(room.mode, room.power);
 
@@ -2316,7 +2903,10 @@
 
         document.getElementById('brandSelect').value = room.brand;
         document.getElementById('lcdRoomAndBrandText').textContent =
-          `${room.name.toUpperCase()} • ${room.brand.toUpperCase()} (${room.protocolVariant})`;
+          `${room.name.toUpperCase()} • ${room.brand.toUpperCase()}`;
+
+        const qBadge = document.getElementById('quickProtocolBadge');
+        if (qBadge) qBadge.textContent = waveMeta.shortBadge;
 
         // Mode Pills
         document.querySelectorAll('[data-mode-pill]').forEach(el => {
@@ -2356,7 +2946,15 @@
         // Active Feature Flags on LCD
         const flagsContainer = document.getElementById('lcdActiveFlagsContainer');
         flagsContainer.innerHTML = '';
-        const profile = BRAND_PROFILES[room.brand] || BRAND_PROFILES.Daikin;
+        const profile = BRAND_PROFILES[room.brand] || BRAND_PROFILES.Casper;
+
+        // Tag hiển thị loại sóng đang khóa
+        const waveTag = document.createElement('span');
+        waveTag.className = 'lcd-flag-tag';
+        waveTag.style.borderColor = 'rgba(52, 211, 153, 0.4)';
+        waveTag.style.color = '#6ee7b7';
+        waveTag.textContent = `📡 ${waveMeta.shortBadge}`;
+        flagsContainer.appendChild(waveTag);
 
         profile.features.forEach(feat => {
           if (room.features && room.features[feat.key]) {
@@ -2376,15 +2974,8 @@
           const scTag = document.createElement('span');
           scTag.className = 'lcd-flag-tag';
           scTag.style.color = '#fbbf24';
-          scTag.textContent = '🌙 SLEEP CURVE';
+          scTag.textContent = '🌙 GIẤC NGỦ ĐÊM';
           flagsContainer.appendChild(scTag);
-        }
-
-        if (flagsContainer.children.length === 0) {
-          const defaultTag = document.createElement('span');
-          defaultTag.style.color = 'var(--text-dim)';
-          defaultTag.textContent = room.power ? 'Chế độ tiêu chuẩn' : 'Đã tắt máy (Standby)';
-          flagsContainer.appendChild(defaultTag);
         }
 
         // Blind Mode Sync
@@ -2395,12 +2986,13 @@
 
       function renderDynamicBrandDrawer() {
         const room = getActiveRoom();
-        const profile = BRAND_PROFILES[room.brand] || BRAND_PROFILES.Daikin;
+        const profile = BRAND_PROFILES[room.brand] || BRAND_PROFILES.Casper;
+        const waveMeta = getWaveMeta(room.protocolVariant);
 
         document.getElementById('brandDrawerTitle').textContent =
-          `TÍNH NĂNG CHUYÊN BIỆT: ${room.brand.toUpperCase()}`;
+          `TÍNH NĂNG: ${room.brand.toUpperCase()}`;
         document.getElementById('protocolVariantBadge').textContent =
-          `PROTO: ${room.protocolVariant}`;
+          `SÓNG: ${waveMeta.shortBadge.toUpperCase()}`;
 
         const grid = document.getElementById('brandFeaturesGrid');
         grid.innerHTML = '';
@@ -2419,19 +3011,37 @@
 
           btn.innerHTML = `
             <span>${feat.label}</span>
-            <span style="font-size: 9.5px; opacity: 0.72; font-weight: 600;">${subText}</span>
+            <span style="font-size: 9px; opacity: 0.76; font-weight: 600;">${subText}</span>
           `;
 
           btn.addEventListener('click', () => {
             if (!room.features) room.features = {};
             if (feat.multiLevel) {
-              // Xoay vòng kiểm soát năng lượng: Off (0) -> 40% (1) -> 60% (2) -> 80% (3) -> Off
               room.energySavingLevel = ((Number(room.energySavingLevel) || 0) + 1) % 4;
               room.features[feat.key] = room.energySavingLevel > 0;
             } else {
               room.features[feat.key] = !room.features[feat.key];
             }
-            transmitCurrentRoomState(30, false);
+
+            // Đồng bộ trạng thái quạt nếu người dùng bật Turbo hoặc Quiet
+            if ((feat.key === 'turbo' || feat.key === 'powerful' || feat.key === 'jetCool') && room.features[feat.key]) {
+              room.fan = 'TURBO';
+              room.power = true;
+            } else if (feat.key === 'quiet' && room.features[feat.key]) {
+              room.fan = 'QUIET';
+              room.power = true;
+            }
+
+            const actionMap = {
+              led: 'toggle_led',
+              turbo: 'toggle_turbo',
+              powerful: 'toggle_turbo',
+              jetCool: 'toggle_turbo',
+              xfan: 'toggle_xfan'
+            };
+            const actionCode = actionMap[feat.key] || `toggle_${feat.key}`;
+            transmitCurrentRoomState(30, false, actionCode);
+            showToast(`${room.features[feat.key] ? '✅ Đã BẬT' : '⚪ Đã TẮT'} ${feat.label}`);
           });
 
           grid.appendChild(btn);
@@ -2440,22 +3050,36 @@
 
       function renderAllUI() {
         renderRoomTabs();
+        renderSavedWavesStrip();
         renderLcdAndPrimaryControls();
         renderDynamicBrandDrawer();
       }
 
       // ========================================================================
-      // 6. XỬ LÝ SỰ KIỆN NÚT BẤM TRUNG TÂM & VUỐT CHUYỂN PHÒNG TRÊN LCD
+      // 6. XỬ LÝ SỰ KIỆN NÚT BẤM TRUNG TÂM & TƯƠNG TÁC TRỰC TIẾP TRÊN MÀN HÌNH LCD
       // ========================================================================
       document.getElementById('brandSelect').addEventListener('change', (e) => {
         const room = getActiveRoom();
         room.brand = e.target.value;
+        room.protocolVariant = getDefaultWaveForBrand(room.brand);
         const profile = BRAND_PROFILES[room.brand];
         room.tempStep = profile && profile.halfDegree ? 0.5 : 1.0;
-        if (!profile.halfDegree) {
+        if (!profile || !profile.halfDegree) {
           room.temp = Math.round(room.temp);
         }
         transmitCurrentRoomState(30, false);
+        showToast(`Đã chọn hãng ${room.brand} (${getWaveMeta(room.protocolVariant).shortBadge})`);
+      });
+
+      document.getElementById('boostToggleBtn').addEventListener('click', () => {
+        appState.signalBoost = !appState.signalBoost;
+        const btn = document.getElementById('boostToggleBtn');
+        const txt = document.getElementById('boostIconText');
+        txt.textContent = appState.signalBoost ? '⚡ Sóng x2' : '⚡ Sóng x1';
+        btn.style.color = appState.signalBoost ? '#6ee7b7' : '#94a3b8';
+        btn.style.borderColor = appState.signalBoost ? 'rgba(52, 211, 153, 0.4)' : 'rgba(255,255,255,0.09)';
+        saveState();
+        showToast(appState.signalBoost ? '⚡ Đã BẬT phát kép x2 (Bắt sóng cực nhạy)' : 'Đã chuyển về phát đơn x1');
       });
 
       document.getElementById('beepToggleBtn').addEventListener('click', () => {
@@ -2468,21 +3092,22 @@
       document.getElementById('powerBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         room.power = !room.power;
-        transmitCurrentRoomState([45, 40, 65], true);
+        transmitCurrentRoomState([45, 40, 65], true, 'toggle_power');
+        showToast(room.power ? '🟢 Đã phát lệnh BẬT điều hòa' : '🔴 Đã phát lệnh TẮT điều hòa');
       });
 
       document.getElementById('tempUpBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         room.power = true;
         room.temp = Math.min(30.0, Number((room.temp + room.tempStep).toFixed(1)));
-        transmitCurrentRoomState(30, false);
+        transmitCurrentRoomState(30, false, 'temp_up');
       });
 
       document.getElementById('tempDownBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         room.power = true;
         room.temp = Math.max(16.0, Number((room.temp - room.tempStep).toFixed(1)));
-        transmitCurrentRoomState(30, false);
+        transmitCurrentRoomState(30, false, 'temp_down');
       });
 
       document.getElementById('tempStepModeToggle').addEventListener('click', () => {
@@ -2494,6 +3119,20 @@
         saveState();
         renderAllUI();
         triggerHapticAndLed(20);
+        showToast(`Bước nhảy nhiệt độ: ±${room.tempStep.toFixed(1)}°C`);
+      });
+
+      // Chạm trực tiếp vào các nút Mode (AUTO / COOL / DRY / FAN / HEAT) trên màn hình LCD
+      document.querySelectorAll('[data-mode-pill]').forEach((pill) => {
+        pill.addEventListener('click', () => {
+          const targetMode = pill.getAttribute('data-mode-pill');
+          if (!targetMode) return;
+          const room = getActiveRoom();
+          room.power = true;
+          room.mode = targetMode;
+          transmitCurrentRoomState(30, false, 'change_mode');
+          showToast(`Chế độ: ${targetMode.toUpperCase()}`);
+        });
       });
 
       document.getElementById('modeCycleBtn').addEventListener('click', () => {
@@ -2501,46 +3140,61 @@
         room.power = true;
         const nextIdx = (MODES.indexOf(room.mode) + 1) % MODES.length;
         room.mode = MODES[nextIdx];
-        transmitCurrentRoomState(30, false);
+        transmitCurrentRoomState(30, false, 'change_mode');
+        showToast(`Chế độ: ${room.mode.toUpperCase()}`);
       });
 
-      document.getElementById('fanCycleBtn').addEventListener('click', () => {
+      function cycleFanSpeed() {
         const room = getActiveRoom();
         room.power = true;
         const nextIdx = (FAN_SPEEDS.indexOf(room.fan) + 1) % FAN_SPEEDS.length;
         room.fan = FAN_SPEEDS[nextIdx];
-        transmitCurrentRoomState(30, false);
-      });
+        transmitCurrentRoomState(30, false, 'change_fan');
+        showToast(`🌀 Tốc độ quạt: ${room.fan}`);
+      }
 
-      document.getElementById('swingVCycleBtn').addEventListener('click', () => {
+      function cycleSwingV() {
         const room = getActiveRoom();
         room.power = true;
         const nextIdx = (SWING_V_MODES.indexOf(room.swingV) + 1) % SWING_V_MODES.length;
         room.swingV = SWING_V_MODES[nextIdx];
-        transmitCurrentRoomState(30, false);
-      });
+        transmitCurrentRoomState(30, false, 'toggle_swing_v');
+        showToast(`↕️ Đảo gió dọc: ${room.swingV}`);
+      }
 
-      document.getElementById('swingHCycleBtn').addEventListener('click', () => {
+      function cycleSwingH() {
         const room = getActiveRoom();
         room.power = true;
         const nextIdx = (SWING_H_MODES.indexOf(room.swingH) + 1) % SWING_H_MODES.length;
         room.swingH = SWING_H_MODES[nextIdx];
-        transmitCurrentRoomState(30, false);
+        transmitCurrentRoomState(30, false, 'toggle_swing_h');
+        showToast(`↔️ Đảo gió ngang: ${room.swingH}`);
+      }
+
+      document.getElementById('fanCycleBtn').addEventListener('click', cycleFanSpeed);
+      document.getElementById('lcdFanChipBtn').addEventListener('click', cycleFanSpeed);
+
+      document.getElementById('swingVCycleBtn').addEventListener('click', cycleSwingV);
+      document.getElementById('lcdSwingVChipBtn').addEventListener('click', cycleSwingV);
+
+      document.getElementById('swingHCycleBtn').addEventListener('click', cycleSwingH);
+      document.getElementById('lcdSwingHChipBtn').addEventListener('click', cycleSwingH);
+
+      document.getElementById('protocolVariantBadge').addEventListener('click', () => {
+        openWaveScannerModal();
       });
 
-      // Vuốt ngang (Swipe Left / Right) trên màn hình LCD để chuyển phòng
+      // Vuốt ngang trên LCD để chuyển phòng
       let lcdTouchStartX = 0;
       const lcdScreenEl = document.getElementById('lcdScreen');
       lcdScreenEl.addEventListener('touchstart', (e) => {
-        if (e.touches && e.touches[0]) {
-          lcdTouchStartX = e.touches[0].clientX;
-        }
+        if (e.touches && e.touches[0]) lcdTouchStartX = e.touches[0].clientX;
       }, { passive: true });
 
       lcdScreenEl.addEventListener('touchend', (e) => {
         if (!e.changedTouches || !e.changedTouches[0]) return;
         const deltaX = e.changedTouches[0].clientX - lcdTouchStartX;
-        if (Math.abs(deltaX) > 55 && appState.rooms.length > 1) {
+        if (Math.abs(deltaX) > 60 && appState.rooms.length > 1) {
           const curIdx = appState.rooms.findIndex(r => r.id === appState.activeRoomId);
           const nextIdx = deltaX < 0
             ? (curIdx + 1) % appState.rooms.length
@@ -2549,13 +3203,13 @@
           saveState();
           renderAllUI();
           triggerHapticAndLed(25);
+          showToast(`Chuyển sang: ${getActiveRoom().name}`);
         }
       }, { passive: true });
 
       // ========================================================================
       // 7. 3 NÚT KỊCH BẢN 1-CHẠM (1-TAP MACROS)
       // ========================================================================
-      // Macro 1: Làm lạnh Cấp tốc (Turbo Cool: Cool + 18°C + Quạt Max + Đảo gió)
       document.getElementById('macroTurboCoolBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         room.power = true;
@@ -2568,10 +3222,10 @@
         room.features.powerful = true;
         room.features.turbo = true;
         room.features.jetCool = true;
-        transmitCurrentRoomState([40, 30, 60], true);
+        transmitCurrentRoomState([40, 30, 60], true, 'macro_turbo');
+        showToast('❄️ Đã bật Làm lạnh nhanh: 18°C • Quạt Turbo');
       });
 
-      // Macro 2: Học tập / Tập trung (Cool + 26°C + Gió êm + Tắt đèn LED)
       document.getElementById('macroFocusStudyBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         room.power = true;
@@ -2581,33 +3235,37 @@
         room.swingV = 'CAO';
         if (!room.features) room.features = {};
         room.features.quiet = true;
-        room.features.comfortAir = true;
+        room.features.sleep = true;
         room.features.led = false;
         room.features.powerful = false;
         room.features.turbo = false;
-        transmitCurrentRoomState([35, 35], false);
+        transmitCurrentRoomState([35, 35], false, 'macro_sleep');
+        showToast('🌙 Đã bật Ngủ êm dịu: 26°C • Quiet • Tắt đèn');
       });
 
-      // Macro 3: Sấy khô chống mốc (Chạy quạt gió Fan + Hẹn tắt sau 15 phút)
       document.getElementById('macroAntiMoldBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         room.power = true;
         room.mode = 'fan';
         room.fan = 'BẬC 3';
-        room.timerOffMinutes = 15;
-        room.timerDeadlineMs = Date.now() + 15 * 60 * 1000;
+        room.timerOffMinutes = 30;
+        room.timerOnMinutes = 0;
+        room.timerDeadlineMs = Date.now() + 30 * 60 * 1000;
         if (!room.features) room.features = {};
         room.features.moldProof = true;
         room.features.xfan = true;
-        transmitCurrentRoomState([40, 40, 80], true);
+        updateScreenWakeLock();
+        transmitCurrentRoomState([40, 40, 80], true, 'activate_timer', true);
+        showToast('🛡️ Chạy quạt sấy dàn lạnh & Hẹn tắt sau 30 phút (🕒)');
       });
 
       // ========================================================================
-      // 8. HỆ THỐNG HẸN GIỜ KÉP (DUAL-MODE TIMER: HARDWARE IR & SLEEP CURVE)
+      // 8. HỆ THỐNG HẸN GIỜ KÉP (BẬT ĐỒNG HỒ 🕒 TRÊN MẶT ĐIỀU HÒA + WAKELOCK)
       // ========================================================================
       const timerModal = document.getElementById('timerModal');
       const hwOnSelect = document.getElementById('hwTimerOnSelect');
       const hwOffSelect = document.getElementById('hwTimerOffSelect');
+      const timerMultiCheck = document.getElementById('timerMultiFormatCheck');
 
       function populateTimerSelectOptions() {
         let htmlOn = '<option value="0">Không hẹn bật (Tắt)</option>';
@@ -2620,22 +3278,43 @@
         hwOnSelect.innerHTML = htmlOn;
         hwOffSelect.innerHTML = htmlOff;
       }
-
       populateTimerSelectOptions();
 
-      document.getElementById('openTimerModalBtn').addEventListener('click', () => {
+      function openTimerModal() {
         const room = getActiveRoom();
         hwOnSelect.value = String(room.timerOnMinutes || 0);
         hwOffSelect.value = String(room.timerOffMinutes || 0);
+        timerMultiCheck.checked = appState.multiFormatTimer !== false;
         renderSleepCurveModalUI();
         timerModal.classList.add('open');
-      });
+      }
+
+      document.getElementById('openTimerModalBtn').addEventListener('click', openTimerModal);
+      document.getElementById('lcdTimerBadgeBtn').addEventListener('click', openTimerModal);
 
       document.getElementById('closeTimerModalBtn').addEventListener('click', () => {
         timerModal.classList.remove('open');
       });
 
-      // Chuyển tab trong Modal Hẹn giờ
+      // Các nút chọn nhanh 0.5h, 1h, 2h, 3h... trong Modal Hẹn Giờ
+      document.querySelectorAll('[data-quick-off-mins]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mins = parseInt(btn.getAttribute('data-quick-off-mins'), 10) || 60;
+          hwOffSelect.value = String(mins);
+          hwOnSelect.value = '0';
+          const room = getActiveRoom();
+          room.power = true;
+          room.timerOffMinutes = mins;
+          room.timerOnMinutes = 0;
+          room.timerDeadlineMs = Date.now() + mins * 60 * 1000;
+          appState.multiFormatTimer = timerMultiCheck.checked;
+          updateScreenWakeLock();
+          transmitCurrentRoomState([50, 40, 80], true, 'activate_timer', appState.multiFormatTimer);
+          timerModal.classList.remove('open');
+          showToast(`🕒 Đã bắn lệnh Hẹn Tắt sau ${(mins / 60).toFixed(1)} giờ lên điều hòa!`);
+        });
+      });
+
       document.getElementById('tabBtnHwTimer').addEventListener('click', () => {
         document.getElementById('tabBtnHwTimer').classList.add('active');
         document.getElementById('tabBtnSleepCurve').classList.remove('active');
@@ -2650,20 +3329,29 @@
         document.getElementById('panelHwTimer').style.display = 'none';
       });
 
-      // Chế độ 1: Kích hoạt Hẹn giờ trên Bo mạch Điều hòa (Hardware IR Packet Timer)
       document.getElementById('activateHwTimerBtn').addEventListener('click', () => {
         const room = getActiveRoom();
         const onMins = parseInt(hwOnSelect.value, 10) || 0;
-        const offMins = parseInt(hwOffSelect.value, 10) || 0;
+        let offMins = parseInt(hwOffSelect.value, 10) || 0;
 
+        // Nếu người dùng chưa chọn giờ nào mà bấm Kích hoạt -> mặc định hẹn tắt 1.0 giờ (60 phút)
+        if (onMins === 0 && offMins === 0) {
+          offMins = 60;
+          hwOffSelect.value = '60';
+        }
+
+        room.power = true;
         room.timerOnMinutes = onMins;
         room.timerOffMinutes = offMins;
+        appState.multiFormatTimer = timerMultiCheck.checked;
 
         const activeMins = offMins > 0 ? offMins : onMins;
         room.timerDeadlineMs = activeMins > 0 ? (Date.now() + activeMins * 60 * 1000) : 0;
 
-        transmitCurrentRoomState([40, 40, 80], true);
+        updateScreenWakeLock();
+        transmitCurrentRoomState([50, 40, 80], true, 'activate_timer', appState.multiFormatTimer);
         timerModal.classList.remove('open');
+        showToast(`🕒 Đã phát gói tin Hẹn Giờ (${(activeMins / 60).toFixed(1)}h) lên mặt điều hòa!`);
       });
 
       document.getElementById('cancelHwTimerBtn').addEventListener('click', () => {
@@ -2673,20 +3361,24 @@
         room.timerDeadlineMs = 0;
         hwOnSelect.value = '0';
         hwOffSelect.value = '0';
-        transmitCurrentRoomState(40, false);
+        updateScreenWakeLock();
+        transmitCurrentRoomState(40, false, 'cancel_timer', appState.multiFormatTimer);
         timerModal.classList.remove('open');
+        showToast('Đã hủy Hẹn giờ trên điều hòa');
       });
 
-      // Chế độ 2: Hẹn giờ Đường cong Giấc ngủ (Smart Sleep Curve)
+      // Giữ thức màn hình (WakeLock) khi đang chạy Hẹn giờ hoặc Đường cong giấc ngủ
       let wakeLockSentinel = null;
-
       async function updateScreenWakeLock() {
         try {
-          if (appState.sleepCurve.active && appState.sleepCurve.wakeLockEnabled && 'wakeLock' in navigator) {
+          const room = getActiveRoom();
+          const hasActiveTimer = Boolean(room.timerDeadlineMs && room.timerDeadlineMs > Date.now());
+          const shouldLock = hasActiveTimer || (appState.sleepCurve.active && appState.sleepCurve.wakeLockEnabled);
+          if (shouldLock && 'wakeLock' in navigator) {
             if (!wakeLockSentinel) {
               wakeLockSentinel = await navigator.wakeLock.request('screen');
             }
-          } else if (wakeLockSentinel) {
+          } else if (!shouldLock && wakeLockSentinel) {
             await wakeLockSentinel.release();
             wakeLockSentinel = null;
           }
@@ -2704,7 +3396,7 @@
           row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 6px; background: #090d16; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border-subtle); font-size: 11px;';
 
           const desc = step.action === 'dry_coil_then_off'
-            ? 'Chạy Fan 10p sấy dàn lạnh -> Tắt máy'
+            ? 'Chạy Fan 30p sấy dàn lạnh -> Tắt máy'
             : `Đặt ${step.mode.toUpperCase()} • ${step.temp}°C • Quạt ${step.fan}`;
 
           row.innerHTML = `
@@ -2755,9 +3447,9 @@
           room.power = true;
           room.mode = 'fan';
           room.fan = 'BẬC 2';
-          room.timerOffMinutes = 10;
-          room.timerDeadlineMs = Date.now() + 10 * 60 * 1000;
-          transmitCurrentRoomState([50, 40, 90], true);
+          room.timerOffMinutes = 30;
+          room.timerDeadlineMs = Date.now() + 30 * 60 * 1000;
+          transmitCurrentRoomState([50, 40, 90], true, 'activate_timer', true);
         } else {
           room.power = true;
           room.mode = step.mode;
@@ -2771,20 +3463,20 @@
         }
       }
 
-      // Nút Chạy thử chuỗi Sleep Curve ngay lập tức (2 giây / mốc)
       document.getElementById('demoSleepCurveNowBtn').addEventListener('click', () => {
         timerModal.classList.remove('open');
         const steps = appState.sleepCurve.steps;
         steps.forEach((step, idx) => {
           setTimeout(() => {
             executeSleepCurveCheckpoint(step);
-          }, idx * 1800);
+          }, idx * 2000);
         });
       });
 
-      // Đồng hồ đếm ngược 1 giây cho cả Hardware Timer & Sleep Curve
+      // Đồng hồ đếm ngược 1 giây & Phát lệnh Tắt dự phòng 3 nhịp khi về 00:00:00
       setInterval(() => {
         const room = getActiveRoom();
+        const badgeBtn = document.getElementById('lcdTimerBadgeBtn');
         const countdownEl = document.getElementById('lcdTimerCountdownText');
 
         if (room.timerDeadlineMs && room.timerDeadlineMs > Date.now()) {
@@ -2793,21 +3485,28 @@
           const mm = String(Math.floor((remainSec % 3600) / 60)).padStart(2, '0');
           const ss = String(remainSec % 60).padStart(2, '0');
           const prefix = room.timerOffMinutes > 0 ? 'TẮT SAU' : 'BẬT SAU';
-          countdownEl.textContent = `⏱️ ${prefix}: ${hh}:${mm}:${ss}`;
+          badgeBtn.style.display = 'inline-flex';
+          countdownEl.textContent = `${prefix} ${hh}:${mm}:${ss}`;
         } else if (room.timerDeadlineMs && room.timerDeadlineMs <= Date.now()) {
-          // Hoàn tất đếm ngược
-          if (room.timerOffMinutes > 0) room.power = false;
-          else if (room.timerOnMinutes > 0) room.power = true;
+          const wasOffTimer = room.timerOffMinutes > 0;
+          room.power = !wasOffTimer;
           room.timerOnMinutes = 0;
           room.timerOffMinutes = 0;
           room.timerDeadlineMs = 0;
+          badgeBtn.style.display = 'none';
           countdownEl.textContent = '';
-          transmitCurrentRoomState([80, 50, 80], true);
+          updateScreenWakeLock();
+
+          // Phát liên tiếp 2 đợt lệnh Tắt/Bật dự phòng cách nhau 450ms để đảm bảo điều hòa tắt 100%
+          transmitCurrentRoomState([80, 50, 80], true, 'timer_expired');
+          setTimeout(() => {
+            transmitCurrentRoomState(40, false, 'timer_expired');
+          }, 480);
         } else {
+          badgeBtn.style.display = 'none';
           countdownEl.textContent = '';
         }
 
-        // Kiểm tra mốc giờ thực cho Smart Sleep Curve
         if (appState.sleepCurve.active) {
           const now = new Date();
           const curHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -2821,103 +3520,11 @@
       }, 1000);
 
       // ========================================================================
-      // 9. CHẾ ĐỘ ĐIỀU KHIỂN MÙ BAN ĐÊM (BLIND GESTURE MODE - OLED BLACK)
-      // ========================================================================
-      const blindOverlay = document.getElementById('blindGestureOverlay');
-      const blindFeedback = document.getElementById('blindModeFeedback');
-      let blindTouchStartY = 0;
-      let blindTouchStartTime = 0;
-      let blindLongPressTimer = null;
-      let blindLastTapTime = 0;
-      let blindGestureHandled = false;
-
-      document.getElementById('openBlindModeBtn').addEventListener('click', () => {
-        renderAllUI();
-        blindFeedback.textContent = 'Chế độ OLED Black đã bật';
-        blindOverlay.classList.add('open');
-        triggerHapticAndLed(30);
-      });
-
-      document.getElementById('exitBlindModeBtn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        blindOverlay.classList.remove('open');
-      });
-
-      blindOverlay.addEventListener('pointerdown', (e) => {
-        if (e.target.id === 'exitBlindModeBtn') return;
-        blindTouchStartY = e.clientY;
-        blindTouchStartTime = Date.now();
-        blindGestureHandled = false;
-
-        clearTimeout(blindLongPressTimer);
-        blindLongPressTimer = setTimeout(() => {
-          // Chạm giữ (Long Press >= 600ms): Kích hoạt ngay chế độ Ngủ đêm (27°C + Quiet + Tắt LED)
-          blindGestureHandled = true;
-          const room = getActiveRoom();
-          room.power = true;
-          room.mode = 'cool';
-          room.temp = 27.0;
-          room.fan = 'QUIET';
-          if (!room.features) room.features = {};
-          room.features.quiet = true;
-          room.features.led = false;
-          blindFeedback.textContent = '🌙 Đã bật Ngủ Đêm: 27.0°C • Quiet • Tắt LED';
-          transmitCurrentRoomState([60, 50, 60, 50, 140], true);
-        }, 600);
-      });
-
-      blindOverlay.addEventListener('pointerup', (e) => {
-        if (e.target.id === 'exitBlindModeBtn') return;
-        clearTimeout(blindLongPressTimer);
-        if (blindGestureHandled) return;
-
-        const deltaY = e.clientY - blindTouchStartY;
-        const now = Date.now();
-
-        // Kiểm tra Vuốt lên / Vuốt xuống
-        if (Math.abs(deltaY) > 45) {
-          const room = getActiveRoom();
-          room.power = true;
-          if (deltaY < 0) {
-            // Vuốt lên: Tăng 1°C (Rung 1 nhịp ngắn)
-            room.temp = Math.min(30.0, room.temp + 1.0);
-            blindFeedback.textContent = `⬆️ Tăng +1°C → ${room.temp.toFixed(1)}°C`;
-          } else {
-            // Vuốt xuống: Giảm 1°C (Rung 1 nhịp ngắn)
-            room.temp = Math.max(16.0, room.temp - 1.0);
-            blindFeedback.textContent = `⬇️ Giảm -1°C → ${room.temp.toFixed(1)}°C`;
-          }
-          transmitCurrentRoomState(45, false);
-          return;
-        }
-
-        // Kiểm tra Chạm đúp (Double Tap): Bật / Tắt nguồn (Rung 2 nhịp dài)
-        if (now - blindLastTapTime < 320) {
-          const room = getActiveRoom();
-          room.power = !room.power;
-          blindFeedback.textContent = room.power ? '⚡ Đã BẬT nguồn điều hòa' : '🌑 Đã TẮT nguồn điều hòa';
-          transmitCurrentRoomState([120, 80, 120], true);
-          blindLastTapTime = 0;
-        } else {
-          blindLastTapTime = now;
-        }
-      });
-
-      // ========================================================================
-      // 10. TRÌNH DÒ MÃ TỰ ĐỘNG (AUTO-SCANNER 1.5s) & CUSTOM RAW IR / PRONTO HEX
+      // 9. MODAL CHỌN SÓNG ĐƠN & DÒ MÃ TỰ ĐỘNG (WAVE SELECTOR & AUTO-SCANNER)
       // ========================================================================
       const scannerModal = document.getElementById('scannerModal');
       let autoScanInterval = null;
       let currentScanIndex = 0;
-
-      function updateScannerDisplay() {
-        const room = getActiveRoom();
-        const variant = PROTOCOL_VARIANTS[currentScanIndex] || PROTOCOL_VARIANTS[0];
-        document.getElementById('scannerCurrentBrandText').textContent = room.brand;
-        document.getElementById('scannerVariantDisplay').textContent = variant.name;
-        document.getElementById('scannerProgressText').textContent =
-          `Biến thể ${currentScanIndex + 1} / ${PROTOCOL_VARIANTS.length} • Chu kỳ 1.5s`;
-      }
 
       function stopAutoScanner() {
         if (autoScanInterval) {
@@ -2925,16 +3532,62 @@
           autoScanInterval = null;
         }
         const btn = document.getElementById('startStopAutoScanBtn');
-        if (btn) btn.textContent = '▶️ Bắt đầu Tự động Dò (1.5s / mã)';
+        if (btn) btn.textContent = '▶️ Tự Động Dò (2.0s/mã)';
       }
 
-      document.getElementById('openScannerModalBtn').addEventListener('click', () => {
-        stopAutoScanner();
+      function renderWaveSelectorList() {
+        const container = document.getElementById('waveListSelectorContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
         const room = getActiveRoom();
-        currentScanIndex = Math.max(0, PROTOCOL_VARIANTS.findIndex(v => v.id === room.protocolVariant));
-        updateScannerDisplay();
+        // Ưu tiên đưa các sóng thuộc hãng đang chọn lên đầu danh sách
+        const sortedWaves = IR_WAVE_CATALOG.slice().sort((a, b) => {
+          const aMatch = a.brands.includes(room.brand) ? 0 : 1;
+          const bMatch = b.brands.includes(room.brand) ? 0 : 1;
+          return aMatch - bMatch;
+        });
+
+        sortedWaves.forEach((wave) => {
+          const isSelected = room.protocolVariant === wave.id;
+          const isRecommended = wave.brands.includes(room.brand) && wave.id !== 'WAVE-MULTI';
+          const row = document.createElement('div');
+          row.className = `wave-option-row ${isSelected ? 'selected' : ''}`;
+          row.innerHTML = `
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 11.5px; font-weight: 800; color: ${isSelected ? '#38bdf8' : '#f1f5f9'}; display: flex; align-items: center; gap: 5px;">
+                <span>${isSelected ? '🟢' : '⚪'} ${wave.name}</span>
+              </div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                ${isRecommended ? '<b style="color:#34d399;">[Khuyên dùng cho ' + room.brand + ']</b> ' : ''}${wave.desc}
+              </div>
+            </div>
+            <button type="button" style="flex-shrink: 0; padding: 6px 10px; border-radius: 8px; background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 10.5px; font-weight: 800; cursor: pointer;">
+              Phát thử
+            </button>
+          `;
+
+          row.addEventListener('click', () => {
+            stopAutoScanner();
+            room.protocolVariant = wave.id;
+            room.power = true;
+            transmitCurrentRoomState(35, true, 'test_wave');
+            renderWaveSelectorList();
+            document.getElementById('scannerProgressText').textContent =
+              `Đang phát thử: ${wave.shortBadge} — Nếu điều hòa kêu Bíp, hãy bấm "💾 Lưu Sóng Đang Chọn!"`;
+          });
+
+          container.appendChild(row);
+        });
+      }
+
+      function openWaveScannerModal() {
+        stopAutoScanner();
+        renderWaveSelectorList();
         scannerModal.classList.add('open');
-      });
+      }
+
+      document.getElementById('openScannerModalBtn').addEventListener('click', openWaveScannerModal);
 
       document.getElementById('closeScannerModalBtn').addEventListener('click', () => {
         stopAutoScanner();
@@ -2948,40 +3601,200 @@
         }
 
         const btn = document.getElementById('startStopAutoScanBtn');
-        btn.textContent = '⏸️ Đang phát thử mỗi 1.5s... (Bấm để dừng)';
+        btn.textContent = '⏸️ Đang dò 2.0s/sóng... (Bấm để dừng)';
 
-        const fireCurrentScanStep = () => {
+        const fireStep = () => {
           const room = getActiveRoom();
-          const variant = PROTOCOL_VARIANTS[currentScanIndex];
-          room.protocolVariant = variant.id;
+          const wave = IR_WAVE_CATALOG[currentScanIndex];
+          room.protocolVariant = wave.id;
           room.power = true;
-          updateScannerDisplay();
-          transmitCurrentRoomState(35, false);
+          renderWaveSelectorList();
+          document.getElementById('scannerProgressText').textContent =
+            `Đang thử (${currentScanIndex + 1}/${IR_WAVE_CATALOG.length}): ${wave.shortBadge}`;
+          transmitCurrentRoomState(35, false, 'auto_scan');
         };
 
-        fireCurrentScanStep();
+        currentScanIndex = 0;
+        fireStep();
         autoScanInterval = setInterval(() => {
-          currentScanIndex = (currentScanIndex + 1) % PROTOCOL_VARIANTS.length;
-          fireCurrentScanStep();
-        }, 1500);
+          currentScanIndex = (currentScanIndex + 1) % IR_WAVE_CATALOG.length;
+          fireStep();
+        }, 2000);
       });
 
-      document.getElementById('lockScannedProtocolBtn').addEventListener('click', () => {
+      document.getElementById('saveScannedWaveBtn').addEventListener('click', () => {
         stopAutoScanner();
+        scannerModal.classList.remove('open');
+        openSaveWaveModal(false);
+      });
+
+      // Nút đổi nhanh sóng trên thanh trạng thái
+      document.getElementById('quickCycleProtocolBtn').addEventListener('click', () => {
         const room = getActiveRoom();
-        const variant = PROTOCOL_VARIANTS[currentScanIndex] || PROTOCOL_VARIANTS[0];
-        room.protocolVariant = variant.id;
+        // Lọc các sóng phù hợp với hãng hiện tại
+        const brandWaves = IR_WAVE_CATALOG.filter(w => w.brands.includes(room.brand));
+        const pool = brandWaves.length > 0 ? brandWaves : IR_WAVE_CATALOG;
+        const idx = pool.findIndex(w => w.id === room.protocolVariant);
+        const nextWave = pool[(idx + 1) % pool.length];
+        room.protocolVariant = nextWave.id;
+        transmitCurrentRoomState(35, true, 'quick_cycle_wave');
+        showToast(`📡 Đổi sang: ${nextWave.shortBadge}`);
+      });
+
+      // ========================================================================
+      // 10. MODAL LƯU SÓNG ĐIỀU KHIỂN 1-CHẠM & QUẢN LÝ PHÒNG (KHÔNG DÙNG PROMPT)
+      // ========================================================================
+      const saveWaveModal = document.getElementById('saveWaveModal');
+      const customWaveNameInput = document.getElementById('customWaveNameInput');
+      const customRoomNameInput = document.getElementById('customRoomNameInput');
+
+      function renderSavedWavesManagerList() {
+        const listEl = document.getElementById('savedWavesManagerList');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        if (!appState.savedWaves || appState.savedWaves.length === 0) {
+          listEl.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 10px;">Chưa có sóng nào được lưu.</div>';
+          return;
+        }
+
+        const room = getActiveRoom();
+
+        appState.savedWaves.forEach((sw) => {
+          const waveMeta = getWaveMeta(sw.protocolVariant);
+          const row = document.createElement('div');
+          row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 8px 10px; border-radius: 10px; background: #090d16; border: 1px solid var(--border-subtle);';
+          row.innerHTML = `
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 12px; font-weight: 800; color: #a7f3d0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${sw.name}
+              </div>
+              <div style="font-size: 10px; color: var(--text-muted);">
+                Hãng: <b>${sw.brand}</b> • Sóng: <b>${sw.customRaw ? 'Raw IR Riêng' : waveMeta.shortBadge}</b>
+              </div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+              <button type="button" data-use-sw="${sw.id}" style="padding: 5px 9px; border-radius: 7px; background: rgba(16, 185, 129, 0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 10.5px; font-weight: 800; cursor: pointer;">
+                Dùng ngay
+              </button>
+              <button type="button" data-del-sw="${sw.id}" style="padding: 5px 8px; border-radius: 7px; background: rgba(239, 68, 68, 0.16); border: 1px solid rgba(248, 113, 113, 0.35); color: #fca5a5; font-size: 10.5px; font-weight: 800; cursor: pointer;">
+                Xóa
+              </button>
+            </div>
+          `;
+
+          row.querySelector('[data-use-sw]').addEventListener('click', () => {
+            room.brand = sw.brand;
+            room.protocolVariant = sw.protocolVariant;
+            if (sw.tempStep) room.tempStep = sw.tempStep;
+            appState.activeSavedWaveId = sw.id;
+            room.power = true;
+            transmitCurrentRoomState([35, 30, 50], true, 'apply_saved_wave');
+            saveWaveModal.classList.remove('open');
+            showToast(`✅ Đã chọn sóng: ${sw.name}`);
+          });
+
+          row.querySelector('[data-del-sw]').addEventListener('click', () => {
+            appState.savedWaves = appState.savedWaves.filter(item => item.id !== sw.id);
+            saveState();
+            renderSavedWavesManagerList();
+            renderAllUI();
+            showToast('🗑️ Đã xóa sóng khỏi bộ nhớ');
+          });
+
+          listEl.appendChild(row);
+        });
+      }
+
+      function openSaveWaveModal(focusRoomInput = false) {
+        const room = getActiveRoom();
+        const waveMeta = getWaveMeta(room.protocolVariant);
+        document.getElementById('saveModalCurrentWaveInfo').textContent =
+          `${room.brand} • ${waveMeta.shortBadge}`;
+        customWaveNameInput.value = `${room.brand} - ${room.name.replace(/^[^\w\u00C0-\u1EF9]+/, '')} (${waveMeta.shortBadge})`;
+        customRoomNameInput.value = room.name;
+        renderSavedWavesManagerList();
+        saveWaveModal.classList.add('open');
+        setTimeout(() => {
+          if (focusRoomInput) customRoomNameInput.focus();
+          else customWaveNameInput.focus();
+        }, 80);
+      }
+
+      document.getElementById('openSaveWaveModalBtn').addEventListener('click', () => openSaveWaveModal(false));
+      document.getElementById('openSavedWavesManagerBtn').addEventListener('click', () => openSaveWaveModal(false));
+
+      document.getElementById('closeSaveWaveModalBtn').addEventListener('click', () => {
+        saveWaveModal.classList.remove('open');
+      });
+
+      document.querySelectorAll('.suggest-name-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const room = getActiveRoom();
+          const waveMeta = getWaveMeta(room.protocolVariant);
+          customWaveNameInput.value = `${btn.getAttribute('data-suggest-name')} (${waveMeta.shortBadge})`;
+        });
+      });
+
+      document.getElementById('confirmSaveWaveBtn').addEventListener('click', () => {
+        const room = getActiveRoom();
+        const waveMeta = getWaveMeta(room.protocolVariant);
+        const name = (customWaveNameInput.value || '').trim() || `❄️ ${room.brand} (${waveMeta.shortBadge})`;
+
+        const newSaved = {
+          id: 'sw_' + Date.now(),
+          name,
+          brand: room.brand,
+          protocolVariant: room.protocolVariant,
+          tempStep: room.tempStep,
+          customRaw: null
+        };
+
+        appState.savedWaves.unshift(newSaved);
+        appState.activeSavedWaveId = newSaved.id;
+        saveState();
+        renderSavedWavesManagerList();
+        renderAllUI();
+        triggerHapticAndLed([40, 30, 60]);
+        saveWaveModal.classList.remove('open');
+        showToast(`💾 Đã lưu "${name}" vào thanh 1-chạm!`);
+      });
+
+      // Đổi tên phòng hoặc Thêm phòng mới ngay trong Modal (tương thích 100% Android WebView)
+      document.getElementById('renameCurrentRoomBtn').addEventListener('click', () => {
+        const val = (customRoomNameInput.value || '').trim();
+        if (!val) return;
+        const room = getActiveRoom();
+        room.name = val;
         saveState();
         renderAllUI();
-        triggerHapticAndLed([50, 40, 80]);
-        scannerModal.classList.remove('open');
+        saveWaveModal.classList.remove('open');
+        showToast(`✅ Đã đổi tên phòng thành: ${val}`);
       });
 
-      // Modal Nạp mã Raw IR / Pronto Hex
+      document.getElementById('addNewRoomModalBtn').addEventListener('click', () => {
+        const val = (customRoomNameInput.value || '').trim() || `🏠 Phòng ${appState.rooms.length + 1}`;
+        const newRoom = {
+          ...JSON.parse(JSON.stringify(getActiveRoom())),
+          id: 'room_' + Date.now(),
+          name: val
+        };
+        appState.rooms.push(newRoom);
+        appState.activeRoomId = newRoom.id;
+        saveState();
+        renderAllUI();
+        saveWaveModal.classList.remove('open');
+        showToast(`✅ Đã thêm phòng mới: ${val}`);
+      });
+
+      // ========================================================================
+      // 11. MODAL NẠP MÃ RAW IR / PRONTO HEX & CHẾ ĐỘ ĐIỀU KHIỂN MÙ BAN ĐÊM
+      // ========================================================================
       const rawIrModal = document.getElementById('rawIrModal');
       const rawIrTextarea = document.getElementById('rawIrInputTextarea');
 
-      document.getElementById('openRawIrModalBtn').addEventListener('click', () => {
+      document.getElementById('openRawIrFromSaveModalBtn').addEventListener('click', () => {
+        saveWaveModal.classList.remove('open');
         if (!rawIrTextarea.value.trim()) {
           const packet = IRProtocolEngine.encodeStateToPulses(getActiveRoom());
           rawIrTextarea.value = packet.pulses.slice(0, 48).join(', ');
@@ -3001,39 +3814,113 @@
       document.getElementById('fireCustomRawIrBtn').addEventListener('click', () => {
         const parsed = IRProtocolEngine.parseCustomRawOrPronto(rawIrTextarea.value);
         if (!parsed) {
-          alert('Dữ liệu xung hoặc Pronto Hex không hợp lệ! Hãy nhập ít nhất 4 giá trị xung.');
+          showToast('⚠️ Chuỗi xung Raw / Pronto Hex chưa hợp lệ!');
           return;
         }
         IRBridge.transmitPacket(parsed, [40, 30, 60], true);
         rawIrModal.classList.remove('open');
+        showToast('🔥 Đã phát chuỗi xung Raw IR tùy chỉnh!');
       });
 
-      // Nút chuyển nhanh Đời mã hồng ngoại (REV-A..REV-E) ngay trên thanh trạng thái
-      document.getElementById('quickCycleProtocolBtn').addEventListener('click', () => {
-        const room = getActiveRoom();
-        const idx = PROTOCOL_VARIANTS.findIndex(v => v.id === room.protocolVariant);
-        const nextVar = PROTOCOL_VARIANTS[(idx + 1) % PROTOCOL_VARIANTS.length];
-        room.protocolVariant = nextVar.id;
-        const qBadge = document.getElementById('quickProtocolBadge');
-        if (qBadge) qBadge.textContent = nextVar.badge || nextVar.id;
-        transmitCurrentRoomState(35, true);
+      // Chế độ Điều khiển mù ban đêm (Blind Gesture Mode - OLED Pure Black)
+      const blindOverlay = document.getElementById('blindGestureOverlay');
+      const blindFeedback = document.getElementById('blindModeFeedback');
+      let blindTouchStartY = 0;
+      let blindLongPressTimer = null;
+      let blindLastTapTime = 0;
+      let blindGestureHandled = false;
+
+      document.getElementById('openBlindModeBtn').addEventListener('click', () => {
+        renderAllUI();
+        blindFeedback.textContent = 'Chế độ OLED Black đã bật';
+        blindOverlay.classList.add('open');
+        triggerHapticAndLed(30);
+      });
+
+      document.getElementById('exitBlindModeBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        blindOverlay.classList.remove('open');
+      });
+
+      blindOverlay.addEventListener('pointerdown', (e) => {
+        if (e.target.id === 'exitBlindModeBtn') return;
+        blindTouchStartY = e.clientY;
+        blindGestureHandled = false;
+
+        clearTimeout(blindLongPressTimer);
+        blindLongPressTimer = setTimeout(() => {
+          blindGestureHandled = true;
+          const room = getActiveRoom();
+          room.power = true;
+          room.mode = 'cool';
+          room.temp = 27.0;
+          room.fan = 'QUIET';
+          if (!room.features) room.features = {};
+          room.features.quiet = true;
+          room.features.sleep = true;
+          room.features.led = false;
+          blindFeedback.textContent = '🌙 Đã bật Ngủ Đêm: 27.0°C • Quiet • Tắt LED';
+          transmitCurrentRoomState([60, 50, 60, 50, 140], true, 'blind_sleep');
+        }, 600);
+      });
+
+      blindOverlay.addEventListener('pointerup', (e) => {
+        if (e.target.id === 'exitBlindModeBtn') return;
+        clearTimeout(blindLongPressTimer);
+        if (blindGestureHandled) return;
+
+        const deltaY = e.clientY - blindTouchStartY;
+        const now = Date.now();
+
+        if (Math.abs(deltaY) > 45) {
+          const room = getActiveRoom();
+          room.power = true;
+          if (deltaY < 0) {
+            room.temp = Math.min(30.0, room.temp + 1.0);
+            blindFeedback.textContent = `⬆️ Tăng +1°C → ${room.temp.toFixed(1)}°C`;
+          } else {
+            room.temp = Math.max(16.0, room.temp - 1.0);
+            blindFeedback.textContent = `⬇️ Giảm -1°C → ${room.temp.toFixed(1)}°C`;
+          }
+          transmitCurrentRoomState(45, false, 'blind_temp');
+          return;
+        }
+
+        if (now - blindLastTapTime < 320) {
+          const room = getActiveRoom();
+          room.power = !room.power;
+          blindFeedback.textContent = room.power ? '⚡ Đã BẬT nguồn điều hòa' : '🌑 Đã TẮT nguồn điều hòa';
+          transmitCurrentRoomState([120, 80, 120], true, 'blind_power');
+          blindLastTapTime = 0;
+        } else {
+          blindLastTapTime = now;
+        }
+      });
+
+      // Đóng các modal khi bấm ra vùng nền tối bên ngoài
+      [timerModal, scannerModal, saveWaveModal, rawIrModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            stopAutoScanner();
+            modal.classList.remove('open');
+          }
+        });
       });
 
       // ========================================================================
-      // 11. KHỞI CHẠY TỨC THÌ (ZERO-CLICK LAUNCH < 0.1s)
+      // 12. KHỞI CHẠY TỨC THÌ (ZERO-CLICK LAUNCH < 0.1s)
       // ========================================================================
       loadState();
       document.getElementById('beepIconText').textContent = appState.beepEnabled ? '🔊 Bíp' : '🔇 Tắt bíp';
+      document.getElementById('boostIconText').textContent = appState.signalBoost ? '⚡ Sóng x2' : '⚡ Sóng x1';
       updateHardwareDiagnosticBanner();
       renderAllUI();
-      const activeVar = PROTOCOL_VARIANTS.find(v => v.id === getActiveRoom().protocolVariant) || PROTOCOL_VARIANTS[0];
-      const qBadgeInit = document.getElementById('quickProtocolBadge');
-      if (qBadgeInit) qBadgeInit.textContent = activeVar.badge || activeVar.id;
-      // Khởi tạo sẵn đồ thị xung của trạng thái hiện tại trên thanh Oscilloscope
+
       const initialPacket = IRProtocolEngine.encodeStateToPulses(getActiveRoom());
       IRBridge.renderDebugOscilloscope(
         initialPacket,
-        Boolean(window.AndroidIR && typeof window.AndroidIR.transmit === 'function')
+        Boolean(window.AndroidIR && typeof window.AndroidIR.transmit === 'function'),
+        1
       );
     })();
   </script>
