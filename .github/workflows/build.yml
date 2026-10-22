@@ -152,6 +152,7 @@ jobs:
             '                    public void run() {',
             '                        try {',
             '                            consumerIr.transmit(safeFreq, pattern);',
+            '                            Thread.sleep(50);',
             '                        } catch (Exception e) {',
             '                            e.printStackTrace();',
             '                        }',
