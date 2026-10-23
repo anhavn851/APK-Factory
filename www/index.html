@@ -3394,6 +3394,9 @@ class NeuroSleepApp {
         const now = Date.now();
         if (now - this.lastOledTapTime < 350) {
           this.exitOledOverlay();
+        } else if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          // Nếu chạm 1 lần khi chưa ẩn thanh sóng SIM/giờ, tự động kích hoạt lại Fullscreen
+          this.requestImmersiveFullscreen();
         }
         this.lastOledTapTime = now;
       });
@@ -3740,6 +3743,9 @@ class NeuroSleepApp {
    * =========================================================================
    */
   async startSleepSession(resumedData = null) {
+    // Gọi ngay Fullscreen đồng bộ trong sự kiện chạm của người dùng để ẩn thanh giờ & sóng SIM
+    this.requestImmersiveFullscreen();
+
     // Khởi tạo AudioContext, 1Hz Keep-Alive & Microphone
     await this.audioEngine.ensureAudioContext();
     await this.audioEngine.startUnkillableKeepAlive();
@@ -4019,11 +4025,38 @@ class NeuroSleepApp {
     }
   }
 
+  /**
+   * Ẩn hoàn toàn thanh trạng thái hệ thống (Giờ, Sóng SIM, Pin) & thanh điều hướng
+   */
+  requestImmersiveFullscreen() {
+    const docEl = document.documentElement;
+    try {
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) {
+        docEl.msRequestFullscreen();
+      }
+    } catch (e) {}
+  }
+
+  exitImmersiveFullscreen() {
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    } catch (e) {}
+  }
+
   enterOledOverlay() {
     const overlay = document.getElementById('oled-overlay');
     if (!overlay) return;
     overlay.classList.remove('hidden');
     this.isOledActive = true;
+    this.requestImmersiveFullscreen();
     this.updateOledClockAndStatus();
 
     // Dịch chuyển vị trí nhẹ mỗi 5 phút (300.000ms) để chống lưu ảnh OLED (burn-in)
@@ -4038,6 +4071,7 @@ class NeuroSleepApp {
     if (!overlay) return;
     overlay.classList.add('hidden');
     this.isOledActive = false;
+    this.exitImmersiveFullscreen();
     if (this.oledBurnInInterval) {
       clearInterval(this.oledBurnInInterval);
       this.oledBurnInInterval = null;
